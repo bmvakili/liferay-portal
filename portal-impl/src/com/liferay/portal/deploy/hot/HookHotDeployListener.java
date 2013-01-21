@@ -257,7 +257,8 @@ public class HookHotDeployListener
 		"users.full.name.validator", "users.image.max.height",
 		"users.image.max.width", "users.screen.name.always.autogenerate",
 		"users.screen.name.generator", "users.screen.name.validator",
-		"value.object.listener.*"
+		"value.object.listener.*", "wiki.formats.*", "wiki.importers.*",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.wiki.edit.*.jsp"
 	};
 
 	public HookHotDeployListener() {
