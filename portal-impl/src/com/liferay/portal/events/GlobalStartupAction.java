@@ -49,8 +49,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jamwiki.Environment;
-
 /**
  * @author Brian Wing Shun Chan
  */
@@ -250,17 +248,6 @@ public class GlobalStartupAction extends SimpleAction {
 		// Authentication
 
 		AuthPublicPathRegistry.register(PropsValues.AUTH_PUBLIC_PATHS);
-
-		// JAMWiki
-
-		try {
-			String tmpDir = SystemProperties.get(SystemProperties.TMP_DIR);
-
-			Environment.setValue(Environment.PROP_BASE_FILE_DIR, tmpDir);
-		}
-		catch (Throwable t) {
-			_log.error(t);
-		}
 
 		// Javadoc
 

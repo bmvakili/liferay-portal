@@ -1,7 +1,7 @@
 <!--
 <!DOCTYPE hook PUBLIC
-	"-//Liferay//DTD Hook 6.2.0//EN"
-	"http://www.liferay.com/dtd/liferay-hook_6_2_0.dtd">
+	"-//Liferay//DTD Hook 6.1.0//EN"
+	"http://www.liferay.com/dtd/liferay-hook_6_1_0.dtd">
 -->
 
 <!ELEMENT hook (portal-properties?, language-properties*, custom-jsp-dir?,
@@ -32,7 +32,6 @@ captcha.engine.impl
 com.liferay.portal.servlet.filters.*Filter
 company.default.locale
 company.default.time.zone
-company.settings.form.authentication
 company.settings.form.configuration
 company.settings.form.identification
 company.settings.form.miscellaneous
@@ -45,7 +44,6 @@ dl.repository.impl
 dl.store.antivirus.impl
 dl.store.impl
 dockbar.add.portlets
-editor.wysiwyg.portal-web.docroot.html.portlet.wiki.edit.*
 field.enable.com.liferay.portal.model.Contact.birthday
 field.enable.com.liferay.portal.model.Contact.male
 field.enable.com.liferay.portal.model.Organization.status
@@ -62,9 +60,11 @@ layout.template.cache.enabled
 layout.types
 layout.user.private.layouts.auto.create
 layout.user.private.layouts.enabled
+layout.user.private.layouts.modifiable
 layout.user.private.layouts.power.user.required
 layout.user.public.layouts.auto.create
 layout.user.public.layouts.enabled
+layout.user.public.layouts.modifiable
 layout.user.public.layouts.power.user.required
 ldap.attrs.transformer.impl
 locales
@@ -73,8 +73,6 @@ lock.listeners
 login.create.account.allow.custom.password
 login.events.post
 login.events.pre
-login.form.navigation.post
-login.form.navigation.pre
 logout.events.post
 logout.events.pre
 mail.hook.impl
@@ -94,7 +92,6 @@ phone.number.format.usa.regexp
 portlet.add.default.resource.check.enabled
 portlet.add.default.resource.check.whitelist
 portlet.add.default.resource.check.whitelist.actions
-rss.feeds.enabled
 sanitizer.impl
 servlet.session.create.events
 servlet.session.destroy.events
@@ -142,7 +139,6 @@ users.screen.name.generator
 users.screen.name.validator
 value.object.listener.*
 wiki.formats.*
-wiki.importers.*
 </pre>
 -->
 <!ELEMENT portal-properties (#PCDATA)>

@@ -1952,6 +1952,21 @@ public class HookHotDeployListener
 			ScreenNameValidatorFactory.setInstance(screenNameValidator);
 		}
 
+                if (portalProperties.containsKey(
+                                PropsKeys.USERS_SCREEN_NAME_VALIDATOR)) {
+
+                        String screenNameValidatorClassName = portalProperties.getProperty(
+                                PropsKeys.USERS_SCREEN_NAME_VALIDATOR);
+
+                        ScreenNameValidator screenNameValidator =
+                                (ScreenNameValidator)newInstance(
+                                        portletClassLoader, ScreenNameValidator.class,
+                                        screenNameValidatorClassName);
+
+                        ScreenNameValidatorFactory.setInstance(screenNameValidator);
+                }
+
+
 		Set<String> liferayFilterClassNames =
 			LiferayFilterTracker.getClassNames();
 

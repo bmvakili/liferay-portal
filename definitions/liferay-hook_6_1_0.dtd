@@ -44,6 +44,7 @@ dl.repository.impl
 dl.store.antivirus.impl
 dl.store.impl
 dockbar.add.portlets
+editor.wysiwyg.portal-web.docroot.html.portlet.wiki.edit.*
 field.enable.com.liferay.portal.model.Contact.birthday
 field.enable.com.liferay.portal.model.Contact.male
 field.enable.com.liferay.portal.model.Organization.status
@@ -138,6 +139,8 @@ users.screen.name.always.autogenerate
 users.screen.name.generator
 users.screen.name.validator
 value.object.listener.*
+wiki.formats.*
+wiki.importers.*
 </pre>
 -->
 <!ELEMENT portal-properties (#PCDATA)>
