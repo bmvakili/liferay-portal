@@ -74,6 +74,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
+import com.liferay.portal.kernel.util.InstancePool;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
@@ -146,9 +147,11 @@ import com.liferay.portlet.documentlibrary.store.Store;
 import com.liferay.portlet.documentlibrary.store.StoreFactory;
 import com.liferay.portlet.documentlibrary.util.DLProcessor;
 import com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil;
+import com.liferay.portlet.wiki.engines.WikiEngine;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -204,6 +207,7 @@ public class HookHotDeployListener
 		"dl.file.entry.open.in.ms.office.manual.check.in.required",
 		"dl.file.entry.processors", "dl.repository.impl",
 		"dl.store.antivirus.impl", "dl.store.impl", "dockbar.add.portlets",
+		"editor.wysiwyg.portal-web.docroot.html.portlet.wiki.edit.*",
 		"field.enable.com.liferay.portal.model.Contact.birthday",
 		"field.enable.com.liferay.portal.model.Contact.male",
 		"field.enable.com.liferay.portal.model.Organization.status",
@@ -1953,17 +1957,43 @@ public class HookHotDeployListener
 		}
 
                 if (portalProperties.containsKey(
-                                PropsKeys.USERS_SCREEN_NAME_VALIDATOR)) {
+                                PropsKeys.WIKI_FORMATS)) {
 
-                        String screenNameValidatorClassName = portalProperties.getProperty(
-                                PropsKeys.USERS_SCREEN_NAME_VALIDATOR);
+			String[] wikiFormats = StringUtil.split(
+				portalProperties.getProperty(PropsKeys.WIKI_FORMATS));
+                                	
+			for (String wikiFormat : wikiFormats) {
+				String wikiEngineClassName = PropsUtil.get(
+					PropsKeys.WIKI_FORMATS_ENGINE, new com.liferay.portal.kernel.configuration.Filter(wikiFormat));
 
-                        ScreenNameValidator screenNameValidator =
-                                (ScreenNameValidator)newInstance(
-                                        portletClassLoader, ScreenNameValidator.class,
-                                        screenNameValidatorClassName);
+				if (wikiEngineClassName == null) {
+					_log.error("No engine for " + wikiFormat + " specified.");
+					continue;
+				}
 
-                        ScreenNameValidatorFactory.setInstance(screenNameValidator);
+				String wikiFormatsEditPage = PropsUtil.get(
+					PropsKeys.WIKI_FORMATS_EDIT_PAGE, new com.liferay.portal.kernel.configuration.Filter(wikiFormat));
+
+				try {
+					WikiEngine wikiEngine = (WikiEngine)InstancePool.get(wikiEngineClassName);
+
+					wikiEngine.setMainConfiguration(
+						_readConfigurationFile(
+							PropsKeys.WIKI_FORMATS_CONFIGURATION_MAIN, wikiFormat));
+
+					wikiEngine.setInterWikiConfiguration(
+						_readConfigurationFile(
+							PropsKeys.WIKI_FORMATS_CONFIGURATION_INTERWIKI,
+							wikiFormat));
+
+					InstancePool.put(wikiEngineClassName, wikiEngine);
+
+				} catch (Exception e) {
+					_log.error(e);
+				}
+
+			}
+
                 }
 
 
@@ -1996,6 +2026,23 @@ public class HookHotDeployListener
 				unfilteredPortalProperties);
 		}
 	}
+
+        private String _readConfigurationFile(String propertyName, String format)
+                throws IOException {
+
+                ClassLoader classLoader = getClass().getClassLoader();
+
+                String configurationFile = PropsUtil.get(
+                        propertyName, new com.liferay.portal.kernel.configuration.Filter(format));
+
+                if (Validator.isNotNull(configurationFile)) {
+                        return HttpUtil.URLtoString(
+                                classLoader.getResource(configurationFile));
+                }
+                else {
+                        return StringPool.BLANK;
+                }
+        }
 
 	protected void initServices(
 			String servletContextName, ClassLoader portletClassLoader,
@@ -2598,7 +2645,8 @@ public class HookHotDeployListener
 		"users.form.my.account.identification", "users.form.my.account.main",
 		"users.form.my.account.miscellaneous",
 		"users.form.update.identification", "users.form.update.main",
-		"users.form.update.miscellaneous"
+		"users.form.update.miscellaneous",
+		"wiki.formats",
 	};
 
 	private static final String[] _PROPS_VALUES_OBSOLETE = {
