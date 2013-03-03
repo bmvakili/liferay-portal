@@ -492,49 +492,6 @@ public class HookHotDeployListener
 			ScreenNameValidatorFactory.setInstance(null);
 		}
 
-                if (portalProperties.containsKey(
-                                PropsKeys.WIKI_FORMATS)) {
-
-                        String[] wikiFormats = StringUtil.split(
-                                portalProperties.getProperty(PropsKeys.WIKI_FORMATS));
-
-                        for (String wikiFormat : wikiFormats) {
-
-				
-                                String wikiEngineClassName = PropsUtil.get(
-                                        PropsKeys.WIKI_FORMATS_ENGINE, new com.liferay.portal.kernel.configuration.Filter(wikiFormat));
-
-                                if (wikiEngineClassName == null) {
-                                        _log.error("No engine for " + wikiFormat + " specified.");
-                                        continue;
-                                }
-
-                                String wikiFormatsEditPage = PropsUtil.get(
-                                        PropsKeys.WIKI_FORMATS_EDIT_PAGE, new com.liferay.portal.kernel.configuration.Filter(wikiFormat));
-
-                                try {
-                                        WikiEngine wikiEngine = (WikiEngine)InstancePool.get(wikiEngineClassName);
-
-                                        wikiEngine.setMainConfiguration(
-                                                _readConfigurationFile(
-                                                        PropsKeys.WIKI_FORMATS_CONFIGURATION_MAIN, wikiFormat));
-
-                                        wikiEngine.setInterWikiConfiguration(
-                                                _readConfigurationFile(
-                                                        PropsKeys.WIKI_FORMATS_CONFIGURATION_INTERWIKI,
-                                                        wikiFormat));
-
-                                        InstancePool.put(wikiEngineClassName, wikiEngine);
-
-                                } catch (Exception e) {
-                                        _log.error(e);
-                                }
-
-                        }
-
-                }
-
-
 		Set<String> liferayFilterClassNames =
 			LiferayFilterTracker.getClassNames();
 
