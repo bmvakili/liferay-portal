@@ -19,6 +19,8 @@ package com.liferay.portal.kernel.util;
  */
 public interface WebKeys {
 
+	public static final String ASSET_LAYOUT_TAG_NAMES = "ASSET_LAYOUT_TAG_NAMES";
+
 	public static final String ASSET_RENDERER = "ASSET_RENDERER";
 
 	public static final String ASSET_RENDERER_FACTORY = "ASSET_RENDERER_FACTORY";
