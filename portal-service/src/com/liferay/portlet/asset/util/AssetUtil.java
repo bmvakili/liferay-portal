@@ -40,12 +40,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
-<<<<<<< HEAD:portal-service/src/com/liferay/portlet/asset/util/AssetUtil.java
-import com.liferay.portal.kernel.util.WebKeys;
-=======
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
->>>>>>> master:portal-impl/src/com/liferay/portlet/asset/util/AssetUtil.java
 import com.liferay.portlet.asset.NoSuchCategoryException;
 import com.liferay.portlet.asset.NoSuchTagException;
 import com.liferay.portlet.asset.model.AssetCategory;
