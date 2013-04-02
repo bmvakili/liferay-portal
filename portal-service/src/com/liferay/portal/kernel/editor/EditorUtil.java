@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,22 @@ import javax.servlet.http.HttpServletRequest;
  * @author Julio Camarero
  */
 public class EditorUtil {
+
+	public static String getEditorMode(String langType) {
+		String editorMode = "php";
+
+		if (langType.equals("css")) {
+			editorMode = "css";
+		}
+		else if (langType.equals("xml") ||
+				 langType.equals("xsl") ||
+				 langType.equals("xsd")) {
+
+			editorMode = "xml";
+		}
+
+		return editorMode;
+	}
 
 	public static String getEditorValue(
 		HttpServletRequest request, String editorImpl) {

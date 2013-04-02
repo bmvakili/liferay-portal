@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,6 +38,8 @@ import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.service.permission.PortletPermissionUtil;
 import com.liferay.portal.service.permission.TeamPermissionUtil;
 import com.liferay.portal.service.permission.UserPermissionUtil;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.permission.BlogsEntryPermission;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
@@ -52,12 +54,8 @@ import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermiss
 import com.liferay.portlet.documentlibrary.service.permission.DLFolderPermission;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFeed;
-import com.liferay.portlet.journal.model.JournalStructure;
-import com.liferay.portlet.journal.model.JournalTemplate;
 import com.liferay.portlet.journal.service.permission.JournalArticlePermission;
 import com.liferay.portlet.journal.service.permission.JournalFeedPermission;
-import com.liferay.portlet.journal.service.permission.JournalStructurePermission;
-import com.liferay.portlet.journal.service.permission.JournalTemplatePermission;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.service.permission.MBCategoryPermission;
@@ -172,16 +170,6 @@ public class PermissionServiceImpl extends PermissionServiceBaseImpl {
 				permissionChecker, GetterUtil.getLong(primKey),
 				ActionKeys.PERMISSIONS);
 		}
-		else if (name.equals(JournalStructure.class.getName())) {
-			JournalStructurePermission.check(
-				permissionChecker, GetterUtil.getLong(primKey),
-				ActionKeys.PERMISSIONS);
-		}
-		else if (name.equals(JournalTemplate.class.getName())) {
-			JournalTemplatePermission.check(
-				permissionChecker, GetterUtil.getLong(primKey),
-				ActionKeys.PERMISSIONS);
-		}
 		else if (name.equals(Layout.class.getName())) {
 			LayoutPermissionUtil.check(
 				permissionChecker, GetterUtil.getLong(primKey),
@@ -264,6 +252,23 @@ public class PermissionServiceImpl extends PermissionServiceBaseImpl {
 		}
 		else if (!permissionChecker.hasPermission(
 					groupId, name, primKey, ActionKeys.PERMISSIONS)) {
+
+			AssetRendererFactory assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassName(name);
+
+			if (assetRendererFactory != null) {
+				try {
+					if (assetRendererFactory.hasPermission(
+							permissionChecker, GetterUtil.getLong(primKey),
+							ActionKeys.PERMISSIONS)) {
+
+						return;
+					}
+				}
+				catch (Exception e) {
+				}
+			}
 
 			long ownerId = 0;
 

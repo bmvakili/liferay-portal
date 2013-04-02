@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.bookmarks.service.persistence;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceTestUtil;
@@ -138,6 +140,14 @@ public class BookmarksEntryPersistenceTest {
 
 		newBookmarksEntry.setPriority(ServiceTestUtil.nextInt());
 
+		newBookmarksEntry.setStatus(ServiceTestUtil.nextInt());
+
+		newBookmarksEntry.setStatusByUserId(ServiceTestUtil.nextLong());
+
+		newBookmarksEntry.setStatusByUserName(ServiceTestUtil.randomString());
+
+		newBookmarksEntry.setStatusDate(ServiceTestUtil.nextDate());
+
 		_persistence.update(newBookmarksEntry);
 
 		BookmarksEntry existingBookmarksEntry = _persistence.findByPrimaryKey(newBookmarksEntry.getPrimaryKey());
@@ -174,6 +184,15 @@ public class BookmarksEntryPersistenceTest {
 			newBookmarksEntry.getVisits());
 		Assert.assertEquals(existingBookmarksEntry.getPriority(),
 			newBookmarksEntry.getPriority());
+		Assert.assertEquals(existingBookmarksEntry.getStatus(),
+			newBookmarksEntry.getStatus());
+		Assert.assertEquals(existingBookmarksEntry.getStatusByUserId(),
+			newBookmarksEntry.getStatusByUserId());
+		Assert.assertEquals(existingBookmarksEntry.getStatusByUserName(),
+			newBookmarksEntry.getStatusByUserName());
+		Assert.assertEquals(Time.getShortTimestamp(
+				existingBookmarksEntry.getStatusDate()),
+			Time.getShortTimestamp(newBookmarksEntry.getStatusDate()));
 	}
 
 	@Test
@@ -214,6 +233,26 @@ public class BookmarksEntryPersistenceTest {
 		BookmarksEntry missingBookmarksEntry = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingBookmarksEntry);
+	}
+
+	@Test
+	public void testActionableDynamicQuery() throws Exception {
+		final IntegerWrapper count = new IntegerWrapper();
+
+		ActionableDynamicQuery actionableDynamicQuery = new BookmarksEntryActionableDynamicQuery() {
+				@Override
+				protected void performAction(Object object) {
+					BookmarksEntry bookmarksEntry = (BookmarksEntry)object;
+
+					Assert.assertNotNull(bookmarksEntry);
+
+					count.increment();
+				}
+			};
+
+		actionableDynamicQuery.performActions();
+
+		Assert.assertEquals(count.getValue(), _persistence.countAll());
 	}
 
 	@Test
@@ -339,6 +378,14 @@ public class BookmarksEntryPersistenceTest {
 		bookmarksEntry.setVisits(ServiceTestUtil.nextInt());
 
 		bookmarksEntry.setPriority(ServiceTestUtil.nextInt());
+
+		bookmarksEntry.setStatus(ServiceTestUtil.nextInt());
+
+		bookmarksEntry.setStatusByUserId(ServiceTestUtil.nextLong());
+
+		bookmarksEntry.setStatusByUserName(ServiceTestUtil.randomString());
+
+		bookmarksEntry.setStatusDate(ServiceTestUtil.nextDate());
 
 		_persistence.update(bookmarksEntry);
 

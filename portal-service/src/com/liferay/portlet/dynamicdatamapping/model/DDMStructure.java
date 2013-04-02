@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,6 +32,11 @@ public interface DDMStructure extends DDMStructureModel, PersistedModel {
 	 * Never modify this interface directly. Add methods to {@link com.liferay.portlet.dynamicdatamapping.model.impl.DDMStructureImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public java.util.List<java.lang.String> getAvailableLanguageIds();
+
+	public java.util.List<java.lang.String> getChildrenFieldNames(
+		java.lang.String fieldName)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	public java.lang.String getCompleteXsd()
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -69,6 +74,10 @@ public interface DDMStructure extends DDMStructureModel, PersistedModel {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public boolean getFieldRepeatable(java.lang.String fieldName)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public boolean getFieldRequired(java.lang.String fieldName)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -90,6 +99,16 @@ public interface DDMStructure extends DDMStructureModel, PersistedModel {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public java.lang.String getFieldTip(java.lang.String fieldName,
+		java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public java.lang.String getFieldTip(java.lang.String fieldName,
+		java.lang.String locale)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public java.lang.String getFieldType(java.lang.String fieldName)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -97,6 +116,10 @@ public interface DDMStructure extends DDMStructureModel, PersistedModel {
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> getLocalizedFieldsMap();
 
 	public java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.String>>> getLocalizedTransientFieldsMap();
+
+	public java.util.List<java.lang.String> getRootFieldNames()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	public java.util.List<com.liferay.portlet.dynamicdatamapping.model.DDMTemplate> getTemplates()
 		throws com.liferay.portal.kernel.exception.SystemException;
@@ -106,7 +129,24 @@ public interface DDMStructure extends DDMStructureModel, PersistedModel {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* Returns the WebDAV URL to access the structure.
+	*
+	* @param themeDisplay the theme display needed to build the URL. It can
+	set HTTPS access, the server name, the server port, the path
+	context, and the scope group.
+	* @param webDAVToken the WebDAV token for the URL
+	* @return the WebDAV URL
+	*/
+	public java.lang.String getWebDavURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay,
+		java.lang.String webDAVToken);
+
 	public boolean hasField(java.lang.String fieldName)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public boolean isFieldPrivate(java.lang.String fieldName)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -108,13 +108,13 @@ public class GetMessageAttachmentAction extends PortletAction {
 		DLFileVersion dlFileVersion = dlFileEntry.getFileVersion();
 
 		if ((status != WorkflowConstants.STATUS_IN_TRASH) &&
-			(dlFileVersion.isInTrash() || dlFileEntry.isInTrashFolder())) {
+			(dlFileVersion.isInTrash() || dlFileEntry.isInTrashContainer())) {
 
 			return;
 		}
 
 		if (dlFileVersion.isInTrash()) {
-			fileName = TrashUtil.stripTrashNamespace(dlFileEntry.getTitle());
+			fileName = TrashUtil.getOriginalTitle(dlFileEntry.getTitle());
 		}
 
 		ServletResponseUtil.sendFile(

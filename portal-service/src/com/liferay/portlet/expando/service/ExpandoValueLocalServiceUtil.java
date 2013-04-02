@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -384,12 +384,13 @@ public class ExpandoValueLocalServiceUtil {
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		long companyId, java.lang.String className, java.lang.String tableName,
 		java.lang.String columnName, long classPK,
-		java.util.Map<java.util.Locale, ?> dataMap)
+		java.util.Map<java.util.Locale, ?> dataMap,
+		java.util.Locale defautlLocale)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .addValue(companyId, className, tableName, columnName,
-			classPK, dataMap);
+			classPK, dataMap, defautlLocale);
 	}
 
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
@@ -463,8 +464,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	boolean[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, boolean[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -476,8 +477,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	boolean[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, boolean[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -489,7 +490,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long, Date[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, Date[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -501,7 +503,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long, Date[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, Date[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -513,8 +516,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	double[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, double[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -526,8 +529,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	double[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, double[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -539,8 +542,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	float[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, float[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -552,8 +555,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	float[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, float[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -565,7 +568,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long, int[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, int[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -577,7 +581,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long, int[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, int[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -589,7 +594,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long, long[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, long[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -601,7 +607,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long, long[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, long[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -613,7 +620,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long, Object)}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, Object)}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -625,8 +633,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	short[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, short[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -638,8 +646,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	short[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, short[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -651,8 +659,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	String[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, String[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -664,8 +672,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #addValue(long, String, String, String, long,
-	String[])}
+	* @deprecated As of 6.1.0, replaced by {@link #addValue(long, String,
+	String, String, long, String[])}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue addValue(
 		java.lang.String className, java.lang.String tableName,
@@ -804,8 +812,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getColumnValues(long, String, String, String, String,
-	int, int)}
+	* @deprecated As of 6.1.0, replaced by {@link #getColumnValues(long,
+	String, String, String, String, int, int)}
 	*/
 	public static java.util.List<com.liferay.portlet.expando.model.ExpandoValue> getColumnValues(
 		java.lang.String className, java.lang.String tableName,
@@ -857,8 +865,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getColumnValuesCount(long, String, String, String,
-	String)}
+	* @deprecated As of 6.1.0, replaced by {@link #getColumnValuesCount(long,
+	String, String, String, String)}
 	*/
 	public static int getColumnValuesCount(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName,
@@ -1081,7 +1089,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long)}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long)}
 	*/
 	public static java.io.Serializable getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK)
@@ -1091,8 +1100,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long,
-	boolean[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, boolean[])}
 	*/
 	public static boolean getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1105,8 +1114,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long,
-	boolean[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, boolean[])}
 	*/
 	public static boolean[] getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1119,7 +1128,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, Date[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, Date[])}
 	*/
 	public static java.util.Date getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1132,7 +1142,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, Date[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, Date[])}
 	*/
 	public static java.util.Date[] getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1145,8 +1156,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long,
-	double[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, double[])}
 	*/
 	public static double getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1159,8 +1170,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long,
-	double[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, double[])}
 	*/
 	public static double[] getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1173,7 +1184,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, float[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, float[])}
 	*/
 	public static float getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1186,7 +1198,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, float[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, float[])}
 	*/
 	public static float[] getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1199,7 +1212,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, int[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, int[])}
 	*/
 	public static int getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1212,7 +1226,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, int[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, int[])}
 	*/
 	public static int[] getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1225,7 +1240,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, long[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, long[])}
 	*/
 	public static long getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1238,7 +1254,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, long[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, long[])}
 	*/
 	public static long[] getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1251,7 +1268,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, short[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, short[])}
 	*/
 	public static short getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1264,7 +1282,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long, short[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, short[])}
 	*/
 	public static short[] getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1277,8 +1296,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long,
-	String[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, String[])}
 	*/
 	public static java.lang.String getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1291,8 +1310,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getData(long, String, String, String, long,
-	String[])}
+	* @deprecated As of 6.1.0, replaced by {@link #getData(long, String,
+	String, String, long, String[])}
 	*/
 	public static java.lang.String[] getData(java.lang.String className,
 		java.lang.String tableName, java.lang.String columnName, long classPK,
@@ -1416,7 +1435,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getValue(long, long, String, String, long)}
+	* @deprecated As of 6.1.0, replaced by {@link #getValue(long, long, String,
+	String, long)}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue getValue(
 		long classNameId, java.lang.String tableName,
@@ -1435,7 +1455,8 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #getValue(long, String, String, String, long)}
+	* @deprecated As of 6.1.0, replaced by {@link #getValue(long, String,
+	String, String, long)}
 	*/
 	public static com.liferay.portlet.expando.model.ExpandoValue getValue(
 		java.lang.String className, java.lang.String tableName,
@@ -1456,7 +1477,7 @@ public class ExpandoValueLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(ExpandoValueLocalService service) {
 	}

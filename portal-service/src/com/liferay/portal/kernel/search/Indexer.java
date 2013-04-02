@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,9 @@ import javax.portlet.PortletURL;
 public interface Indexer {
 
 	public static final int DEFAULT_INTERVAL = 10000;
+
+	public void addRelatedEntryFields(Document document, Object obj)
+		throws Exception;
 
 	public void delete(long companyId, String uid) throws SearchException;
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,9 +24,15 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PrefsParamUtil;
@@ -41,13 +47,17 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Subscription;
+import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.WorkflowDefinitionLinkLocalServiceUtil;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.PortletURLFactoryUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
@@ -60,13 +70,19 @@ import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelModifi
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelNameComparator;
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelReadCountComparator;
 import com.liferay.portlet.documentlibrary.util.comparator.RepositoryModelSizeComparator;
+import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.messageboards.service.MBMessageLocalServiceUtil;
+import com.liferay.portlet.trash.util.TrashUtil;
+import com.liferay.util.ContentUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -238,10 +254,11 @@ public class DLImpl implements DL {
 
 		PortletURL portletURL = renderResponse.createRenderURL();
 
-		if (strutsAction.equals("/journal/select_document_library") ||
-			strutsAction.equals("/document_library/select_file_entry") ||
+		if (strutsAction.equals("/document_library/select_file_entry") ||
 			strutsAction.equals("/document_library/select_folder") ||
 			strutsAction.equals("/document_library_display/select_folder") ||
+			strutsAction.equals(
+				"/dynamic_data_mapping/select_document_library") ||
 			strutsAction.equals("/image_gallery_display/select_folder")) {
 
 			ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
@@ -324,7 +341,7 @@ public class DLImpl implements DL {
 
 		Collections.reverse(dlFolders);
 
-		StringBundler sb = new StringBundler((dlFolders.size() * 3) + 6);
+		StringBundler sb = new StringBundler((dlFolders.size() * 3) + 5);
 
 		sb.append(themeDisplay.translate("home"));
 		sb.append(StringPool.SPACE);
@@ -401,6 +418,177 @@ public class DLImpl implements DL {
 		return portletURL.toString();
 	}
 
+	public Map<Locale, String> getEmailFileEntryAddedBodyMap(
+		PortletPreferences preferences) {
+
+		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
+			preferences, "emailFileEntryAddedBody");
+
+		Locale defaultLocale = LocaleUtil.getDefault();
+
+		String defaultValue = map.get(defaultLocale);
+
+		if (Validator.isNotNull(defaultValue)) {
+			return map;
+		}
+
+		map.put(
+			defaultLocale,
+			ContentUtil.get(
+				PropsUtil.get(PropsKeys.DL_EMAIL_FILE_ENTRY_ADDED_BODY)));
+
+		return map;
+	}
+
+	public boolean getEmailFileEntryAddedEnabled(
+		PortletPreferences preferences) {
+
+		String emailFileEntryAddedEnabled = preferences.getValue(
+			"emailFileEntryAddedEnabled", StringPool.BLANK);
+
+		if (Validator.isNotNull(emailFileEntryAddedEnabled)) {
+			return GetterUtil.getBoolean(emailFileEntryAddedEnabled);
+		}
+		else {
+			return PropsValues.DL_EMAIL_FILE_ENTRY_ADDED_ENABLED;
+		}
+	}
+
+	public Map<Locale, String> getEmailFileEntryAddedSubjectMap(
+		PortletPreferences preferences) {
+
+		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
+			preferences, "emailFileEntryAddedSubject");
+
+		Locale defaultLocale = LocaleUtil.getDefault();
+
+		String defaultValue = map.get(defaultLocale);
+
+		if (Validator.isNotNull(defaultValue)) {
+			return map;
+		}
+
+		map.put(
+			defaultLocale,
+			ContentUtil.get(
+				PropsUtil.get(PropsKeys.DL_EMAIL_FILE_ENTRY_ADDED_SUBJECT)));
+
+		return map;
+	}
+
+	public Map<Locale, String> getEmailFileEntryUpdatedBodyMap(
+		PortletPreferences preferences) {
+
+		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
+			preferences, "emailFileEntryUpdatedBody");
+
+		Locale defaultLocale = LocaleUtil.getDefault();
+
+		String defaultValue = map.get(defaultLocale);
+
+		if (Validator.isNotNull(defaultValue)) {
+			return map;
+		}
+
+		map.put(
+			defaultLocale,
+			ContentUtil.get(
+				PropsUtil.get(PropsKeys.DL_EMAIL_FILE_ENTRY_UPDATED_BODY)));
+
+		return map;
+	}
+
+	public boolean getEmailFileEntryUpdatedEnabled(
+		PortletPreferences preferences) {
+
+		String emailFileEntryUpdatedEnabled = preferences.getValue(
+			"emailFileEntryUpdatedEnabled", StringPool.BLANK);
+
+		if (Validator.isNotNull(emailFileEntryUpdatedEnabled)) {
+			return GetterUtil.getBoolean(emailFileEntryUpdatedEnabled);
+		}
+		else {
+			return PropsValues.DL_EMAIL_FILE_ENTRY_UPDATED_ENABLED;
+		}
+	}
+
+	public Map<Locale, String> getEmailFileEntryUpdatedSubjectMap(
+		PortletPreferences preferences) {
+
+		Map<Locale, String> map = LocalizationUtil.getLocalizationMap(
+			preferences, "emailFileEntryUpdatedSubject");
+
+		Locale defaultLocale = LocaleUtil.getDefault();
+
+		String defaultValue = map.get(defaultLocale);
+
+		if (Validator.isNotNull(defaultValue)) {
+			return map;
+		}
+
+		map.put(
+			defaultLocale,
+			ContentUtil.get(
+				PropsUtil.get(PropsKeys.DL_EMAIL_FILE_ENTRY_UPDATED_SUBJECT)));
+
+		return map;
+	}
+
+	public String getEmailFromAddress(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
+
+		return PortalUtil.getEmailFromAddress(
+			preferences, companyId, PropsValues.DL_EMAIL_FROM_ADDRESS);
+	}
+
+	public String getEmailFromName(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
+
+		return PortalUtil.getEmailFromName(
+			preferences, companyId, PropsValues.DL_EMAIL_FROM_NAME);
+	}
+
+	public List<Object> getEntries(Hits hits) {
+		List<Object> entries = new ArrayList<Object>();
+
+		for (Document document : hits.getDocs()) {
+			String entryClassName = GetterUtil.getString(
+				document.get(Field.ENTRY_CLASS_NAME));
+			long entryClassPK = GetterUtil.getLong(
+				document.get(Field.ENTRY_CLASS_PK));
+
+			try {
+				Object obj = null;
+
+				if (entryClassName.equals(DLFileEntry.class.getName())) {
+					obj = DLAppLocalServiceUtil.getFileEntry(entryClassPK);
+				}
+				else if (entryClassName.equals(MBMessage.class.getName())) {
+					long classPK = GetterUtil.getLong(
+						document.get(Field.CLASS_PK));
+
+					DLAppLocalServiceUtil.getFileEntry(classPK);
+
+					obj = MBMessageLocalServiceUtil.getMessage(entryClassPK);
+				}
+
+				entries.add(obj);
+			}
+			catch (Exception e) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Documents and Media search index is stale and " +
+							"contains entry {className=" + entryClassName +
+								", classPK=" + entryClassPK + "}");
+				}
+			}
+		}
+
+		return entries;
+	}
+
 	public String getFileEntryImage(
 		FileEntry fileEntry, ThemeDisplay themeDisplay) {
 
@@ -413,6 +601,22 @@ public class DLImpl implements DL {
 		sb.append(".png\">");
 
 		return sb.toString();
+	}
+
+	public Set<Long> getFileEntryTypeSubscriptionClassPKs(long userId)
+		throws SystemException {
+
+		List<Subscription> subscriptions =
+			SubscriptionLocalServiceUtil.getUserSubscriptions(
+				userId, DLFileEntryType.class.getName());
+
+		Set<Long> classPKs = new HashSet<Long>(subscriptions.size());
+
+		for (Subscription subscription : subscriptions) {
+			classPKs.add(subscription.getClassPK());
+		}
+
+		return classPKs;
 	}
 
 	public String getFileIcon(String extension) {
@@ -431,6 +635,37 @@ public class DLImpl implements DL {
 		}
 
 		return genericName;
+	}
+
+	public String getImagePreviewURL(
+			FileEntry fileEntry, FileVersion fileVersion,
+			ThemeDisplay themeDisplay)
+		throws Exception {
+
+		String previewQueryString = null;
+
+		if (PropsValues.DL_FILE_ENTRY_THUMBNAIL_ENABLED) {
+			if (ImageProcessorUtil.hasImages(fileVersion)) {
+				previewQueryString = "&imagePreview=1";
+			}
+			else if (PDFProcessorUtil.hasImages(fileVersion)) {
+				previewQueryString = "&previewFileIndex=1";
+			}
+			else if (VideoProcessorUtil.hasVideo(fileVersion)) {
+				previewQueryString = "&videoThumbnail=1";
+			}
+		}
+
+		return getImageSrc(
+			fileEntry, fileVersion, themeDisplay, previewQueryString);
+	}
+
+	public String getImagePreviewURL(
+			FileEntry fileEntry, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		return getImagePreviewURL(
+			fileEntry, fileEntry.getFileVersion(), themeDisplay);
 	}
 
 	public String[] getMediaGalleryMimeTypes(
@@ -456,8 +691,8 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated {@link #getPreviewURL(FileEntry, FileVersion, ThemeDisplay,
-	 *             String, boolean, boolean)}
+	 * @deprecated As of 6.2.0, replaced by {@link #getPreviewURL(FileEntry,
+	 *             FileVersion, ThemeDisplay, String, boolean, boolean)}
 	 */
 	public String getPreviewURL(
 		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
@@ -485,7 +720,15 @@ public class DLImpl implements DL {
 		sb.append(StringPool.SLASH);
 		sb.append(fileEntry.getFolderId());
 		sb.append(StringPool.SLASH);
-		sb.append(HttpUtil.encodeURL(HtmlUtil.unescape(fileEntry.getTitle())));
+
+		String title = fileEntry.getTitle();
+
+		if (fileVersion.isInTrash()) {
+			title = TrashUtil.getOriginalTitle(fileEntry.getTitle());
+		}
+
+		sb.append(HttpUtil.encodeURL(HtmlUtil.unescape(title)));
+
 		sb.append(StringPool.SLASH);
 		sb.append(fileEntry.getUuid());
 
@@ -600,20 +843,9 @@ public class DLImpl implements DL {
 			DLFileShortcut dlFileShortcut, ThemeDisplay themeDisplay)
 		throws Exception {
 
-		StringBundler sb = new StringBundler(4);
-
-		sb.append(themeDisplay.getPathThemeImages());
-		sb.append("/file_system/large/");
-		sb.append(getGenericName(fileEntry.getExtension()));
-		sb.append(".png");
-
-		String thumbnailSrc = sb.toString();
-
 		String thumbnailQueryString = null;
 
-		if (GetterUtil.getBoolean(
-				PropsUtil.get(PropsKeys.DL_FILE_ENTRY_THUMBNAIL_ENABLED))) {
-
+		if (PropsValues.DL_FILE_ENTRY_THUMBNAIL_ENABLED) {
 			if (ImageProcessorUtil.hasImages(fileVersion)) {
 				thumbnailQueryString = "&imageThumbnail=1";
 			}
@@ -625,13 +857,8 @@ public class DLImpl implements DL {
 			}
 		}
 
-		if (Validator.isNotNull(thumbnailQueryString)) {
-			thumbnailSrc = getPreviewURL(
-				fileEntry, fileVersion, themeDisplay, thumbnailQueryString,
-				true, true);
-		}
-
-		return thumbnailSrc;
+		return getImageSrc(
+			fileEntry, fileVersion, themeDisplay, thumbnailQueryString);
 	}
 
 	public String getThumbnailStyle() throws Exception {
@@ -698,9 +925,64 @@ public class DLImpl implements DL {
 			boolean manualCheckInRequired)
 		throws PortalException, SystemException {
 
+		return getWebDavURL(
+			themeDisplay, folder, fileEntry, manualCheckInRequired, false);
+	}
+
+	public String getWebDavURL(
+			ThemeDisplay themeDisplay, Folder folder, FileEntry fileEntry,
+			boolean manualCheckInRequired, boolean openDocumentUrl)
+		throws PortalException, SystemException {
+
+		StringBundler webDavURL = new StringBundler(8);
+
+		boolean secure = false;
+
+		if (themeDisplay.isSecure() ||
+			PropsValues.WEBDAV_SERVLET_HTTPS_REQUIRED) {
+
+			secure = true;
+		}
+
+		String portalURL = PortalUtil.getPortalURL(
+			themeDisplay.getServerName(), themeDisplay.getServerPort(), secure);
+
+		webDavURL.append(portalURL);
+
+		webDavURL.append(themeDisplay.getPathContext());
+		webDavURL.append("/webdav");
+
+		if (manualCheckInRequired) {
+			webDavURL.append(MANUAL_CHECK_IN_REQUIRED_PATH);
+		}
+
+		String fileEntryTitle = null;
+
+		if (fileEntry != null) {
+			String extension = fileEntry.getExtension();
+
+			fileEntryTitle = HtmlUtil.unescape(fileEntry.getTitle());
+
+			if (openDocumentUrl && isOfficeExtension(extension) &&
+				!fileEntryTitle.endsWith(StringPool.PERIOD + extension)) {
+
+				webDavURL.append(OFFICE_EXTENSION_PATH);
+
+				fileEntryTitle += StringPool.PERIOD + extension;
+			}
+		}
+
+		Group group = themeDisplay.getScopeGroup();
+
+		webDavURL.append(group.getFriendlyURL());
+		webDavURL.append("/document_library");
+
 		StringBuilder sb = new StringBuilder();
 
-		if (folder != null) {
+		if ((folder != null) &&
+			(folder.getFolderId() !=
+				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
+
 			Folder curFolder = folder;
 
 			while (true) {
@@ -712,32 +994,17 @@ public class DLImpl implements DL {
 
 					break;
 				}
-				else {
-					curFolder = DLAppLocalServiceUtil.getFolder(
-						curFolder.getParentFolderId());
-				}
+
+				curFolder = DLAppLocalServiceUtil.getFolder(
+					curFolder.getParentFolderId());
 			}
 		}
 
 		if (fileEntry != null) {
 			sb.append(StringPool.SLASH);
-			sb.append(HttpUtil.encodeURL(fileEntry.getTitle(), true));
+			sb.append(HttpUtil.encodeURL(fileEntryTitle, true));
 		}
 
-		Group group = themeDisplay.getScopeGroup();
-
-		StringBundler webDavURL = new StringBundler(7);
-
-		webDavURL.append(themeDisplay.getPortalURL());
-		webDavURL.append(themeDisplay.getPathContext());
-		webDavURL.append("/webdav");
-
-		if (manualCheckInRequired) {
-			webDavURL.append(DLUtil.MANUAL_CHECK_IN_REQUIRED_PATH);
-		}
-
-		webDavURL.append(group.getFriendlyURL());
-		webDavURL.append("/document_library");
 		webDavURL.append(sb.toString());
 
 		return webDavURL.toString();
@@ -785,6 +1052,71 @@ public class DLImpl implements DL {
 		return false;
 	}
 
+	public boolean isOfficeExtension(String extension) {
+		if (extension.equalsIgnoreCase("doc") ||
+			extension.equalsIgnoreCase("docx") ||
+			extension.equalsIgnoreCase("dot") ||
+			extension.equalsIgnoreCase("ppt") ||
+			extension.equalsIgnoreCase("pptx") ||
+			extension.equalsIgnoreCase("xls") ||
+			extension.equalsIgnoreCase("xlsx")) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean isSubscribedToFileEntryType(
+			long companyId, long groupId, long userId, long fileEntryTypeId)
+		throws SystemException {
+
+		if (fileEntryTypeId ==
+				DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT) {
+
+			fileEntryTypeId = groupId;
+		}
+
+		return SubscriptionLocalServiceUtil.isSubscribed(
+			companyId, userId, DLFileEntryType.class.getName(),
+			fileEntryTypeId);
+	}
+
+	public boolean isSubscribedToFolder(
+			long companyId, long groupId, long userId, long folderId)
+		throws PortalException, SystemException {
+
+		return isSubscribedToFolder(companyId, groupId, userId, folderId, true);
+	}
+
+	public boolean isSubscribedToFolder(
+			long companyId, long groupId, long userId, long folderId,
+			boolean recursive)
+		throws PortalException, SystemException {
+
+		List<Long> ancestorFolderIds = new ArrayList<Long>();
+
+		if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			Folder folder = DLAppLocalServiceUtil.getFolder(folderId);
+
+			if (recursive) {
+				ancestorFolderIds = folder.getAncestorFolderIds();
+
+				ancestorFolderIds.add(groupId);
+			}
+
+			ancestorFolderIds.add(0, folderId);
+		}
+		else {
+			ancestorFolderIds.add(groupId);
+		}
+
+		long[] folderIdsArray = ArrayUtil.toLongArray(ancestorFolderIds);
+
+		return SubscriptionLocalServiceUtil.isSubscribed(
+			companyId, userId, Folder.class.getName(), folderIdsArray);
+	}
+
 	protected long getDefaultFolderId(HttpServletRequest request)
 		throws Exception {
 
@@ -796,6 +1128,28 @@ public class DLImpl implements DL {
 			portletPreferences.getValue(
 				"rootFolderId",
 				String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID)));
+	}
+
+	protected String getImageSrc(
+			FileEntry fileEntry, FileVersion fileVersion,
+			ThemeDisplay themeDisplay, String queryString)
+		throws Exception {
+
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(themeDisplay.getPathThemeImages());
+		sb.append("/file_system/large/");
+		sb.append(getGenericName(fileEntry.getExtension()));
+		sb.append(".png");
+
+		String thumbnailSrc = sb.toString();
+
+		if (Validator.isNotNull(queryString)) {
+			thumbnailSrc = getPreviewURL(
+				fileEntry, fileVersion, themeDisplay, queryString, true, true);
+		}
+
+		return thumbnailSrc;
 	}
 
 	private static void _populateGenericNamesMap(String genericName) {
@@ -871,7 +1225,7 @@ public class DLImpl implements DL {
 		}
 
 		String[] genericNames = PropsUtil.getArray(
-				PropsKeys.DL_FILE_GENERIC_NAMES);
+			PropsKeys.DL_FILE_GENERIC_NAMES);
 
 		for (String genericName : genericNames) {
 			_populateGenericNamesMap(genericName);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,6 +49,7 @@ public class WeakValueConcurrentHashMap<K, V>
 
 	public WeakValueConcurrentHashMap(
 		int initialCapacity, float loadFactor, int concurrencyLevel) {
+
 		_map = new ConcurrentHashMap<K, Reference<V>>(
 			initialCapacity, loadFactor, concurrencyLevel);
 	}
@@ -181,7 +182,7 @@ public class WeakValueConcurrentHashMap<K, V>
 
 	protected Reference<V> wrapValue(Object key, Object value) {
 		return FinalizeManager.register(
-			(V)value, new RemoveEntryFinalizeAction((K) key));
+			(V)value, new RemoveEntryFinalizeAction((K)key));
 	}
 
 	private transient Set<Map.Entry<K, V>> _entrySet;

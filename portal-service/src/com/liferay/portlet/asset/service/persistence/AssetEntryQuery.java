@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,9 +33,13 @@ import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
@@ -80,13 +84,16 @@ public class AssetEntryQuery {
 		setAllTagIdsArray(assetEntryQuery.getAllTagIdsArray());
 		setAnyCategoryIds(assetEntryQuery.getAnyCategoryIds());
 		setAnyTagIds(assetEntryQuery.getAnyTagIds());
+		setAttributes(assetEntryQuery.getAttributes());
 		setClassNameIds(assetEntryQuery.getClassNameIds());
 		setClassTypeIds(assetEntryQuery.getClassTypeIds());
+		setDescription(assetEntryQuery.getDescription());
 		setEnablePermissions(assetEntryQuery.isEnablePermissions());
 		setEnd(assetEntryQuery.getEnd());
 		setExcludeZeroViewCount(assetEntryQuery.isExcludeZeroViewCount());
 		setExpirationDate(assetEntryQuery.getExpirationDate());
 		setGroupIds(assetEntryQuery.getGroupIds());
+		setKeywords(assetEntryQuery.getKeywords());
 		setLayout(assetEntryQuery.getLayout());
 		setLinkedAssetEntryId(assetEntryQuery.getLinkedAssetEntryId());
 		setNotAllCategoryIds(assetEntryQuery.getNotAllCategoryIds());
@@ -99,6 +106,7 @@ public class AssetEntryQuery {
 		setOrderByType2(assetEntryQuery.getOrderByType2());
 		setPublishDate(assetEntryQuery.getPublishDate());
 		setStart(assetEntryQuery.getStart());
+		setTitle(assetEntryQuery.getTitle());
 		setVisible(assetEntryQuery.isVisible());
 	}
 
@@ -134,7 +142,7 @@ public class AssetEntryQuery {
 
 		if (Validator.isNotNull(tagName)) {
 			_allTagIds = AssetTagLocalServiceUtil.getTagIds(
-				themeDisplay.getParentGroupId(), new String[] {tagName});
+				themeDisplay.getSiteGroupId(), new String[] {tagName});
 
 			_allTagIdsArray = new long[][] {_allTagIds};
 		}
@@ -196,12 +204,24 @@ public class AssetEntryQuery {
 		return _anyTagIds;
 	}
 
+	public Serializable getAttribute(String name) {
+		return _attributes.get(name);
+	}
+
+	public Map<String, Serializable> getAttributes() {
+		return _attributes;
+	}
+
 	public long[] getClassNameIds() {
 		return _classNameIds;
 	}
 
 	public long[] getClassTypeIds() {
 		return _classTypeIds;
+	}
+
+	public String getDescription() {
+		return _description;
 	}
 
 	public int getEnd() {
@@ -214,6 +234,10 @@ public class AssetEntryQuery {
 
 	public long[] getGroupIds() {
 		return _groupIds;
+	}
+
+	public String getKeywords() {
+		return _keywords;
 	}
 
 	public Layout getLayout() {
@@ -276,6 +300,10 @@ public class AssetEntryQuery {
 		return _start;
 	}
 
+	public String getTitle() {
+		return _title;
+	}
+
 	public boolean isEnablePermissions() {
 		return _enablePermissions;
 	}
@@ -297,7 +325,7 @@ public class AssetEntryQuery {
 	public void setAllTagIds(long[] allTagIds) {
 		_allTagIds = allTagIds;
 
-		_allTagIdsArray = new long[][] {_allTagIds};
+		_allTagIdsArray = _expandTagIds(allTagIds);
 
 		_toString = null;
 	}
@@ -322,6 +350,19 @@ public class AssetEntryQuery {
 		_toString = null;
 	}
 
+	public void setAttribute(String name, Serializable value) {
+		_attributes.put(name, value);
+	}
+
+	public void setAttributes(Map<String, Serializable> attributes) {
+		if (_attributes == null) {
+			_attributes = new HashMap<String, Serializable>();
+		}
+		else {
+			_attributes = attributes;
+		}
+	}
+
 	public void setClassName(String className) {
 		long classNameId = PortalUtil.getClassNameId(className);
 
@@ -340,6 +381,10 @@ public class AssetEntryQuery {
 		_classTypeIds = classTypeIds;
 
 		_toString = null;
+	}
+
+	public void setDescription(String description) {
+		_description = description;
 	}
 
 	public void setEnablePermissions(boolean enablePermissions) {
@@ -370,6 +415,10 @@ public class AssetEntryQuery {
 		_toString = null;
 	}
 
+	public void setKeywords(String keywords) {
+		_keywords = keywords;
+	}
+
 	public void setLayout(Layout layout) {
 		_layout = layout;
 
@@ -391,7 +440,7 @@ public class AssetEntryQuery {
 	public void setNotAllTagIds(long[] notAllTagIds) {
 		_notAllTagIds = notAllTagIds;
 
-		_notAllTagIdsArray = new long[][] {_notAllTagIds};
+		_notAllTagIdsArray = _expandTagIds(notAllTagIds);
 
 		_toString = null;
 	}
@@ -452,6 +501,10 @@ public class AssetEntryQuery {
 		_toString = null;
 	}
 
+	public void setTitle(String title) {
+		_title = title;
+	}
+
 	public void setVisible(Boolean visible) {
 		_visible = visible;
 
@@ -464,7 +517,7 @@ public class AssetEntryQuery {
 			return _toString;
 		}
 
-		StringBundler sb = new StringBundler(47);
+		StringBundler sb = new StringBundler(53);
 
 		sb.append("{allCategoryIds=");
 		sb.append(StringUtil.merge(_allCategoryIds));
@@ -478,6 +531,8 @@ public class AssetEntryQuery {
 		sb.append(StringUtil.merge(_classNameIds));
 		sb.append(", classTypeIds=");
 		sb.append(StringUtil.merge(_classTypeIds));
+		sb.append(_description);
+		sb.append(", description=");
 
 		if (_layout != null) {
 			sb.append(", layout=");
@@ -491,6 +546,8 @@ public class AssetEntryQuery {
 		sb.append(", expirationDate=");
 		sb.append(_expirationDate);
 		sb.append(", groupIds=");
+		sb.append(_keywords);
+		sb.append(", keywords=");
 		sb.append(StringUtil.merge(_groupIds));
 		sb.append(", linkedAssetEntryId=");
 		sb.append(_linkedAssetEntryId);
@@ -514,6 +571,8 @@ public class AssetEntryQuery {
 		sb.append(_publishDate);
 		sb.append(", start=");
 		sb.append(_start);
+		sb.append(_title);
+		sb.append(", title=");
 		sb.append(", visible=");
 		sb.append(_visible);
 		sb.append("}");
@@ -521,6 +580,16 @@ public class AssetEntryQuery {
 		_toString = sb.toString();
 
 		return _toString;
+	}
+
+	private long[][] _expandTagIds(long[] tagIds) {
+		long[][] tagIdsArray = new long[tagIds.length][1];
+
+		for (int i = 0; i < tagIds.length; i++) {
+			tagIdsArray[i][0] = tagIds[i];
+		}
+
+		return tagIdsArray;
 	}
 
 	private long[] _flattenTagIds(long[][] tagIdsArray) {
@@ -569,13 +638,17 @@ public class AssetEntryQuery {
 	private long[][] _allTagIdsArray = new long[0][];
 	private long[] _anyCategoryIds = new long[0];
 	private long[] _anyTagIds = new long[0];
+	private Map<String, Serializable> _attributes =
+		new HashMap<String, Serializable>();
 	private long[] _classNameIds = new long[0];
 	private long[] _classTypeIds = new long[0];
+	private String _description;
 	private boolean _enablePermissions;
 	private int _end = QueryUtil.ALL_POS;
 	private boolean _excludeZeroViewCount;
 	private Date _expirationDate;
 	private long[] _groupIds = new long[0];
+	private String _keywords;
 	private Layout _layout;
 	private long _linkedAssetEntryId = 0;
 	private long[] _notAllCategoryIds = new long[0];
@@ -589,6 +662,7 @@ public class AssetEntryQuery {
 	private String _orderByType2;
 	private Date _publishDate;
 	private int _start = QueryUtil.ALL_POS;
+	private String _title;
 	private String _toString;
 	private Boolean _visible = Boolean.TRUE;
 

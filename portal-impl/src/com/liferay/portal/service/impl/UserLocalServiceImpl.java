@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,7 +44,7 @@ import com.liferay.portal.UserPortraitTypeException;
 import com.liferay.portal.UserReminderQueryException;
 import com.liferay.portal.UserScreenNameException;
 import com.liferay.portal.UserSmsException;
-import com.liferay.portal.kernel.dao.shard.ShardUtil;
+import com.liferay.portal.kernel.concurrent.PortalCallable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.image.ImageBag;
@@ -68,6 +68,7 @@ import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -116,8 +117,8 @@ import com.liferay.portal.security.auth.ScreenNameValidator;
 import com.liferay.portal.security.auth.ScreenNameValidatorFactory;
 import com.liferay.portal.security.ldap.LDAPSettingsUtil;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
+import com.liferay.portal.security.pwd.PasswordEncryptorUtil;
 import com.liferay.portal.security.pwd.PwdAuthenticator;
-import com.liferay.portal.security.pwd.PwdEncryptor;
 import com.liferay.portal.security.pwd.PwdToolkitUtil;
 import com.liferay.portal.security.pwd.RegExpToolkit;
 import com.liferay.portal.service.BaseServiceImpl;
@@ -132,6 +133,7 @@ import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
 import com.liferay.util.Encryptor;
 import com.liferay.util.EncryptorException;
+import com.liferay.util.PwdGenerator;
 
 import java.awt.image.RenderedImage;
 
@@ -426,6 +428,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *         be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void addGroupUsers(long groupId, long[] userIds)
 		throws PortalException, SystemException {
 
@@ -449,6 +452,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *         could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void addOrganizationUsers(long organizationId, long[] userIds)
 		throws PortalException, SystemException {
 
@@ -485,6 +489,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *         be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void addRoleUsers(long roleId, long[] userIds)
 		throws PortalException, SystemException {
 
@@ -506,6 +511,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *         be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void addTeamUsers(long teamId, long[] userIds)
 		throws PortalException, SystemException {
 
@@ -558,10 +564,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  userGroupIds the primary keys of the user's user groups
 	 * @param  sendEmail whether to send the user an email notification about
 	 *         their new account
-	 * @param  serviceContext the user's service context (optionally
-	 *         <code>null</code>). Can set the universally unique identifier
-	 *         (with the <code>uuid</code> attribute), asset category IDs, asset
-	 *         tag names, and expando bridge attributes for the user.
+	 * @param  serviceContext the service context to be applied (optionally
+	 *         <code>null</code>). Can set the UUID (with the <code>uuid</code>
+	 *         attribute), asset category IDs, asset tag names, and expando
+	 *         bridge attributes for the user.
 	 * @return the new user
 	 * @throws PortalException if the user's information was invalid
 	 * @throws SystemException if a system exception occurred
@@ -605,6 +611,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *         could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	@SuppressWarnings("deprecation")
 	public void addUserGroupUsers(long userGroupId, long[] userIds)
 		throws PortalException, SystemException {
@@ -662,10 +669,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  userGroupIds the primary keys of the user's user groups
 	 * @param  sendEmail whether to send the user an email notification about
 	 *         their new account
-	 * @param  serviceContext the user's service context (optionally
-	 *         <code>null</code>). Can set the universally unique identifier
-	 *         (with the <code>uuid</code> attribute), asset category IDs, asset
-	 *         tag names, and expando bridge attributes for the user.
+	 * @param  serviceContext the service context to be applied (optionally
+	 *         <code>null</code>). Can set the UUID (with the <code>uuid</code>
+	 *         attribute), asset category IDs, asset tag names, and expando
+	 *         bridge attributes for the user.
 	 * @return the new user
 	 * @throws PortalException if the user's information was invalid
 	 * @throws SystemException if a system exception occurred
@@ -687,8 +694,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		Company company = companyPersistence.findByPrimaryKey(companyId);
 		screenName = getScreenName(screenName);
-		emailAddress = emailAddress.trim().toLowerCase();
-		openId = openId.trim();
+		openId = StringUtil.trim(openId);
 		Date now = new Date();
 
 		if (PrefsPropsUtil.getBoolean(
@@ -704,8 +710,13 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		EmailAddressGenerator emailAddressGenerator =
 			EmailAddressGeneratorFactory.getInstance();
 
-		if (emailAddressGenerator.isGenerated(emailAddress)) {
+		if ((emailAddress == null) ||
+			emailAddressGenerator.isGenerated(emailAddress)) {
+
 			emailAddress = StringPool.BLANK;
+		}
+		else {
+			emailAddress = emailAddress.trim().toLowerCase();
 		}
 
 		if (!PropsValues.USERS_EMAIL_ADDRESS_REQUIRED &&
@@ -767,7 +778,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		user.setContactId(counterLocalService.increment());
 
 		if (Validator.isNotNull(password1)) {
-			user.setPassword(PwdEncryptor.encrypt(password1));
+			user.setPassword(PasswordEncryptorUtil.encrypt(password1));
 			user.setPasswordUnencrypted(password1);
 		}
 
@@ -775,14 +786,20 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		PasswordPolicy passwordPolicy = defaultUser.getPasswordPolicy();
 
-		if ((passwordPolicy != null) && passwordPolicy.isChangeable() &&
-			passwordPolicy.isChangeRequired()) {
+		boolean passwordReset = false;
 
-			user.setPasswordReset(true);
+		if (passwordPolicy != null) {
+			if (passwordPolicy.isChangeable() &&
+				passwordPolicy.isChangeRequired()) {
+
+				passwordReset = true;
+			}
+
+			addPasswordPolicyUsers(
+				passwordPolicy.getPasswordPolicyId(), new long[] {userId});
 		}
-		else {
-			user.setPasswordReset(false);
-		}
+
+		user.setPasswordReset(passwordReset);
 
 		user.setDigest(StringPool.BLANK);
 		user.setScreenName(screenName);
@@ -799,7 +816,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		user.setOpenId(openId);
-		user.setLanguageId(locale.toString());
+		user.setLanguageId(LocaleUtil.toLanguageId(locale));
 		user.setTimeZoneId(defaultUser.getTimeZoneId());
 		user.setGreeting(greeting);
 		user.setFirstName(firstName);
@@ -1144,10 +1161,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			String userPassword = user.getPassword();
 
 			if (!user.isPasswordEncrypted()) {
-				userPassword = PwdEncryptor.encrypt(userPassword);
+				userPassword = PasswordEncryptorUtil.encrypt(userPassword);
 			}
 
-			String encPassword = PwdEncryptor.encrypt(password);
+			String encPassword = PasswordEncryptorUtil.encrypt(password);
 
 			if (userPassword.equals(password) ||
 				userPassword.equals(encPassword)) {
@@ -1197,16 +1214,22 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			user = getUserByEmailAddress(companyId, username);
 		}
 		catch (NoSuchUserException nsue) {
+		}
+
+		if (user == null) {
 			try {
 				user = getUserByScreenName(companyId, username);
 			}
-			catch (NoSuchUserException nsue2) {
-				try {
-					user = getUserById(GetterUtil.getLong(username));
-				}
-				catch (NoSuchUserException nsue3) {
-					return 0;
-				}
+			catch (NoSuchUserException nsue) {
+			}
+		}
+
+		if (user == null) {
+			try {
+				user = getUserById(GetterUtil.getLong(username));
+			}
+			catch (NoSuchUserException nsue) {
+				return 0;
 			}
 		}
 
@@ -1299,7 +1322,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				}
 
 				if (!PropsValues.PORTAL_JAAS_STRICT_PASSWORD) {
-					encPassword = PwdEncryptor.encrypt(encPassword, password);
+					encPassword = PasswordEncryptorUtil.encrypt(
+						encPassword, password);
 
 					if (password.equals(encPassword)) {
 						return true;
@@ -1313,7 +1337,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					}
 				}
 
-				password = PwdEncryptor.encrypt(password);
+				password = PasswordEncryptorUtil.encrypt(password);
 
 				if (password.equals(encPassword)) {
 					return true;
@@ -1518,6 +1542,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  organizationId the primary key of the organization
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void clearOrganizationUsers(long organizationId)
 		throws SystemException {
 
@@ -1532,6 +1557,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  userGroupId the primary key of the user group
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void clearUserGroupUsers(long userGroupId) throws SystemException {
 		userGroupPersistence.clearUsers(userGroupId);
 
@@ -1543,10 +1569,11 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * the confirmation email.
 	 *
 	 * @param  user the user
-	 * @param  serviceContext the user's service context. Can set whether a
-	 *         password should be generated (with the <code>autoPassword</code>
-	 *         attribute) and whether the confirmation email should be sent
-	 *         (with the <code>sendEmail</code> attribute) for the user.
+	 * @param  serviceContext the service context to be applied. Can set whether
+	 *         a password should be generated (with the
+	 *         <code>autoPassword</code> attribute) and whether the confirmation
+	 *         email should be sent (with the <code>sendEmail</code> attribute)
+	 *         for the user.
 	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -1584,7 +1611,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				password = PwdToolkitUtil.generate(passwordPolicy);
 			}
 
-			user.setPassword(PwdEncryptor.encrypt(password));
+			user.setPassword(PasswordEncryptorUtil.encrypt(password));
 			user.setPasswordEncrypted(true);
 			user.setPasswordUnencrypted(password);
 
@@ -1656,7 +1683,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			throw new SystemException(ee);
 		}
 
-		String encPassword = PwdEncryptor.encrypt(password);
+		String encPassword = PasswordEncryptorUtil.encrypt(password);
 
 		if (user.getPassword().equals(encPassword)) {
 			if (isPasswordExpired(user)) {
@@ -1705,6 +1732,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *         be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void deleteRoleUser(long roleId, long userId)
 		throws PortalException, SystemException {
 
@@ -1871,6 +1899,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void deleteUserGroupUser(long userGroupId, long userId)
 		throws PortalException, SystemException {
 
@@ -2045,28 +2074,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns all the users belonging to the group.
-	 *
-	 * @param  groupId the primary key of the group
-	 * @return the users belonging to the group
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<User> getGroupUsers(long groupId) throws SystemException {
-		return groupPersistence.getUsers(groupId);
-	}
-
-	/**
-	 * Returns the number of users belonging to the group.
-	 *
-	 * @param  groupId the primary key of the group
-	 * @return the number of users belonging to the group
-	 * @throws SystemException if a system exception occurred
-	 */
-	public int getGroupUsersCount(long groupId) throws SystemException {
-		return groupPersistence.getUsersSize(groupId);
-	}
-
-	/**
 	 * Returns the number of users with the status belonging to the group.
 	 *
 	 * @param  groupId the primary key of the group
@@ -2138,32 +2145,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns all the users belonging to the organization.
-	 *
-	 * @param  organizationId the primary key of the organization
-	 * @return the users belonging to the organization
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<User> getOrganizationUsers(long organizationId)
-		throws SystemException {
-
-		return organizationPersistence.getUsers(organizationId);
-	}
-
-	/**
-	 * Returns the number of users belonging to the organization.
-	 *
-	 * @param  organizationId the primary key of the organization
-	 * @return the number of users belonging to the organization
-	 * @throws SystemException if a system exception occurred
-	 */
-	public int getOrganizationUsersCount(long organizationId)
-		throws SystemException {
-
-		return organizationPersistence.getUsersSize(organizationId);
-	}
-
-	/**
 	 * Returns the number of users with the status belonging to the
 	 * organization.
 	 *
@@ -2197,53 +2178,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 */
 	public long[] getRoleUserIds(long roleId) throws SystemException {
 		return getUserIds(getRoleUsers(roleId));
-	}
-
-	/**
-	 * Returns all the users belonging to the role.
-	 *
-	 * @param  roleId the primary key of the role
-	 * @return the users belonging to the role
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<User> getRoleUsers(long roleId) throws SystemException {
-		return rolePersistence.getUsers(roleId);
-	}
-
-	/**
-	 * Returns a range of all the users belonging to the role.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end -
-	 * start</code> instances. <code>start</code> and <code>end</code> are not
-	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
-	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	 * result set.
-	 * </p>
-	 *
-	 * @param  roleId the primary key of the role
-	 * @param  start the lower bound of the range of users
-	 * @param  end the upper bound of the range of users (not inclusive)
-	 * @return the range of users belonging to the role
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<User> getRoleUsers(long roleId, int start, int end)
-		throws SystemException {
-
-		return rolePersistence.getUsers(roleId, start, end);
-	}
-
-	/**
-	 * Returns the number of users belonging to the role.
-	 *
-	 * @param  roleId the primary key of the role
-	 * @return the number of users belonging to the role
-	 * @throws SystemException if a system exception occurred
-	 */
-	public int getRoleUsersCount(long roleId) throws SystemException {
-		return rolePersistence.getUsersSize(roleId);
 	}
 
 	/**
@@ -2671,14 +2605,14 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns the user with the universally unique identifier.
+	 * Returns the user with the UUID.
 	 *
-	 * @param      uuid the user's universally unique identifier
-	 * @return     the user with the universally unique identifier
-	 * @throws     PortalException if a user with the universally unique
-	 *             identifier could not be found
+	 * @param      uuid the user's UUID
+	 * @return     the user with the UUID
+	 * @throws     PortalException if a user with the UUID could not be found
 	 * @throws     SystemException if a system exception occurred
-	 * @deprecated {@link #getUserByUuidAndCompanyId(String, long)}
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             #getUserByUuidAndCompanyId(String, long)}
 	 */
 	public User getUserByUuid(String uuid)
 		throws PortalException, SystemException {
@@ -2694,13 +2628,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns the user with the universally unique identifier.
+	 * Returns the user with the UUID.
 	 *
-	 * @param  uuid the user's universally unique identifier
+	 * @param  uuid the user's UUID
 	 * @param  companyId the primary key of the user's company
-	 * @return the user with the universally unique identifier
-	 * @throws PortalException if a user with the universally unique identifier
-	 *         could not be found
+	 * @return the user with the UUID
+	 * @throws PortalException if a user with the UUID could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public User getUserByUuidAndCompanyId(String uuid, long companyId)
@@ -2714,30 +2647,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		else {
 			return users.get(0);
 		}
-	}
-
-	/**
-	 * Returns all the users belonging to the user group.
-	 *
-	 * @param  userGroupId the primary key of the user group
-	 * @return the users belonging to the user group
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<User> getUserGroupUsers(long userGroupId)
-		throws SystemException {
-
-		return userGroupPersistence.getUsers(userGroupId);
-	}
-
-	/**
-	 * Returns the number of users belonging to the user group.
-	 *
-	 * @param  userGroupId the primary key of the user group
-	 * @return the number of users belonging to the user group
-	 * @throws SystemException if a system exception occurred
-	 */
-	public int getUserGroupUsersCount(long userGroupId) throws SystemException {
-		return userGroupPersistence.getUsersSize(userGroupId);
 	}
 
 	/**
@@ -2804,36 +2713,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns <code>true</code> if the user is a member of the group.
-	 *
-	 * @param  groupId the primary key of the group
-	 * @param  userId the primary key of the user
-	 * @return <code>true</code> if the user is a member of the group;
-	 *         <code>false</code> otherwise
-	 * @throws SystemException if a system exception occurred
-	 */
-	public boolean hasGroupUser(long groupId, long userId)
-		throws SystemException {
-
-		return groupPersistence.containsUser(groupId, userId);
-	}
-
-	/**
-	 * Returns <code>true</code> if the user is a member of the organization.
-	 *
-	 * @param  organizationId the primary key of the organization
-	 * @param  userId the primary key of the user
-	 * @return <code>true</code> if the user is a member of the organization;
-	 *         <code>false</code> otherwise
-	 * @throws SystemException if a system exception occurred
-	 */
-	public boolean hasOrganizationUser(long organizationId, long userId)
-		throws SystemException {
-
-		return organizationPersistence.containsUser(organizationId, userId);
-	}
-
-	/**
 	 * Returns <code>true</code> if the password policy has been assigned to the
 	 * user.
 	 *
@@ -2848,21 +2727,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		return passwordPolicyRelLocalService.hasPasswordPolicyRel(
 			passwordPolicyId, User.class.getName(), userId);
-	}
-
-	/**
-	 * Returns <code>true</code> if the user is a member of the role.
-	 *
-	 * @param  roleId the primary key of the role
-	 * @param  userId the primary key of the user
-	 * @return <code>true</code> if the user is a member of the role;
-	 *         <code>false</code> otherwise
-	 * @throws SystemException if a system exception occurred
-	 */
-	public boolean hasRoleUser(long roleId, long userId)
-		throws SystemException {
-
-		return rolePersistence.containsUser(roleId, userId);
 	}
 
 	/**
@@ -2885,36 +2749,6 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		return roleLocalService.hasUserRole(userId, companyId, name, inherited);
-	}
-
-	/**
-	 * Returns <code>true</code> if the user is a member of the team.
-	 *
-	 * @param  teamId the primary key of the team
-	 * @param  userId the primary key of the user
-	 * @return <code>true</code> if the user is a member of the team;
-	 *         <code>false</code> otherwise
-	 * @throws SystemException if a system exception occurred
-	 */
-	public boolean hasTeamUser(long teamId, long userId)
-		throws SystemException {
-
-		return teamPersistence.containsUser(teamId, userId);
-	}
-
-	/**
-	 * Returns <code>true</code> if the user is a member of the user group.
-	 *
-	 * @param  userGroupId the primary key of the user group
-	 * @param  userId the primary key of the user
-	 * @return <code>true</code> if the user is a member of the user group;
-	 *         <code>false</code> otherwise
-	 * @throws SystemException if a system exception occurred
-	 */
-	public boolean hasUserGroupUser(long userGroupId, long userId)
-		throws SystemException {
-
-		return userGroupPersistence.containsUser(userGroupId, userId);
 	}
 
 	/**
@@ -3297,9 +3131,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *
 	 * @param  user the verification email recipient
 	 * @param  emailAddress the recipient's email address
-	 * @param  serviceContext the service context. Must set the portal URL, main
-	 *         path, primary key of the layout, remote address, remote host, and
-	 *         agent for the user.
+	 * @param  serviceContext the service context to be applied. Must set the
+	 *         portal URL, main path, primary key of the layout, remote address,
+	 *         remote host, and agent for the user.
 	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -3380,7 +3214,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *         specified in <code>portal.properties</code> will be used.
 	 * @param  body the email body. If <code>null</code>, the body specified in
 	 *         <code>portal.properties</code> will be used.
-	 * @param  serviceContext the user's service context
+	 * @param  serviceContext the service context to be applied
 	 * @throws PortalException if a user with the email address could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
@@ -3415,6 +3249,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			if ((passwordPolicy != null) &&
 				(passwordPolicy.getResetTicketMaxAge() > 0)) {
+
 				expirationDate = new Date(
 					System.currentTimeMillis() +
 						(passwordPolicy.getResetTicketMaxAge() * 1000));
@@ -3432,8 +3267,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 							"&ticketKey=" + ticket.getKey();
 		}
 		else {
-			if (!PwdEncryptor.PASSWORDS_ENCRYPTION_ALGORITHM.equals(
-					PwdEncryptor.TYPE_NONE)) {
+			if (!PasswordEncryptorUtil.PASSWORDS_ENCRYPTION_ALGORITHM.equals(
+					PasswordEncryptorUtil.TYPE_NONE)) {
 
 				if (LDAPSettingsUtil.isPasswordPolicyEnabled(
 						user.getCompanyId())) {
@@ -3466,7 +3301,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 					passwordReset = true;
 				}
 
-				user.setPassword(PwdEncryptor.encrypt(newPassword));
+				user.setPassword(PasswordEncryptorUtil.encrypt(newPassword));
 				user.setPasswordUnencrypted(newPassword);
 				user.setPasswordEncrypted(true);
 				user.setPasswordReset(passwordReset);
@@ -3548,6 +3383,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void setRoleUsers(long roleId, long[] userIds)
 		throws PortalException, SystemException {
 
@@ -3569,6 +3405,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	@SuppressWarnings("deprecation")
 	public void setUserGroupUsers(long userGroupId, long[] userIds)
 		throws PortalException, SystemException {
@@ -3611,7 +3448,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *
 	 * @param  groupId the primary key of the group
 	 * @param  userIds the primary keys of the users
-	 * @param  serviceContext the service context (optionally <code>null</code>)
+	 * @param  serviceContext the service context to be applied (optionally
+	 *         <code>null</code>)
 	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -3619,7 +3457,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			long groupId, long[] userIds, ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		userGroupRoleLocalService.deleteUserGroupRoles(userIds, groupId);
+		userGroupRoleLocalService.deleteUserGroupRoles(
+			userIds, groupId, RoleConstants.TYPE_SITE);
 
 		userLocalService.unsetGroupTeamsUsers(groupId, userIds);
 
@@ -3648,9 +3487,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		Group group = organization.getGroup();
 
-		long groupId = group.getGroupId();
-
-		userGroupRoleLocalService.deleteUserGroupRoles(userIds, groupId);
+		userGroupRoleLocalService.deleteUserGroupRoles(
+			userIds, group.getGroupId(), RoleConstants.TYPE_ORGANIZATION);
 
 		organizationPersistence.removeUsers(organizationId, userIds);
 
@@ -3688,7 +3526,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		Role role = rolePersistence.findByPrimaryKey(roleId);
 
-		if (role.getName().equals(RoleConstants.USER)) {
+		String roleName = role.getName();
+
+		if ((roleName.equals(RoleConstants.ADMINISTRATOR) &&
+			 (getRoleUsersCount(role.getRoleId()) <= 1)) ||
+			roleName.equals(RoleConstants.USER)) {
+
 			return;
 		}
 
@@ -3714,7 +3557,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		Role role = rolePersistence.findByPrimaryKey(roleId);
 
-		if (role.getName().equals(RoleConstants.USER)) {
+		String roleName = role.getName();
+
+		if (roleName.equals(RoleConstants.USER) ||
+			(roleName.equals(RoleConstants.ADMINISTRATOR) &&
+				getRoleUsersCount(role.getRoleId()) <= 1)) {
+
 			return;
 		}
 
@@ -3887,9 +3735,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  password the user's password
 	 * @param  emailAddress1 the user's new email address
 	 * @param  emailAddress2 the user's new email address confirmation
-	 * @param  serviceContext the service context. Must set the portal URL, main
-	 *         path, primary key of the layout, remote address, remote host, and
-	 *         agent for the user.
+	 * @param  serviceContext the service context to be applied. Must set the
+	 *         portal URL, main path, primary key of the layout, remote address,
+	 *         remote host, and agent for the user.
 	 * @return the user
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
@@ -3977,7 +3825,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *
 	 * @param  userId the primary key of the user
 	 * @param  newGroupIds the primary keys of the groups
-	 * @param  serviceContext the service context (optionally <code>null</code>)
+	 * @param  serviceContext the service context to be applied (optionally
+	 *         <code>null</code>)
 	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -4022,7 +3871,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  updateUserInformation whether to update the user's information
 	 * @param  sendEmail whether to send the user an email notification about
 	 *         their new account
-	 * @param  serviceContext the user's service context (optionally
+	 * @param  serviceContext the service context to be applied (optionally
 	 *         <code>null</code>). Can set expando bridge attributes for the
 	 *         user.
 	 * @return the user
@@ -4047,6 +3896,17 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		User defaultUser = getDefaultUser(companyId);
+
+		if (facebookId > 0) {
+			autoPassword = false;
+
+			if ((password1 == null) || (password2 == null)) {
+				password1 = PwdGenerator.getPassword();
+				password2 = password1;
+			}
+
+			sendEmail = false;
+		}
 
 		if (updateUserInformation) {
 			autoScreenName = false;
@@ -4094,7 +3954,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				locale, "welcome-x", " " + fullName, false);
 
 			if (Validator.isNotNull(password1)) {
-				user.setPassword(PwdEncryptor.encrypt(password1));
+				user.setPassword(PasswordEncryptorUtil.encrypt(password1));
 				user.setPasswordUnencrypted(password1);
 			}
 
@@ -4379,8 +4239,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 *
 	 * @param  userId the primary key of the user
 	 * @param  newOrganizationIds the primary keys of the organizations
-	 * @param  serviceContext the service context. Must set whether user
-	 *         indexing is enabled.
+	 * @param  serviceContext the service context to be applied. Must set
+	 *         whether user indexing is enabled.
 	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -4443,10 +4303,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		String oldEncPwd = user.getPassword();
 
 		if (!user.isPasswordEncrypted()) {
-			oldEncPwd = PwdEncryptor.encrypt(user.getPassword());
+			oldEncPwd = PasswordEncryptorUtil.encrypt(user.getPassword());
 		}
 
-		String newEncPwd = PwdEncryptor.encrypt(password1);
+		String newEncPwd = PasswordEncryptorUtil.encrypt(password1);
 
 		if (user.hasCompanyMx()) {
 			mailService.updatePassword(user.getCompanyId(), userId, password1);
@@ -4747,10 +4607,10 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	 * @param  roleIds the primary keys of the user's roles
 	 * @param  userGroupRoles the user user's group roles
 	 * @param  userGroupIds the primary keys of the user's user groups
-	 * @param  serviceContext the user's service context (optionally
-	 *         <code>null</code>). Can set the universally unique identifier
-	 *         (with the <code>uuid</code> attribute), asset category IDs, asset
-	 *         tag names, and expando bridge attributes for the user.
+	 * @param  serviceContext the service context to be applied (optionally
+	 *         <code>null</code>). Can set the UUID (with the <code>uuid</code>
+	 *         attribute), asset category IDs, asset tag names, and expando
+	 *         bridge attributes for the user.
 	 * @return the user
 	 * @throws PortalException if a user with the primary key could not be found
 	 *         or if the new information was invalid
@@ -5277,7 +5137,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		if (!user.isPasswordEncrypted()) {
-			user.setPassword(PwdEncryptor.encrypt(user.getPassword()));
+			user.setPassword(PasswordEncryptorUtil.encrypt(user.getPassword()));
 			user.setPasswordEncrypted(true);
 
 			userPersistence.update(user);
@@ -5461,17 +5321,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		final Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
 			User.class);
 
-		Callable<Void> callable = new Callable<Void>() {
+		Callable<Void> callable = new PortalCallable<Void>(
+			user.getCompanyId()) {
 
-			public Void call() throws Exception {
-				try {
-					ShardUtil.pushCompanyService(user.getCompanyId());
-
-					indexer.reindex(user);
-				}
-				finally {
-					ShardUtil.popCompanyService();
-				}
+			@Override
+			protected Void doCall() throws Exception {
+				indexer.reindex(user);
 
 				return null;
 			}

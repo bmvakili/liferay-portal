@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,6 +40,7 @@ import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
+import com.liferay.portlet.documentlibrary.FileExtensionException;
 import com.liferay.portlet.documentlibrary.FileNameException;
 import com.liferay.portlet.documentlibrary.FileSizeException;
 import com.liferay.portlet.documentlibrary.action.EditFileEntryAction;
@@ -160,7 +161,9 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 						ServletResponseConstants.SC_FILE_NAME_EXCEPTION);
 				}
 			}
-			else if (e instanceof FileSizeException) {
+			else if (e instanceof FileExtensionException ||
+					 e instanceof FileSizeException) {
+
 				SessionErrors.add(actionRequest, e.getClass());
 			}
 			else {
@@ -269,15 +272,18 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 		long nodeId = ParamUtil.getLong(actionRequest, "nodeId");
 		String title = ParamUtil.getString(actionRequest, "title");
 
-		String tempFileName = TempFileUtil.getTempFileName(
-			themeDisplay.getUserId(), selectedFileName, _TEMP_FOLDER_NAME);
+		FileEntry tempFileEntry = null;
 
 		try {
-			InputStream inputStream = TempFileUtil.getTempFileAsStream(
-				tempFileName);
+			tempFileEntry = TempFileUtil.getTempFile(
+				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
+				selectedFileName, _TEMP_FOLDER_NAME);
+
+			InputStream inputStream = tempFileEntry.getContentStream();
+			String mimeType = tempFileEntry.getMimeType();
 
 			WikiPageServiceUtil.addPageAttachment(
-				nodeId, title, selectedFileName, inputStream);
+				nodeId, title, selectedFileName, inputStream, mimeType);
 
 			validFileNames.add(selectedFileName);
 		}
@@ -291,7 +297,9 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 			invalidFileNameKVPs.add(invalidFileNameKVP);
 		}
 		finally {
-			TempFileUtil.deleteTempFile(tempFileName);
+			if (tempFileEntry != null) {
+				TempFileUtil.deleteTempFile(tempFileEntry.getFileEntryId());
+			}
 		}
 	}
 
@@ -309,8 +317,11 @@ public class EditPageAttachmentsAction extends EditFileEntryAction {
 		try {
 			inputStream = uploadPortletRequest.getFileAsStream("file");
 
+			String mimeType = uploadPortletRequest.getContentType("file");
+
 			WikiPageServiceUtil.addTempPageAttachment(
-				nodeId, sourceFileName, _TEMP_FOLDER_NAME, inputStream);
+				nodeId, sourceFileName, _TEMP_FOLDER_NAME, inputStream,
+				mimeType);
 		}
 		finally {
 			StreamUtil.cleanUp(inputStream);

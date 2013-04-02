@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -675,7 +675,7 @@ public class RoleFinderImpl
 		if (_countByR_U == null) {
 			StringBundler sb = new StringBundler(13);
 
-			sb.append("(");
+			sb.append(StringPool.OPEN_PARENTHESIS);
 			sb.append(CustomSQLUtil.get(COUNT_BY_ORGANIZATION));
 			sb.append(") UNION (");
 			sb.append(CustomSQLUtil.get(COUNT_BY_ORGANIZATION_SITE));
@@ -687,7 +687,7 @@ public class RoleFinderImpl
 			sb.append(CustomSQLUtil.get(COUNT_BY_USER_GROUP));
 			sb.append(") UNION (");
 			sb.append(CustomSQLUtil.get(COUNT_BY_USER_GROUP_SITE));
-			sb.append(")");
+			sb.append(StringPool.CLOSE_PARENTHESIS);
 
 			_countByR_U = sb.toString();
 		}
@@ -768,7 +768,7 @@ public class RoleFinderImpl
 			}
 		}
 
-		sb.append(")");
+		sb.append(StringPool.CLOSE_PARENTHESIS);
 
 		return sb.toString();
 	}

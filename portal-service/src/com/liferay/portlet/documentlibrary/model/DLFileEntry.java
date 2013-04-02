@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -80,7 +80,7 @@ public interface DLFileEntry extends DLFileEntryModel, PersistedModel {
 
 	public java.lang.String getLuceneProperties();
 
-	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashFolder();
+	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashContainer();
 
 	public boolean hasLock();
 
@@ -88,13 +88,10 @@ public interface DLFileEntry extends DLFileEntryModel, PersistedModel {
 
 	public boolean isInHiddenFolder();
 
-	public boolean isInTrashFolder();
+	public boolean isInTrashContainer();
 
 	public void setExtraSettings(java.lang.String extraSettings);
 
 	public void setExtraSettingsProperties(
 		com.liferay.portal.kernel.util.UnicodeProperties extraSettingsProperties);
-
-	public void setFileVersion(
-		com.liferay.portlet.documentlibrary.model.DLFileVersion dlFileVersion);
 }

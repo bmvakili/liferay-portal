@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,6 +56,13 @@ request.setAttribute("view.jsp-folder", folder);
 
 request.setAttribute("view.jsp-folderId", String.valueOf(folderId));
 %>
+
+<portlet:actionURL var="undoTrashURL">
+	<portlet:param name="struts_action" value="/journal/edit_entry" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo portletURL="<%= undoTrashURL %>" />
 
 <div id="<portlet:namespace />journalContainer">
 	<aui:layout cssClass="lfr-app-column-view">
@@ -163,6 +170,7 @@ int foldersTotal = GetterUtil.getInteger((String)request.getAttribute("view_fold
 					node: A.one(document.<portlet:namespace />fm)
 				},
 				moveEntryRenderUrl: '<portlet:renderURL><portlet:param name="struts_action" value="/journal/move_entry" /></portlet:renderURL>',
+				trashLinkId: '<%= TrashUtil.isTrashEnabled(scopeGroupId) ? "_" + PortletKeys.CONTROL_PANEL_MENU + "_portlet_" + PortletKeys.TRASH : StringPool.BLANK %>',
 				updateable: true
 			},
 			paginator: {

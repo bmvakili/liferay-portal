@@ -4,7 +4,7 @@
 /* ---------- Base styles ---------- */
 
 body {
-	background: #EEF0F2;
+	background: #EEF0F2 url(../images/custom/sidebar_bg.png) repeat-y 0 0;
 	color: #1A1A1A;
 	font-size: 12px;
 }
@@ -22,35 +22,15 @@ select {
 	padding: 4px;
 }
 
-.display-panel-columns:after, .display-panel-columns:before {
-	position: fixed;
-	content: '';
-	display: block;
-	bottom: 0;
-	top: 0;
-	width: 238px;
-	z-index: -1;
-}
-
-.display-panel-columns:after {
-	margin-left: 1px;
-	border-right: 1px solid #FFF;
-}
-
-.ie8 .display-panel-columns:after {
-	position: relative;
-}
-
-.display-panel-columns:before {
-	background-color: #CAD2DD;
-	border-right: 1px solid #B0B1B3;
-}
-
 body.portal-popup:after, body.portal-popup:before {
-	display: none;
+	background-image: none;
 }
 
-.panels-minimized.display-panel-columns:before, .panels-minimized.display-panel-columns:after, .panels-minimized .panel-page-menu {
+.panels-minimized.display-panel-columns {
+	background-position: -198px 0;
+}
+
+.panels-minimized .panel-page-menu {
 	left: -198px;
 }
 
@@ -62,7 +42,7 @@ body.portal-popup:after, body.portal-popup:before {
 	clear: none;
 }
 
-#skip-to-content, #banner, #minimize-panels span, #heading .site-title, #breadcrumbs h1, #navigation h1, .lfr-ctrl-panel .user-greeting {
+#skip-to-content, #banner, .minimize-panels span, #heading .site-title, #breadcrumbs h1, #navigation h1, .lfr-ctrl-panel .user-greeting {
 	clip: rect(0 0 0 0);
 	position: absolute;
 }
@@ -285,7 +265,7 @@ body.portal-popup:after, body.portal-popup:before {
 	display: block;
 }
 
-#minimize-panels {
+.minimize-panels {
 	background: #333;
 	position: absolute;
 	right: -10px;
@@ -293,18 +273,18 @@ body.portal-popup:after, body.portal-popup:before {
 	z-index: 6;
 }
 
-#minimize-panels, #minimize-panels a {
+.minimize-panels, .minimize-panels a {
 	display: block;
 	height: 33px;
 	width: 10px;
 }
 
-#minimize-panels a {
+.minimize-panels a {
 	background: url(../images/custom/toggle_panels_bg.gif) 1px 0 no-repeat;
 	border-bottom: 1px solid #FFF;
 }
 
-.panels-minimized #minimize-panels a {
+.panels-minimized .minimize-panels a {
 	background-position: 1px -34px;
 }
 
@@ -712,7 +692,7 @@ body.portal-popup:after, body.portal-popup:before {
 	padding: 5px 0 0;
 }
 
-/*----- Extras -----*/
+/* ---------- Extras ---------- */
 
 input[type="text"], input[type="password"], select, textarea, .textarea, .aui-tagselector-content .aui-textboxlistentry-holder {
 	@include box-shadow(0 1px 0 #FFF, 0 1px 2px #CCC inset);
@@ -740,7 +720,7 @@ input[type="text"], input[type="password"], select, textarea, .textarea, #breadc
 	@include box-shadow(0 0 8px #CECECE inset);
 }
 
-#minimize-panels {
+.minimize-panels {
 	@include border-radius(0 2px 2px 0);
 }
 

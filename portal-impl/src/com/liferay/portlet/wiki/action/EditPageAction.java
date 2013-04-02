@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.wiki.action;
 
 import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
+import com.liferay.portal.kernel.sanitizer.SanitizerException;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.Constants;
@@ -135,7 +136,8 @@ public class EditPageAction extends PortletAction {
 			else if (e instanceof DuplicatePageException ||
 					 e instanceof PageContentException ||
 					 e instanceof PageVersionException ||
-					 e instanceof PageTitleException) {
+					 e instanceof PageTitleException ||
+					 e instanceof SanitizerException) {
 
 				SessionErrors.add(actionRequest, e.getClass());
 			}
@@ -145,7 +147,14 @@ public class EditPageAction extends PortletAction {
 				SessionErrors.add(actionRequest, e.getClass(), e);
 			}
 			else {
-				throw e;
+				Throwable cause = e.getCause();
+
+				if (cause instanceof SanitizerException) {
+					SessionErrors.add(actionRequest, SanitizerException.class);
+				}
+				else {
+					throw e;
+				}
 			}
 		}
 	}
@@ -214,7 +223,7 @@ public class EditPageAction extends PortletAction {
 		}
 		else {
 			if (version > 0) {
-				WikiPageServiceUtil.deletePage(nodeId, title, version);
+				WikiPageServiceUtil.discardDraft(nodeId, title, version);
 			}
 			else {
 				WikiPageServiceUtil.deletePage(nodeId, title);
@@ -226,7 +235,7 @@ public class EditPageAction extends PortletAction {
 
 			data.put(
 				"restoreEntryIds",
-				new String[]{String.valueOf(wikiPage.getResourcePrimKey())});
+				new String[] {String.valueOf(wikiPage.getResourcePrimKey())});
 
 			SessionMessages.add(
 				actionRequest,

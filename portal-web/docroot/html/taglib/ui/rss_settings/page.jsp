@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@
 <%
 int delta = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:rss-settings:delta"));
 String displayStyle = (String)request.getAttribute("liferay-ui:rss-settings:displayStyle");
+String[] displayStyles = (String[])request.getAttribute("liferay-ui:rss-settings:displayStyles");
 boolean enabled = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:rss-settings:enabled"));
 String feedType = (String)request.getAttribute("liferay-ui:rss-settings:feedType");
 String name = (String)request.getAttribute("liferay-ui:rss-settings:name");
@@ -57,9 +58,17 @@ boolean nameEnabled = GetterUtil.getBoolean((String)request.getAttribute("lifera
 			</aui:select>
 
 			<aui:select label="display-style" name="preferences--rssDisplayStyle--">
-				<aui:option label="<%= RSSUtil.DISPLAY_STYLE_ABSTRACT %>" selected="<%= displayStyle.equals(RSSUtil.DISPLAY_STYLE_ABSTRACT) %>" />
-				<aui:option label="<%= RSSUtil.DISPLAY_STYLE_FULL_CONTENT%>" selected="<%= displayStyle.equals(RSSUtil.DISPLAY_STYLE_FULL_CONTENT) %>" />
-				<aui:option label="<%= RSSUtil.DISPLAY_STYLE_TITLE %>" selected="<%= displayStyle.equals(RSSUtil.DISPLAY_STYLE_TITLE) %>" />
+
+				<%
+				for (String curDisplayStyle : displayStyles) {
+				%>
+
+					<aui:option label="<%= curDisplayStyle %>" selected="<%= displayStyle.equals(curDisplayStyle) %>" />
+
+				<%
+				}
+				%>
+
 			</aui:select>
 
 			<aui:select label="format" name="preferences--rssFeedType--">

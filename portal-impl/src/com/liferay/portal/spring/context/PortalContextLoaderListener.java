@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,12 +42,11 @@ import com.liferay.portal.kernel.util.PortalLifecycleUtil;
 import com.liferay.portal.kernel.util.ReferenceRegistry;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.webcache.WebCachePoolUtil;
-import com.liferay.portal.module.framework.ModuleFrameworkUtil;
-import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
-import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
+import com.liferay.portal.module.framework.ModuleFrameworkUtilAdapter;
 import com.liferay.portal.security.permission.PermissionCacheUtil;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
 import com.liferay.portal.spring.bean.BeanReferenceRefreshUtil;
+import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebAppPool;
@@ -118,21 +117,25 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			_log.error(e, e);
 		}
 
-		try {
-			ModuleFrameworkUtil.stopRuntime();
-		}
-		catch (Exception e) {
-			_log.error(e, e);
+		if (PropsValues.MODULE_FRAMEWORK_ENABLED) {
+			try {
+				ModuleFrameworkUtilAdapter.stopRuntime();
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
 		}
 
 		try {
 			super.contextDestroyed(servletContextEvent);
 
-			try {
-				ModuleFrameworkUtil.stopFramework();
-			}
-			catch (Exception e) {
-				_log.error(e, e);
+			if (PropsValues.MODULE_FRAMEWORK_ENABLED) {
+				try {
+					ModuleFrameworkUtilAdapter.stopFramework();
+				}
+				catch (Exception e) {
+					_log.error(e, e);
+				}
 			}
 		}
 		finally {
@@ -142,8 +145,6 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		PortalSecurityManagerThreadLocal.setEnabled(false);
-
 		DBFactoryUtil.reset();
 		DeployManagerUtil.reset();
 		InstancePool.reset();
@@ -167,7 +168,7 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		if (PropsValues.MODULE_FRAMEWORK_ENABLED) {
 			try {
-				ModuleFrameworkUtil.startFramework();
+				ModuleFrameworkUtilAdapter.startFramework();
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -181,8 +182,6 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		}
 		finally {
 			PortalContextLoaderLifecycleThreadLocal.setInitializing(false);
-
-			PortalSecurityManagerThreadLocal.setEnabled(true);
 		}
 
 		ApplicationContext applicationContext =
@@ -211,13 +210,10 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		SingleVMPoolUtil.clear();
 		WebCachePoolUtil.clear();
 
-		ClassLoader portalClassLoader =
-			PACLClassLoaderUtil.getPortalClassLoader();
+		ClassLoader portalClassLoader = ClassLoaderUtil.getPortalClassLoader();
 
 		BeanLocatorImpl beanLocatorImpl = new BeanLocatorImpl(
 			portalClassLoader, applicationContext);
-
-		beanLocatorImpl.setPACLWrapPersistence(true);
 
 		PortalBeanLocatorUtil.setBeanLocator(beanLocatorImpl);
 
@@ -236,10 +232,10 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		if (PropsValues.MODULE_FRAMEWORK_ENABLED) {
 			try {
-				ModuleFrameworkUtil.registerContext(applicationContext);
-				ModuleFrameworkUtil.registerContext(servletContext);
+				ModuleFrameworkUtilAdapter.registerContext(applicationContext);
+				ModuleFrameworkUtilAdapter.registerContext(servletContext);
 
-				ModuleFrameworkUtil.startRuntime();
+				ModuleFrameworkUtilAdapter.startRuntime();
 			}
 			catch (Exception e) {
 				_log.error(e, e);

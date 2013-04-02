@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -175,12 +175,12 @@ public interface WikiPageLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Returns the wiki page with the UUID in the group.
+	* Returns the wiki page matching the UUID and group.
 	*
-	* @param uuid the UUID of wiki page
-	* @param groupId the group id of the wiki page
-	* @return the wiki page
-	* @throws PortalException if a wiki page with the UUID in the group could not be found
+	* @param uuid the wiki page's UUID
+	* @param groupId the primary key of the group
+	* @return the matching wiki page
+	* @throws PortalException if a matching wiki page could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -258,13 +258,14 @@ public interface WikiPageLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public void addPageAttachment(long userId, long nodeId,
-		java.lang.String title, java.lang.String fileName, java.io.File file)
+		java.lang.String title, java.lang.String fileName, java.io.File file,
+		java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public void addPageAttachment(long userId, long nodeId,
 		java.lang.String title, java.lang.String fileName,
-		java.io.InputStream inputStream)
+		java.io.InputStream inputStream, java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -294,9 +295,9 @@ public interface WikiPageLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public java.lang.String addTempPageAttachment(long userId,
+	public void addTempPageAttachment(long groupId, long userId,
 		java.lang.String fileName, java.lang.String tempFolderName,
-		java.io.InputStream inputStream)
+		java.io.InputStream inputStream, java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -310,6 +311,10 @@ public interface WikiPageLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated As of 6.2.0 replaced by {@link #discardDraft(long, String,
+	double)}
+	*/
 	public void deletePage(long nodeId, java.lang.String title, double version)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -331,12 +336,16 @@ public interface WikiPageLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void deleteTempPageAttachment(long userId,
+	public void deleteTempPageAttachment(long groupId, long userId,
 		java.lang.String fileName, java.lang.String tempFolderName)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public void deleteTrashPageAttachments(long nodeId, java.lang.String title)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void discardDraft(long nodeId, java.lang.String title, double version)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -517,7 +526,8 @@ public interface WikiPageLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated {@link #getRecentChanges(long, long, int, int)}
+	* @deprecated As of 6.2.0, replaced by {@link #getRecentChanges(long, long,
+	int, int)}
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getRecentChanges(
@@ -531,7 +541,8 @@ public interface WikiPageLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated {@link #getRecentChangesCount(long, long)}
+	* @deprecated As of 6.2.0, replaced by {@link #getRecentChangesCount(long,
+	long)}
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getRecentChangesCount(long nodeId)
@@ -543,8 +554,10 @@ public interface WikiPageLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.lang.String[] getTempPageAttachmentNames(long userId,
-		java.lang.String tempFolderName);
+	public java.lang.String[] getTempPageAttachmentNames(long groupId,
+		long userId, java.lang.String tempFolderName)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasDraftPage(long nodeId, java.lang.String title)
@@ -624,12 +637,6 @@ public interface WikiPageLocalService extends BaseLocalService,
 	public com.liferay.portlet.wiki.model.WikiPage updateStatus(long userId,
 		long resourcePrimKey, int status,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	public com.liferay.portlet.wiki.model.WikiPage updateStatus(long userId,
-		com.liferay.portlet.wiki.model.WikiPage page, int status,
-		int nodeStatus, com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.increment.BufferedIncrement;
 import com.liferay.portal.kernel.increment.NumberIncrement;
-import com.liferay.portal.kernel.lar.ImportExportThreadLocal;
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.FacetedSearcher;
 import com.liferay.portal.kernel.search.Field;
@@ -313,14 +313,11 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 		return assetEntryFinder.findEntries(entryQuery);
 	}
 
-	@BufferedIncrement(incrementClass = NumberIncrement.class)
+	@BufferedIncrement(
+		configuration = "AssetEntry", incrementClass = NumberIncrement.class)
 	public AssetEntry incrementViewCounter(
 			long userId, String className, long classPK, int increment)
 		throws SystemException {
-
-		if (!PropsValues.ASSET_ENTRY_INCREMENT_VIEW_COUNTER_ENABLED) {
-			return null;
-		}
 
 		if (classPK <= 0) {
 			return null;
@@ -353,8 +350,8 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #search(long, long[], long, String, String, int, int,
-	 *             int)}
+	 * @deprecated As of 6.2.0, replaced by {@link #search(long, long[], long,
+	 *             String, String, int, int, int)}
 	 */
 	public Hits search(
 			long companyId, long[] groupIds, long userId, String className,
@@ -414,8 +411,9 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #search(long, long[], long, String, String, String,
-	 *             String, String, String, int, boolean, int, int)}
+	 * @deprecated As of 6.2.0, replaced by {@link #search(long, long[], long,
+	 *             String, String, String, String, String, String, int, boolean,
+	 *             int, int)}
 	 */
 	public Hits search(
 			long companyId, long[] groupIds, long userId, String className,
@@ -486,8 +484,8 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #search(long, long[], long, String, String, int, int,
-	 *             int)}
+	 * @deprecated As of 6.2.0, replaced by {@link #search(long, long[], long,
+	 *             String, String, int, int, int)}
 	 */
 	public Hits search(
 			long companyId, long[] groupIds, String className, String keywords,
@@ -588,7 +586,7 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 		// Tags
 
 		if (tagNames != null) {
-			long parentGroupId = PortalUtil.getParentGroupId(groupId);
+			long siteGroupId = PortalUtil.getSiteGroupId(groupId);
 
 			List<AssetTag> tags = new ArrayList<AssetTag>(tagNames.length);
 
@@ -596,14 +594,14 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 				AssetTag tag = null;
 
 				try {
-					tag = assetTagLocalService.getTag(parentGroupId, tagName);
+					tag = assetTagLocalService.getTag(siteGroupId, tagName);
 				}
 				catch (NoSuchTagException nste) {
 					ServiceContext serviceContext = new ServiceContext();
 
 					serviceContext.setAddGroupPermissions(true);
 					serviceContext.setAddGuestPermissions(true);
-					serviceContext.setScopeGroupId(parentGroupId);
+					serviceContext.setScopeGroupId(siteGroupId);
 
 					tag = assetTagLocalService.addTag(
 						user.getUserId(), tagName,
@@ -752,9 +750,10 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #updateEntry(long, long, String, long, String, long,
-	 *             long[], String[], boolean, Date, Date, Date, String, String,
-	 *             String, String, String, String, int, int, Integer, boolean)}
+	 * @deprecated As of 6.2.0, replaced by {@link #updateEntry(long, long,
+	 *             String, long, String, long, long[], String[], boolean, Date,
+	 *             Date, Date, String, String, String, String, String, String,
+	 *             int, int, Integer, boolean)}
 	 */
 	public AssetEntry updateEntry(
 			long userId, long groupId, String className, long classPK,
@@ -774,10 +773,10 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #updateEntry(long, long, Date, Date, String, long,
-	 *             String, long, long[], String[], boolean, Date, Date, Date,
-	 *             String, String, String, String, String, String, int, int,
-	 *             Integer, boolean)}
+	 * @deprecated As of 6.2.0, replaced by {@link #updateEntry(long, long,
+	 *             Date, Date, String, long, String, long, long[], String[],
+	 *             boolean, Date, Date, Date, String, String, String, String,
+	 *             String, String, int, int, Integer, boolean)}
 	 */
 	public AssetEntry updateEntry(
 			long userId, long groupId, String className, long classPK,
@@ -854,7 +853,7 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 			String[] tagNames)
 		throws PortalException, SystemException {
 
-		if (ImportExportThreadLocal.isImportInProcess()) {
+		if (ExportImportThreadLocal.isImportInProcess()) {
 			return;
 		}
 

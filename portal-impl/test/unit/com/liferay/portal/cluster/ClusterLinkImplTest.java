@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.cluster.Address;
 import com.liferay.portal.kernel.cluster.Priority;
 import com.liferay.portal.kernel.cluster.messaging.ClusterForwardMessageListener;
 import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -40,11 +41,13 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+import org.jgroups.Channel.State;
 import org.jgroups.JChannel;
 import org.jgroups.View;
 import org.jgroups.util.UUID;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -54,6 +57,10 @@ import org.junit.runner.RunWith;
  */
 @RunWith(AspectJMockingNewClassLoaderJUnitTestRunner.class)
 public class ClusterLinkImplTest extends BaseClusterTestCase {
+
+	@ClassRule
+	public static CodeCoverageAssertor codeCoverageAssertor =
+		new CodeCoverageAssertor();
 
 	@AdviseWith(adviceClasses = {DisableClusterLinkAdvice.class})
 	@Test
@@ -81,11 +88,11 @@ public class ClusterLinkImplTest extends BaseClusterTestCase {
 
 		JChannel jChannel = jChannels.get(0);
 
-		Assert.assertTrue(jChannel.isOpen());
+		Assert.assertTrue(isOpen(jChannel));
 
 		jChannel = jChannels.get(1);
 
-		Assert.assertTrue(jChannel.isOpen());
+		Assert.assertTrue(isOpen(jChannel));
 
 		clusterLinkImpl.destroy();
 
@@ -95,11 +102,11 @@ public class ClusterLinkImplTest extends BaseClusterTestCase {
 
 		jChannel = jChannels.get(0);
 
-		Assert.assertFalse(jChannel.isOpen());
+		Assert.assertFalse(isOpen(jChannel));
 
 		jChannel = jChannels.get(1);
 
-		Assert.assertFalse(jChannel.isOpen());
+		Assert.assertFalse(isOpen(jChannel));
 	}
 
 	@AdviseWith(
@@ -633,6 +640,12 @@ public class ClusterLinkImplTest extends BaseClusterTestCase {
 		JChannel jChannel = jChannels.get(index);
 
 		return (TestReceiver)jChannel.getReceiver();
+	}
+
+	protected boolean isOpen(JChannel jChannel) {
+		String state = jChannel.getState();
+
+		return !state.equals(State.CLOSED.toString());
 	}
 
 	private class TestReceiver extends BaseReceiver {

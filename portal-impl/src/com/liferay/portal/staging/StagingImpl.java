@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,10 +28,13 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.messaging.MessageStatus;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelperUtil;
+import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.staging.LayoutStagingUtil;
 import com.liferay.portal.kernel.staging.Staging;
 import com.liferay.portal.kernel.staging.StagingConstants;
@@ -116,6 +119,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Wesley Gong
  * @author Zsolt Balogh
  */
+@DoPrivileged
 public class StagingImpl implements Staging {
 
 	public String buildRemoteURL(
@@ -179,7 +183,8 @@ public class StagingImpl implements Staging {
 		Group liveGroup = stagingGroup.getLiveGroup();
 
 		Layout sourceLayout = LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
-			targetLayout.getUuid(), liveGroup.getGroupId());
+			targetLayout.getUuid(), liveGroup.getGroupId(),
+			targetLayout.isPrivateLayout());
 
 		copyPortlet(
 			portletRequest, liveGroup.getGroupId(), stagingGroup.getGroupId(),
@@ -285,8 +290,8 @@ public class StagingImpl implements Staging {
 					layouts.add(layout);
 				}
 
-				List<Layout> parentLayouts = getMissingParentLayouts(
-					layout, sourceGroupId);
+				List<Layout> parentLayouts = getMissingRemoteParentLayouts(
+					httpPrincipal, layout, remoteGroupId);
 
 				for (Layout parentLayout : parentLayouts) {
 					if (!layouts.contains(parentLayout)) {
@@ -608,6 +613,9 @@ public class StagingImpl implements Staging {
 		return group.getGroupId();
 	}
 
+	/**
+	 * @see #getMissingRemoteParentLayouts(HttpPrincipal, Layout, long)
+	 */
 	public List<Layout> getMissingParentLayouts(Layout layout, long liveGroupId)
 		throws Exception {
 
@@ -623,7 +631,8 @@ public class StagingImpl implements Staging {
 
 			try {
 				LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
-					parentLayout.getUuid(), liveGroupId);
+					parentLayout.getUuid(), liveGroupId,
+					parentLayout.isPrivateLayout());
 
 				// If one parent is found all others are assumed to exist
 
@@ -1088,7 +1097,8 @@ public class StagingImpl implements Staging {
 			liveGroup = stagingGroup.getLiveGroup();
 
 			targetLayout = LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
-				sourceLayout.getUuid(), liveGroup.getGroupId());
+				sourceLayout.getUuid(), liveGroup.getGroupId(),
+				sourceLayout.isPrivateLayout());
 		}
 
 		copyPortlet(
@@ -1144,8 +1154,8 @@ public class StagingImpl implements Staging {
 	}
 
 	public void setRecentLayoutBranchId(
-		HttpServletRequest request, long layoutSetBranchId, long plid,
-		long layoutBranchId)
+			HttpServletRequest request, long layoutSetBranchId, long plid,
+			long layoutBranchId)
 		throws SystemException {
 
 		PortalPreferences portalPreferences =
@@ -1156,7 +1166,7 @@ public class StagingImpl implements Staging {
 	}
 
 	public void setRecentLayoutBranchId(
-		User user, long layoutSetBranchId, long plid, long layoutBranchId)
+			User user, long layoutSetBranchId, long plid, long layoutBranchId)
 		throws SystemException {
 
 		PortalPreferences portalPreferences = getPortalPreferences(user);
@@ -1427,6 +1437,11 @@ public class StagingImpl implements Staging {
 				}
 			}
 			catch (LayoutSetBranchNameException lsbne) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to create master branch for public layouts",
+						lsbne);
+				}
 			}
 		}
 
@@ -1457,6 +1472,11 @@ public class StagingImpl implements Staging {
 				}
 			}
 			catch (LayoutSetBranchNameException lsbne) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to create master branch for private layouts",
+						lsbne);
+				}
 			}
 		}
 	}
@@ -1511,7 +1531,7 @@ public class StagingImpl implements Staging {
 		}
 		else {
 			locale = LocaleUtil.getDefault();
-			timeZone = TimeZoneUtil.getDefault();
+			timeZone = TimeZoneUtil.getTimeZone(StringPool.UTC);
 		}
 
 		Calendar cal = CalendarFactoryUtil.getCalendar(timeZone, locale);
@@ -1553,6 +1573,40 @@ public class StagingImpl implements Staging {
 		return ParamUtil.getLong(
 			portletRequest, param,
 			GetterUtil.getLong(group.getTypeSettingsProperty(param)));
+	}
+
+	/**
+	 * @see #getMissingParentLayouts(Layout, long)
+	 */
+	protected List<Layout> getMissingRemoteParentLayouts(
+			HttpPrincipal httpPrincipal, Layout layout, long remoteGroupId)
+		throws Exception {
+
+		List<Layout> missingRemoteParentLayouts = new ArrayList<Layout>();
+
+		long parentLayoutId = layout.getParentLayoutId();
+
+		while (parentLayoutId > 0) {
+			Layout parentLayout = LayoutLocalServiceUtil.getLayout(
+				layout.getGroupId(), layout.isPrivateLayout(), parentLayoutId);
+
+			try {
+				LayoutServiceHttp.getLayoutByUuidAndGroupId(
+					httpPrincipal, parentLayout.getUuid(), remoteGroupId,
+					parentLayout.getPrivateLayout());
+
+				// If one parent is found all others are assumed to exist
+
+				break;
+			}
+			catch (NoSuchLayoutException nsle) {
+				missingRemoteParentLayouts.add(parentLayout);
+
+				parentLayoutId = parentLayout.getParentLayoutId();
+			}
+		}
+
+		return missingRemoteParentLayouts;
 	}
 
 	protected PortalPreferences getPortalPreferences(User user)
@@ -2108,6 +2162,9 @@ public class StagingImpl implements Staging {
 			}
 		}
 		catch (PortalException pe) {
+			if (_log.isWarnEnabled()) {
+				_log.warn("Unable to set recent layout revision ID", pe);
+			}
 		}
 
 		portalPreferences.setValue(
@@ -2253,5 +2310,7 @@ public class StagingImpl implements Staging {
 		}
 
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(StagingImpl.class);
 
 }

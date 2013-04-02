@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -248,7 +248,8 @@ public class JournalRSSUtil {
 
 		syndEnclosure.setLength((Long)imageProperties[1]);
 		syndEnclosure.setType(
-			MimeTypesUtil.getContentType("*." + imageProperties[0]));
+			MimeTypesUtil.getExtensionContentType(
+				imageProperties[0].toString()));
 		syndEnclosure.setUrl(portalURL + url);
 
 		syndEnclosures.add(syndEnclosure);
@@ -271,7 +272,8 @@ public class JournalRSSUtil {
 		syndLink.setLength((Long)imageProperties[1]);
 		syndLink.setRel("enclosure");
 		syndLink.setType(
-			MimeTypesUtil.getContentType("*." + imageProperties[0]));
+			MimeTypesUtil.getExtensionContentType(
+				imageProperties[0].toString()));
 
 		syndLinks.add(syndLink);
 

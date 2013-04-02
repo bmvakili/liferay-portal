@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,7 +51,7 @@ public class AssetVocabularyLocalServiceImpl
 	extends AssetVocabularyLocalServiceBaseImpl {
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.1.0
 	 */
 	public AssetVocabulary addVocabulary(
 			long userId, Map<Locale, String> titleMap,
@@ -122,6 +122,24 @@ public class AssetVocabularyLocalServiceImpl
 		}
 
 		return vocabulary;
+	}
+
+	public AssetVocabulary addVocabulary(
+			long userId, String title, ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+
+		Locale locale = LocaleUtil.getDefault();
+
+		titleMap.put(locale, title);
+
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+
+		descriptionMap.put(locale, StringPool.BLANK);
+
+		return addVocabulary(
+			userId, title, titleMap, descriptionMap, null, serviceContext);
 	}
 
 	public void addVocabularyResources(
@@ -313,7 +331,7 @@ public class AssetVocabularyLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.1.0
 	 */
 	public AssetVocabulary updateVocabulary(
 			long vocabularyId, Map<Locale, String> titleMap,

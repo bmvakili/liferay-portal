@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -74,6 +76,7 @@ import javax.servlet.jsp.PageContext;
  * @author Daeyoung Song
  * @author Raymond Augé
  */
+@DoPrivileged
 public class ResourceActionsImpl implements ResourceActions {
 
 	public void afterPropertiesSet() {
@@ -387,9 +390,9 @@ public class ResourceActionsImpl implements ResourceActions {
 	public List<String> getPortletResourceGroupDefaultActions(String name) {
 
 		// This method should always be called only after
-		// _getPortletResourceActions has been called at least once to
-		// populate the default group actions. Check to make sure this is the
-		// case. However, if it is not, that means the methods
+		// _getPortletResourceActions has been called at least once to populate
+		// the default group actions. Check to make sure this is the case.
+		// However, if it is not, that means the methods
 		// getPortletResourceGuestDefaultActions and
 		// getPortletResourceGuestDefaultActions may not work either.
 
@@ -451,7 +454,7 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	public List<String> getResourceActions(String name) {
-		if (name.contains(StringPool.PERIOD)) {
+		if (name.indexOf(CharPool.PERIOD) != -1) {
 			return getModelResourceActions(name);
 		}
 		else {
@@ -500,11 +503,12 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	/**
-	 * @deprecated {@link #getRoles(long, Group, String, int[])}
+	 * @deprecated As of 6.1.0, replaced by {@link #getRoles(long, Group,
+	 *             String, int[])}
 	 */
 	public List<Role> getRoles(
 			long companyId, Group group, String modelResource)
-			throws SystemException {
+		throws SystemException {
 
 		return getRoles(companyId, group, modelResource, null);
 	}
@@ -1087,10 +1091,13 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	protected Portal portal;
+
 	@BeanReference(type = PortletLocalService.class)
 	protected PortletLocalService portletLocalService;
+
 	@BeanReference(type = ResourceActionLocalService.class)
 	protected ResourceActionLocalService resourceActionLocalService;
+
 	@BeanReference(type = RoleLocalService.class)
 	protected RoleLocalService roleLocalService;
 

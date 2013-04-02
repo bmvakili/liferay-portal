@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -190,12 +190,12 @@ public class AssetVocabularyLocalServiceWrapper
 	}
 
 	/**
-	* Returns the asset vocabulary with the UUID in the group.
+	* Returns the asset vocabulary matching the UUID and group.
 	*
-	* @param uuid the UUID of asset vocabulary
-	* @param groupId the group id of the asset vocabulary
-	* @return the asset vocabulary
-	* @throws PortalException if a asset vocabulary with the UUID in the group could not be found
+	* @param uuid the asset vocabulary's UUID
+	* @param groupId the primary key of the group
+	* @return the matching asset vocabulary
+	* @throws PortalException if a matching asset vocabulary could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.asset.model.AssetVocabulary getAssetVocabularyByUuidAndGroupId(
@@ -267,7 +267,7 @@ public class AssetVocabularyLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated
+	* @deprecated As of 6.1.0
 	*/
 	public com.liferay.portlet.asset.model.AssetVocabulary addVocabulary(
 		long userId,
@@ -291,6 +291,15 @@ public class AssetVocabularyLocalServiceWrapper
 			com.liferay.portal.kernel.exception.SystemException {
 		return _assetVocabularyLocalService.addVocabulary(userId, title,
 			titleMap, descriptionMap, settings, serviceContext);
+	}
+
+	public com.liferay.portlet.asset.model.AssetVocabulary addVocabulary(
+		long userId, java.lang.String title,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _assetVocabularyLocalService.addVocabulary(userId, title,
+			serviceContext);
 	}
 
 	public void addVocabularyResources(
@@ -396,7 +405,7 @@ public class AssetVocabularyLocalServiceWrapper
 	}
 
 	/**
-	* @deprecated
+	* @deprecated As of 6.1.0
 	*/
 	public com.liferay.portlet.asset.model.AssetVocabulary updateVocabulary(
 		long vocabularyId,
@@ -423,14 +432,14 @@ public class AssetVocabularyLocalServiceWrapper
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public AssetVocabularyLocalService getWrappedAssetVocabularyLocalService() {
 		return _assetVocabularyLocalService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedAssetVocabularyLocalService(
 		AssetVocabularyLocalService assetVocabularyLocalService) {

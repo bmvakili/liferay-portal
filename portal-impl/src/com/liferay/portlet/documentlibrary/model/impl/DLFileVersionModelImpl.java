@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -113,11 +113,12 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	public static long FILEENTRYID_COLUMN_BITMASK = 2L;
 	public static long FOLDERID_COLUMN_BITMASK = 4L;
 	public static long GROUPID_COLUMN_BITMASK = 8L;
-	public static long STATUS_COLUMN_BITMASK = 16L;
-	public static long TITLE_COLUMN_BITMASK = 32L;
-	public static long UUID_COLUMN_BITMASK = 64L;
-	public static long VERSION_COLUMN_BITMASK = 128L;
-	public static long CREATEDATE_COLUMN_BITMASK = 256L;
+	public static long MIMETYPE_COLUMN_BITMASK = 16L;
+	public static long STATUS_COLUMN_BITMASK = 32L;
+	public static long TITLE_COLUMN_BITMASK = 64L;
+	public static long UUID_COLUMN_BITMASK = 128L;
+	public static long VERSION_COLUMN_BITMASK = 256L;
+	public static long CREATEDATE_COLUMN_BITMASK = 512L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -196,7 +197,7 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public Serializable getPrimaryKeyObj() {
-		return new Long(_fileVersionId);
+		return _fileVersionId;
 	}
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
@@ -597,7 +598,17 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	public void setMimeType(String mimeType) {
+		_columnBitmask |= MIMETYPE_COLUMN_BITMASK;
+
+		if (_originalMimeType == null) {
+			_originalMimeType = _mimeType;
+		}
+
 		_mimeType = mimeType;
+	}
+
+	public String getOriginalMimeType() {
+		return GetterUtil.getString(_originalMimeType);
 	}
 
 	@JSON
@@ -785,7 +796,7 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	}
 
 	/**
-	 * @deprecated {@link #isApproved}
+	 * @deprecated As of 6.1.0, replaced by {@link #isApproved}
 	 */
 	public boolean getApproved() {
 		return isApproved();
@@ -1016,6 +1027,8 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 		dlFileVersionModelImpl._originalFileEntryId = dlFileVersionModelImpl._fileEntryId;
 
 		dlFileVersionModelImpl._setOriginalFileEntryId = false;
+
+		dlFileVersionModelImpl._originalMimeType = dlFileVersionModelImpl._mimeType;
 
 		dlFileVersionModelImpl._originalTitle = dlFileVersionModelImpl._title;
 
@@ -1371,6 +1384,7 @@ public class DLFileVersionModelImpl extends BaseModelImpl<DLFileVersion>
 	private boolean _setOriginalFileEntryId;
 	private String _extension;
 	private String _mimeType;
+	private String _originalMimeType;
 	private String _title;
 	private String _originalTitle;
 	private String _description;

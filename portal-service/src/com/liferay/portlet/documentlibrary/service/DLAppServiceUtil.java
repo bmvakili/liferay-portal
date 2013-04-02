@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -259,32 +259,32 @@ public class DLAppServiceUtil {
 	* @param fileName the file's original name
 	* @param tempFolderName the temporary folder's name
 	* @param file Name the file's original name
+	* @param mimeType the file's MIME type
 	* @return the file's name
-	* @throws IOException if a problem occurred in the access or storage of the
-	file
 	* @throws PortalException if the file name was invalid
 	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.kernel.util.TempFileUtil
 	*/
-	public static java.lang.String addTempFileEntry(long groupId,
-		long folderId, java.lang.String fileName,
-		java.lang.String tempFolderName, java.io.File file)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException,
-			java.io.IOException {
-		return getService()
-				   .addTempFileEntry(groupId, folderId, fileName,
-			tempFolderName, file);
-	}
-
-	public static java.lang.String addTempFileEntry(long groupId,
-		long folderId, java.lang.String fileName,
-		java.lang.String tempFolderName, java.io.InputStream inputStream)
+	public static com.liferay.portal.kernel.repository.model.FileEntry addTempFileEntry(
+		long groupId, long folderId, java.lang.String fileName,
+		java.lang.String tempFolderName, java.io.File file,
+		java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .addTempFileEntry(groupId, folderId, fileName,
-			tempFolderName, inputStream);
+			tempFolderName, file, mimeType);
+	}
+
+	public static com.liferay.portal.kernel.repository.model.FileEntry addTempFileEntry(
+		long groupId, long folderId, java.lang.String fileName,
+		java.lang.String tempFolderName, java.io.InputStream inputStream,
+		java.lang.String mimeType)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .addTempFileEntry(groupId, folderId, fileName,
+			tempFolderName, inputStream, mimeType);
 	}
 
 	/**
@@ -350,7 +350,8 @@ public class DLAppServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #checkInFileEntry(long, String, ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long,
+	String, ServiceContext)}
 	*/
 	public static void checkInFileEntry(long fileEntryId,
 		java.lang.String lockUuid)
@@ -376,7 +377,7 @@ public class DLAppServiceUtil {
 	* </p>
 	*
 	* @param fileEntryId the primary key of the file entry to check in
-	* @param lockUuid the lock's universally unique identifier
+	* @param lockUuid the lock's UUID
 	* @param serviceContext the service context to be applied
 	* @throws PortalException if the file entry could not be found
 	* @throws SystemException if a system exception occurred
@@ -875,7 +876,7 @@ public class DLAppServiceUtil {
 	/**
 	* Returns the file entry with the UUID and group.
 	*
-	* @param uuid the file entry's universally unique identifier
+	* @param uuid the file entry's UUID
 	* @param groupId the primary key of the file entry's group
 	* @return the file entry with the UUID and group
 	* @throws PortalException if the file entry could not be found
@@ -1729,7 +1730,8 @@ public class DLAppServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #checkOutFileEntry(long, ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
+	ServiceContext)}
 	*/
 	public static com.liferay.portal.model.Lock lockFileEntry(long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -1738,8 +1740,8 @@ public class DLAppServiceUtil {
 	}
 
 	/**
-	* @deprecated {@link #checkOutFileEntry(long, String, long,
-	ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
+	String, long, ServiceContext)}
 	*/
 	public static com.liferay.portal.model.Lock lockFileEntry(
 		long fileEntryId, java.lang.String owner, long expirationTime)
@@ -1936,7 +1938,7 @@ public class DLAppServiceUtil {
 	* Refreshes the lock for the file entry. This method is primarily used by
 	* WebDAV.
 	*
-	* @param lockUuid the lock's universally unique identifier
+	* @param lockUuid the lock's UUID
 	* @param companyId the primary key of the file entry's company
 	* @param expirationTime the time in milliseconds before the lock expires.
 	If the value is <code>0</code>, the default expiration time will
@@ -1957,7 +1959,7 @@ public class DLAppServiceUtil {
 	* Refreshes the lock for the folder. This method is primarily used by
 	* WebDAV.
 	*
-	* @param lockUuid the lock's universally unique identifier
+	* @param lockUuid the lock's UUID
 	* @param companyId the primary key of the file entry's company
 	* @param expirationTime the time in milliseconds before the lock expires.
 	If the value is <code>0</code>, the default expiration time will
@@ -2047,8 +2049,40 @@ public class DLAppServiceUtil {
 	}
 
 	/**
-	* @deprecated Use {@link #checkInFileEntry(long, boolean, String,
-	ServiceContext)}.
+	* Subscribe the user to changes in documents of the file entry type. This
+	* method is only supported by the Liferay repository.
+	*
+	* @param groupId the primary key of the file entry type's group
+	* @param fileEntryTypeId the primary key of the file entry type
+	* @throws PortalException if the user or group could not be found, or if
+	subscribing was not permissible
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void subscribeFileEntryType(long groupId, long fileEntryTypeId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().subscribeFileEntryType(groupId, fileEntryTypeId);
+	}
+
+	/**
+	* Subscribe the user to document changes in the folder. This method is only
+	* supported by the Liferay repository.
+	*
+	* @param groupId the primary key of the folder's group
+	* @param folderId the primary key of the folder
+	* @throws PortalException if the user or group could not be found, or if
+	subscribing was not permissible
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void subscribeFolder(long groupId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().subscribeFolder(groupId, folderId);
+	}
+
+	/**
+	* @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long,
+	boolean, String, ServiceContext)}.
 	*/
 	public static void unlockFileEntry(long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -2057,7 +2091,8 @@ public class DLAppServiceUtil {
 	}
 
 	/**
-	* @deprecated Use {@link #checkInFileEntry(long, String)}.
+	* @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long,
+	String)}.
 	*/
 	public static void unlockFileEntry(long fileEntryId,
 		java.lang.String lockUuid)
@@ -2071,7 +2106,7 @@ public class DLAppServiceUtil {
 	*
 	* @param repositoryId the primary key of the repository
 	* @param folderId the primary key of the folder
-	* @param lockUuid the lock's universally unique identifier
+	* @param lockUuid the lock's UUID
 	* @throws PortalException if the repository or folder could not be found
 	* @throws SystemException if a system exception occurred
 	*/
@@ -2088,7 +2123,7 @@ public class DLAppServiceUtil {
 	* @param repositoryId the primary key of the repository
 	* @param parentFolderId the primary key of the parent folder
 	* @param name the folder's name
-	* @param lockUuid the lock's universally unique identifier
+	* @param lockUuid the lock's UUID
 	* @throws PortalException if the repository or folder could not be found
 	* @throws SystemException if a system exception occurred
 	*/
@@ -2097,6 +2132,39 @@ public class DLAppServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().unlockFolder(repositoryId, parentFolderId, name, lockUuid);
+	}
+
+	/**
+	* Unsubscribe the user from changes in documents of the file entry type.
+	* This method is only supported by the Liferay repository.
+	*
+	* @param groupId the primary key of the file entry type's group
+	* @param fileEntryTypeId the primary key of the file entry type
+	* @throws PortalException if the user or group could not be found, or if
+	unsubscribing was not permissible
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void unsubscribeFileEntryType(long groupId,
+		long fileEntryTypeId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().unsubscribeFileEntryType(groupId, fileEntryTypeId);
+	}
+
+	/**
+	* Unsubscribe the user from document changes in the folder. This method is
+	* only supported by the Liferay repository.
+	*
+	* @param groupId the primary key of the folder's group
+	* @param folderId the primary key of the folder
+	* @throws PortalException if the user or group could not be found, or if
+	unsubscribing was not permissible
+	* @throws SystemException if a system exception occurred
+	*/
+	public static void unsubscribeFolder(long groupId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().unsubscribeFolder(groupId, folderId);
 	}
 
 	/**
@@ -2337,7 +2405,7 @@ public class DLAppServiceUtil {
 	*
 	* @param repositoryId the primary key for the repository
 	* @param fileEntryId the primary key for the file entry
-	* @param lockUuid the lock's universally unique identifier
+	* @param lockUuid the lock's UUID
 	* @return <code>true</code> if the file entry is checked out;
 	<code>false</code> otherwise
 	* @throws PortalException if the file entry could not be found
@@ -2365,7 +2433,7 @@ public class DLAppServiceUtil {
 	*
 	* @param repositoryId the primary key for the repository
 	* @param folderId the primary key for the folder
-	* @param lockUuid the lock's universally unique identifier
+	* @param lockUuid the lock's UUID
 	* @return <code>true</code> if the inheritable lock exists;
 	<code>false</code> otherwise
 	* @throws PortalException if the folder could not be found
@@ -2391,7 +2459,7 @@ public class DLAppServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(DLAppService service) {
 	}

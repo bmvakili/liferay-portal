@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,11 +45,17 @@ String script = BeanParamUtil.getString(structure, request, "xsd");
 JSONArray scriptJSONArray = null;
 
 if (Validator.isNotNull(script)) {
-	scriptJSONArray = DDMXSDUtil.getJSONArray(script);
-}
-
-if (scriptJSONArray != null) {
-	scriptJSONArray = _addStructureFieldAttributes(structure, scriptJSONArray);
+	if (structure != null) {
+		try {
+			scriptJSONArray = DDMXSDUtil.getJSONArray(structure, script);
+		}
+		catch (Exception e) {
+			scriptJSONArray = DDMXSDUtil.getJSONArray(structure.getDocument());
+		}
+	}
+	else {
+		scriptJSONArray = DDMXSDUtil.getJSONArray(script);
+	}
 }
 %>
 
@@ -155,7 +161,7 @@ if (scriptJSONArray != null) {
 
 				<aui:input name="description" />
 
-				<aui:field-wrapper label="parent-data-definition">
+				<aui:field-wrapper label='<%= LanguageUtil.format(pageContext, "parent-x", scopeStructureName) %>'>
 					<aui:input name="parentStructureId" type="hidden" value="<%= parentStructureId %>" />
 
 					<c:choose>
@@ -185,14 +191,9 @@ if (scriptJSONArray != null) {
 						<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathMain() + "/dynamic_data_mapping/get_structure?structureId=" + classPK %>' />
 					</aui:field-wrapper>
 
-					<c:if test="<%= portletDisplay.isWebDAVEnabled() %>">
+					<c:if test="<%= Validator.isNotNull(refererWebDAVToken) %>">
 						<aui:field-wrapper label="webdav-url">
-
-							<%
-							Group scopeGroup = GroupLocalServiceUtil.getGroup(scopeGroupId);
-							%>
-
-							<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/webdav" + scopeGroup.getFriendlyURL() + "/dynamic_data_mapping/ddmStructures/" + classPK %>' />
+							<liferay-ui:input-resource url="<%= structure.getWebDavURL(themeDisplay, refererWebDAVToken) %>" />
 						</aui:field-wrapper>
 					</c:if>
 				</c:if>
@@ -212,52 +213,45 @@ if (scriptJSONArray != null) {
 <aui:script>
 	function <portlet:namespace />openParentStructureSelector() {
 		Liferay.Util.openDDMPortlet(
-		{
-			ddmResource: '<%= ddmResource %>',
-			dialog: {
-				width: 820
+			{
+				availableFields: 'Liferay.FormBuilder.AVAILABLE_FIELDS.WCM_STRUCTURE',
+				classPK: <%= (structure != null) ? structure.getPrimaryKey() : 0 %>,
+				ddmResource: '<%= ddmResource %>',
+				dialog: {
+					width: 820
+				},
+				eventName: '<portlet:namespace />selectParentStructure',
+				showGlobalScope: true,
+				showManageTemplates: false,
+				storageType: '<%= scopeStorageType %>',
+				structureName: '<%= scopeStructureName %>',
+				structureType: '<%= scopeStructureType %>',
+				struts_action: '/dynamic_data_mapping/select_structure',
+				title: '<%= scopeTitle %>'
 			},
-			saveCallback: '<%= renderResponse.getNamespace() + "selectParentStructure" %>',
-			showGlobalScope: true,
-			showManageTemplates: false,
-			storageType: '<%= PropsValues.DYNAMIC_DATA_LISTS_STORAGE_TYPE %>',
-			structureName: 'data-definition',
-			structureType: 'com.liferay.portlet.dynamicdatalists.model.DDLRecordSet',
-			struts_action: '/dynamic_data_mapping/select_structure',
-			title: '<%= UnicodeLanguageUtil.get(pageContext, "data-definitions") %>'
-		}
+			function(event){
+				document.<portlet:namespace />fm.<portlet:namespace />parentStructureId.value = event.ddmstructureid;
+
+				var nameEl = document.getElementById('<portlet:namespace />parentStructureName');
+
+				nameEl.href = '<portlet:renderURL><portlet:param name="struts_action" value="/dynamic_data_mapping/edit_structure" /><portlet:param name="redirect" value="<%= currentURL %>" /><portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" /><portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" /></portlet:renderURL>&<portlet:namespace />classPK=' + event.ddmstructureid;
+				nameEl.innerHTML = event.name + '&nbsp;';
+
+				document.getElementById('<portlet:namespace />removeParentStructureButton').disabled = false;
+			}
 		);
 	}
 
 	function <portlet:namespace />removeParentStructure() {
-		document.<portlet:namespace />fm.<portlet:namespace />parentStructureId.value = "";
+		document.<portlet:namespace />fm.<portlet:namespace />parentStructureId.value = '';
 
-		var nameEl = document.getElementById("<portlet:namespace />parentStructureName");
+		var nameEl = document.getElementById('<portlet:namespace />parentStructureName');
 
-		nameEl.href = "#";
-		nameEl.innerHTML = "";
+		nameEl.href = '#';
+		nameEl.innerHTML = '';
 
-		document.getElementById("<portlet:namespace />removeParentStructureButton").disabled = true;
+		document.getElementById('<portlet:namespace />removeParentStructureButton').disabled = true;
 	}
-
-	Liferay.provide(
-		window,
-		'<portlet:namespace />selectParentStructure',
-		function(ddmStructureId, ddmStructureName, dialog) {
-			document.<portlet:namespace />fm.<portlet:namespace />parentStructureId.value = ddmStructureId;
-
-			var nameEl = document.getElementById("<portlet:namespace />parentStructureName");
-
-			nameEl.href = "<portlet:renderURL><portlet:param name="struts_action" value="/dynamic_data_mapping/edit_structure" /><portlet:param name="redirect" value="<%= currentURL %>" /><portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" /><portlet:param name="classNameId" value="<%= String.valueOf(classNameId) %>" /></portlet:renderURL>&<portlet:namespace />classPK=" + ddmStructureId;
-			nameEl.innerHTML = ddmStructureName + "&nbsp;";
-
-			document.getElementById("<portlet:namespace />removeParentStructureButton").disabled = false;
-
-			if (dialog) {
-				dialog.close();
-			}
-		}
-	);
 </aui:script>
 
 <aui:script>
@@ -265,48 +259,14 @@ if (scriptJSONArray != null) {
 		window,
 		'<portlet:namespace />saveStructure',
 		function() {
-			if (window.<portlet:namespace />formBuilder) {
-				document.<portlet:namespace />fm.<portlet:namespace />xsd.value = window.<portlet:namespace />formBuilder.getXSD();
-			}
+			document.<portlet:namespace />fm.<portlet:namespace />xsd.value = window.<portlet:namespace />formBuilder.getContentXSD();
 
 			submitForm(document.<portlet:namespace />fm);
 		},
-		['aui-base']
+		['aui-base', 'liferay-portlet-dynamic-data-mapping']
 	);
 
 	<c:if test="<%= Validator.isNotNull(saveCallback) && (classPK != 0) %>">
 		window.parent['<%= HtmlUtil.escapeJS(saveCallback) %>']('<%= classPK %>', '<%= HtmlUtil.escape(structure.getName(locale)) %>');
 	</c:if>
 </aui:script>
-
-<%!
-public JSONArray _addStructureFieldAttributes(DDMStructure structure, JSONArray scriptJSONArray) throws Exception {
-	for (int i = 0; i < scriptJSONArray.length(); i++) {
-		JSONObject jsonObject = scriptJSONArray.getJSONObject(i);
-
-		String fieldName = jsonObject.getString("name");
-
-		try {
-			jsonObject.put("readOnlyAttributes", _getFieldReadOnlyAttributes(structure, fieldName));
-		}
-		catch (StructureFieldException sfe) {
-		}
-	}
-
-	return scriptJSONArray;
-}
-
-public JSONArray _getFieldReadOnlyAttributes(DDMStructure structure, String fieldName) throws Exception {
-	JSONArray readOnlyAttributesJSONArray = JSONFactoryUtil.createJSONArray();
-
-	try {
-		if (DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(structure.getStructureId()) > 0) {
-			readOnlyAttributesJSONArray.put("name");
-		}
-	}
-	catch (Exception e) {
-	}
-
-	return readOnlyAttributesJSONArray;
-}
-%>

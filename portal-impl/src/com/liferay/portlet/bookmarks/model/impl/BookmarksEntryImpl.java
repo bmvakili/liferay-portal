@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,6 +46,25 @@ public class BookmarksEntryImpl extends BookmarksEntryBaseImpl {
 		}
 
 		return folder;
+	}
+
+	public BookmarksFolder getTrashContainer() {
+		BookmarksFolder folder = getFolder();
+
+		if (folder.isInTrash()) {
+			return folder;
+		}
+
+		return folder.getTrashContainer();
+	}
+
+	public boolean isInTrashContainer() {
+		if (getTrashContainer() != null) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(BookmarksEntryImpl.class);

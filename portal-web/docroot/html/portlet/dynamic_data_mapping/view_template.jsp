@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,12 @@ if (!portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
 	}
 }
 %>
+
+<liferay-ui:error exception="<%= RequiredTemplateException.class %>">
+	<liferay-ui:message key="required-templates-could-not-be-deleted" />
+
+	<liferay-ui:message key="they-are-referenced-by-web-contents" />
+</liferay-ui:error>
 
 <portlet:renderURL var="viewRecordsURL">
 	<portlet:param name="struts_action" value="/dynamic_data_lists/view" />
@@ -169,9 +175,9 @@ if (!portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
 				String value = null;
 
 				if (portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
-					PortletDisplayTemplateHandler portletDisplayTemplateHandler = PortletDisplayTemplateHandlerRegistryUtil.getPortletDisplayTemplateHandler(template.getClassNameId());
+					TemplateHandler templateHandler = TemplateHandlerRegistryUtil.getTemplateHandler(template.getClassNameId());
 
-					value = portletDisplayTemplateHandler.getName(locale);
+					value = templateHandler.getName(locale);
 				}
 				else if (Validator.isNull(templateTypeValue)) {
 					value = LanguageUtil.get(pageContext, template.getType());
@@ -234,6 +240,22 @@ if (!portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
 </aui:form>
 
 <aui:script>
+	function <portlet:namespace />copyTemplate(uri) {
+		Liferay.Util.openWindow(
+			{
+				dialog: {
+					align: Liferay.Util.Window.ALIGN_CENTER,
+					constrain: true,
+					width: 600
+				},
+				id: '<portlet:namespace />copyTemplate',
+				refreshWindow: window,
+				title: '<%= UnicodeLanguageUtil.get(pageContext, "copy-template") %>',
+				uri: uri
+			}
+		);
+	}
+
 	Liferay.provide(
 		window,
 		'<portlet:namespace />deleteTemplates',
@@ -254,7 +276,7 @@ if (!portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
 	var buttons = A.all('.delete-templates-button');
 
 	if (buttons.size()) {
-		var toggleDisabled = A.bind(Liferay.Util.toggleDisabled, Liferay.Util, ':button');
+		var toggleDisabled = A.bind('toggleDisabled', Liferay.Util, ':button');
 
 		var resultsGrid = A.one('.results-grid');
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,8 +49,10 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_user_roles.jsp-po
 	url="<%= portletURL.toString() %>"
 />
 
+<liferay-ui:membership-policy-error />
+
 <liferay-ui:search-container
-	rowChecker="<%= new UserGroupRoleUserChecker(renderResponse, group, role) %>"
+	rowChecker="<%= (role.getType() == RoleConstants.TYPE_SITE) ? new UserGroupRoleUserChecker(renderResponse, group, role) : new OrganizationRoleUserChecker(renderResponse, organization, role) %>"
 	searchContainer="<%= new UserSearch(renderRequest, portletURL) %>"
 >
 	<liferay-ui:search-form
@@ -62,7 +64,7 @@ PortletURL portletURL = (PortletURL)request.getAttribute("edit_user_roles.jsp-po
 
 	LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
 
-	userParams.put("inherit", true);
+	userParams.put("inherit", Boolean.TRUE);
 	userParams.put("usersGroups", new Long(group.getGroupId()));
 
 	if (tabs1.equals("current")) {

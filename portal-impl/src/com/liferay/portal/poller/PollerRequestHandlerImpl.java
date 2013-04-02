@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -81,7 +81,13 @@ public class PollerRequestHandlerImpl
 		PollerHeader pollerHeader = parsePollerRequestHeader(
 			pollerRequestChunks);
 
-		if (pollerHeader == null) {
+		if (!isValidPollerHeader(pollerHeader)) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Invalid poller header for request " +
+						pollerRequestString);
+			}
+
 			return null;
 		}
 
@@ -121,7 +127,7 @@ public class PollerRequestHandlerImpl
 			return;
 		}
 
-		PollerResponse pollerResponse = (PollerResponse) messagePayload;
+		PollerResponse pollerResponse = (PollerResponse)messagePayload;
 
 		PollerHeader pollerHeader = pollerResponse.getPollerHeader();
 
@@ -357,8 +363,22 @@ public class PollerRequestHandlerImpl
 		}
 	}
 
+	protected boolean isValidPollerHeader(PollerHeader pollerHeader) {
+		if (pollerHeader == null) {
+			return false;
+		}
+
+		Map<String, Boolean> portletIdsMap = pollerHeader.getPortletIdsMap();
+
+		if ((portletIdsMap == null) || portletIdsMap.isEmpty()) {
+			return false;
+		}
+
+		return true;
+	}
+
 	protected Map<String, String> parseData(
-		Map<String, Object> pollerRequestChunk)
+			Map<String, Object> pollerRequestChunk)
 		throws Exception {
 
 		Map<String, Object> oldParameterMap =

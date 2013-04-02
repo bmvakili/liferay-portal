@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -162,8 +162,7 @@ public class IncludeTag extends AttributesTagSupport {
 
 		_calledSetAttributes = true;
 
-		HttpServletRequest request =
-			(HttpServletRequest)pageContext.getRequest();
+		HttpServletRequest request = getOriginalServletRequest();
 
 		if (isCleanUpSetAttributes()) {
 			_trackedRequest = new TrackedServletRequest(request);
@@ -269,6 +268,10 @@ public class IncludeTag extends AttributesTagSupport {
 
 	protected String getEndPage() {
 		return null;
+	}
+
+	protected HttpServletRequest getOriginalServletRequest() {
+		return (HttpServletRequest)pageContext.getRequest();
 	}
 
 	protected String getPage() {

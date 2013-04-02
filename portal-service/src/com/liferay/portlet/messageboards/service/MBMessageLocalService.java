@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -179,12 +179,12 @@ public interface MBMessageLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Returns the message-boards message with the UUID in the group.
+	* Returns the message-boards message matching the UUID and group.
 	*
-	* @param uuid the UUID of message-boards message
-	* @param groupId the group id of the message-boards message
-	* @return the message-boards message
-	* @throws PortalException if a message-boards message with the UUID in the group could not be found
+	* @param uuid the message-boards message's UUID
+	* @param groupId the primary key of the group
+	* @return the matching message-boards message
+	* @throws PortalException if a matching message-boards message could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -275,6 +275,13 @@ public interface MBMessageLocalService extends BaseLocalService,
 		java.lang.String format,
 		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.io.InputStream>> inputStreamOVPs,
 		boolean anonymous, double priority, boolean allowPingbacks,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.messageboards.model.MBMessage addMessage(
+		long userId, java.lang.String userName, long categoryId,
+		java.lang.String subject, java.lang.String body,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;

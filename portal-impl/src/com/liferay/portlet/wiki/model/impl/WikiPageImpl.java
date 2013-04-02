@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,15 +20,17 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.service.WikiNodeLocalServiceUtil;
 import com.liferay.portlet.wiki.service.WikiPageLocalServiceUtil;
 import com.liferay.portlet.wiki.service.WikiPageServiceUtil;
-import com.liferay.portlet.wiki.util.WikiPageAttachmentsUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,8 +74,19 @@ public class WikiPageImpl extends WikiPageBaseImpl {
 			return _attachmentsFolderId;
 		}
 
-		_attachmentsFolderId = WikiPageAttachmentsUtil.getFolderId(
-			getGroupId(), getUserId(), getNodeId(), getResourcePrimKey());
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setAddGroupPermissions(true);
+		serviceContext.setAddGuestPermissions(true);
+
+		long repositoryId = PortletFileRepositoryUtil.getPortletRepositoryId(
+			getGroupId(), PortletKeys.WIKI, serviceContext);
+
+		Folder folder = PortletFileRepositoryUtil.getPortletFolder(
+			getUserId(), repositoryId, getNodeAttachmentsFolderId(),
+			String.valueOf(getResourcePrimKey()), serviceContext);
+
+		_attachmentsFolderId = folder.getFolderId();
 
 		return _attachmentsFolderId;
 	}
@@ -124,6 +137,14 @@ public class WikiPageImpl extends WikiPageBaseImpl {
 		}
 	}
 
+	public long getNodeAttachmentsFolderId()
+		throws PortalException, SystemException {
+
+		WikiNode node = getNode();
+
+		return node.getAttachmentsFolderId();
+	}
+
 	public WikiPage getParentPage() {
 		if (Validator.isNull(getParentTitle())) {
 			return null;
@@ -169,6 +190,16 @@ public class WikiPageImpl extends WikiPageBaseImpl {
 		}
 	}
 
+	public WikiNode getTrashContainer() {
+		WikiNode node = getNode();
+
+		if (node.isInTrash()) {
+			return node;
+		}
+
+		return null;
+	}
+
 	public List<WikiPage> getViewableChildPages() {
 		try {
 			return WikiPageServiceUtil.getChildren(
@@ -210,7 +241,7 @@ public class WikiPageImpl extends WikiPageBaseImpl {
 		return pages;
 	}
 
-	public boolean isInTrashFolder() {
+	public boolean isInTrashContainer() {
 		WikiNode node = getNode();
 
 		if (node != null) {

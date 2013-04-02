@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,16 +17,25 @@
 <%@ include file="/html/portlet/sites_admin/init.jsp" %>
 
 <%
-String target = ParamUtil.getString(request, "target");
+String p_u_i_d = ParamUtil.getString(request, "p_u_i_d");
 boolean includeCompany = ParamUtil.getBoolean(request, "includeCompany");
 boolean includeUserPersonalSite = ParamUtil.getBoolean(request, "includeUserPersonalSite");
+String callback = ParamUtil.getString(request, "callback", "selectGroup");
+String target = ParamUtil.getString(request, "target");
+
+User selUser = PortalUtil.getSelectedUser(request);
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/sites_admin/select_site");
-portletURL.setParameter("target", target);
 portletURL.setParameter("includeCompany", String.valueOf(includeCompany));
 portletURL.setParameter("includeUserPersonalSite", String.valueOf(includeUserPersonalSite));
+portletURL.setParameter("callback", callback);
+portletURL.setParameter("target", target);
+
+if (selUser != null) {
+	portletURL.setParameter("p_u_i_d", String.valueOf(selUser.getUserId()));
+}
 %>
 
 <aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
@@ -78,12 +87,13 @@ portletURL.setParameter("includeUserPersonalSite", String.valueOf(includeUserPer
 
 			groupParams.put("site", Boolean.TRUE);
 
-			int end = searchContainer.getEnd() - additionalSites;
 			int start = searchContainer.getStart();
 
 			if (searchContainer.getStart() > additionalSites) {
 				start = searchContainer.getStart() - additionalSites;
 			}
+
+			int end = searchContainer.getEnd() - additionalSites;
 
 			List<Group> sites = null;
 
@@ -116,19 +126,24 @@ portletURL.setParameter("includeUserPersonalSite", String.valueOf(includeUserPer
 		>
 
 			<%
-			StringBundler sb = new StringBundler(9);
+			String rowHREF = null;
 
-			sb.append("javascript:opener.");
-			sb.append(renderResponse.getNamespace());
-			sb.append("selectGroup('");
-			sb.append(group.getGroupId());
-			sb.append("', '");
-			sb.append(UnicodeFormatter.toString(group.getDescriptiveName(locale)));
-			sb.append("', '");
-			sb.append(target);
-			sb.append("'); window.close();");
+			if (Validator.isNull(p_u_i_d) || SiteMembershipPolicyUtil.isMembershipAllowed((selUser != null) ? selUser.getUserId() : 0, group.getGroupId())) {
+				StringBundler sb = new StringBundler(10);
 
-			String rowHREF = sb.toString();
+				sb.append("javascript:opener.");
+				sb.append(renderResponse.getNamespace());
+				sb.append(callback);
+				sb.append("('");
+				sb.append(group.getGroupId());
+				sb.append("', '");
+				sb.append(UnicodeFormatter.toString(group.getDescriptiveName(locale)));
+				sb.append("', '");
+				sb.append(target);
+				sb.append("'); window.close();");
+
+				rowHREF = sb.toString();
+			}
 			%>
 
 			<liferay-ui:search-container-column-text

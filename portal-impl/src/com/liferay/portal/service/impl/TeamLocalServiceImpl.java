@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -74,7 +74,7 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 
 		roleLocalService.addRole(
 			userId, Team.class.getName(), teamId, String.valueOf(teamId), null,
-			null, RoleConstants.TYPE_PROVIDER, null);
+			null, RoleConstants.TYPE_PROVIDER, null, null);
 
 		return team;
 	}
@@ -130,10 +130,6 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 		return teamPersistence.findByG_N(groupId, name);
 	}
 
-	public List<Team> getUserTeams(long userId) throws SystemException {
-		return userPersistence.getTeams(userId);
-	}
-
 	public List<Team> getUserTeams(long userId, long groupId)
 		throws SystemException {
 
@@ -145,12 +141,6 @@ public class TeamLocalServiceImpl extends TeamLocalServiceBaseImpl {
 		return search(
 			groupId, null, null, params, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
 			null);
-	}
-
-	public boolean hasUserTeam(long userId, long teamId)
-		throws SystemException {
-
-		return userPersistence.containsTeam(userId, teamId);
 	}
 
 	public List<Team> search(

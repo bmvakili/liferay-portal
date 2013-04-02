@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,6 +35,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 
+import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 
 import java.io.File;
@@ -274,7 +275,9 @@ public class ImageProcessorImpl
 				return;
 			}
 
-			if (renderedImage.getColorModel().getNumComponents() == 4) {
+			ColorModel colorModel = renderedImage.getColorModel();
+
+			if (colorModel.getNumColorComponents() == 4) {
 				Future<RenderedImage> future = ImageToolUtil.convertCMYKtoRGB(
 					bytes, imageBag.getType());
 

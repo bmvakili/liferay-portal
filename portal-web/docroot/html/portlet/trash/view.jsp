@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,6 +39,38 @@ portletURL.setParameter("tabs1", tabs1);
 
 <liferay-util:include page="/html/portlet/trash/restore_path.jsp" />
 
+<liferay-ui:error exception="<%= TrashPermissionException.class %>">
+
+	<%
+	TrashPermissionException tpe = (TrashPermissionException)errorException;
+	%>
+
+	<c:if test="<%= tpe.getType() == TrashPermissionException.DELETE %>">
+		<liferay-ui:message key="you-do-not-have-permission-to-delete-this-item" />
+	</c:if>
+
+	<c:if test="<%= tpe.getType() == TrashPermissionException.EMPTY_TRASH %>">
+		<liferay-ui:message key="unable-to-completely-empty-trash-you-do-not-have-permission-to-delete-one-or-more-items" />
+	</c:if>
+
+	<c:if test="<%= tpe.getType() == TrashPermissionException.MOVE %>">
+		<liferay-ui:message key="you-do-not-have-permission-to-move-this-item-to-the-selected-destination" />
+	</c:if>
+
+	<c:if test="<%= tpe.getType() == TrashPermissionException.RESTORE %>">
+		<liferay-ui:message key="you-do-not-have-permission-to-restore-this-item" />
+	</c:if>
+
+	<c:if test="<%= tpe.getType() == TrashPermissionException.RESTORE_OVERWRITE %>">
+		<liferay-ui:message key="you-do-not-have-permission-to-replace-an-existing-item-with-the-selected-one" />
+	</c:if>
+
+	<c:if test="<%= tpe.getType() == TrashPermissionException.RESTORE_RENAME %>">
+		<liferay-ui:message key="you-do-not-have-permission-to-rename-this-item" />
+	</c:if>
+
+</liferay-ui:error>
+
 <c:if test="<%= group.isStagingGroup() %>">
 	<liferay-ui:tabs
 		names="staging,live"
@@ -55,7 +87,6 @@ portletURL.setParameter("tabs1", tabs1);
 
 <liferay-portlet:renderURL varImpl="searchURL">
 	<portlet:param name="struts_action" value="/trash/view" />
-	<portlet:param name="redirect" value="<%= redirect %>" />
 </liferay-portlet:renderURL>
 
 <liferay-ui:search-container
@@ -233,12 +264,15 @@ portletURL.setParameter("tabs1", tabs1);
 		<portlet:param name="struts_action" value="/trash/edit_entry" />
 	</portlet:actionURL>
 
-	<liferay-ui:trash-empty portletURL="<%= emptyTrashURL %>" totalEntries="<%= total %>" />
+	<liferay-ui:trash-empty
+		portletURL="<%= emptyTrashURL %>"
+		totalEntries="<%= total %>"
+	/>
 
 	<aui:form action="<%= searchURL.toString() %>" method="get" name="fm">
 		<liferay-portlet:renderURLParams varImpl="searchURL" />
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="" />
-		<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
+		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 		<aui:input name="deleteTrashEntryIds" type="hidden" />
 		<aui:input name="restoreTrashEntryIds" type="hidden" />
 

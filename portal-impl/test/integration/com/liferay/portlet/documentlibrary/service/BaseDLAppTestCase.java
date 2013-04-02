@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,7 +16,8 @@ package com.liferay.portlet.documentlibrary.service;
 
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.model.Group;
-import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
 
@@ -30,7 +31,7 @@ public abstract class BaseDLAppTestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		group = ServiceTestUtil.addGroup();
+		group = GroupTestUtil.addGroup();
 
 		parentFolder = DLAppTestUtil.addFolder(
 			group.getGroupId(), DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
@@ -39,9 +40,7 @@ public abstract class BaseDLAppTestCase {
 
 	@After
 	public void tearDown() throws Exception {
-		if (parentFolder != null) {
-			DLAppServiceUtil.deleteFolder(parentFolder.getFolderId());
-		}
+		GroupLocalServiceUtil.deleteGroup(group);
 	}
 
 	protected static final String CONTENT =

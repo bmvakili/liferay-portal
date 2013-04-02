@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.service.base.AssetEntryServiceBaseImpl;
@@ -123,10 +124,6 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 	public AssetEntry incrementViewCounter(String className, long classPK)
 		throws PortalException, SystemException {
 
-		if (!PropsValues.ASSET_ENTRY_INCREMENT_VIEW_COUNTER_ENABLED) {
-			return null;
-		}
-
 		AssetEntryPermission.check(
 			getPermissionChecker(), className, classPK, ActionKeys.VIEW);
 
@@ -168,9 +165,10 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #updateEntry(long, String, long, String, long, long[],
-	 *             String[], boolean, Date, Date, Date, String, String, String,
-	 *             String, String, String, int, int, Integer, boolean)}
+	 * @deprecated As of 6.2.0, replaced by {@link #updateEntry(long, String,
+	 *             long, String, long, long[], String[], boolean, Date, Date,
+	 *             Date, String, String, String, String, String, String, int,
+	 *             int, Integer, boolean)}
 	 */
 	public AssetEntry updateEntry(
 			long groupId, String className, long classPK, String classUuid,
@@ -192,10 +190,10 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #updateEntry(long, Date, Date. String, long, String,
-	 *             long, long[], String[], boolean, Date, Date, Date, String,
-	 *             String, String, String, String, String, int, int, Integer,
-	 *             boolean)}
+	 * @deprecated As of 6.2.0, replaced by {@link #updateEntry(long, Date,
+	 *             Date. String, long, String, long, long[], String[], boolean,
+	 *             Date, Date, Date, String, String, String, String, String,
+	 *             String, int, int, Integer, boolean)}
 	 */
 	public AssetEntry updateEntry(
 			long groupId, String className, long classPK, String classUuid,
@@ -240,7 +238,11 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 		List<Long> viewableCategoryIds = new ArrayList<Long>();
 
 		for (long categoryId : categoryIds) {
-			if (AssetCategoryPermission.contains(
+			AssetCategory category = assetCategoryPersistence.fetchByPrimaryKey(
+				categoryId);
+
+			if ((category != null) &&
+				AssetCategoryPermission.contains(
 					getPermissionChecker(), categoryId, ActionKeys.VIEW)) {
 
 				viewableCategoryIds.add(categoryId);
@@ -437,8 +439,8 @@ public class AssetEntryServiceImpl extends AssetEntryServiceBaseImpl {
 			(filteredEntryQuery.getAnyTagIds().length == 0)) {
 
 			// No results will be available if the original entry query
-			// specified at least one tag id, but the filtered entry query
-			// shows that the user does not have access to any tag ids
+			// specified at least one tag id, but the filtered entry query shows
+			// that the user does not have access to any tag ids
 
 			return true;
 		}

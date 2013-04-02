@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -155,11 +155,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 	public DLFileVersion getFileVersion()
 		throws PortalException, SystemException {
 
-		if (_dlFileVersion == null) {
-			_dlFileVersion = getFileVersion(getVersion());
-		}
-
-		return _dlFileVersion;
+		return getFileVersion(getVersion());
 	}
 
 	public DLFileVersion getFileVersion(String version)
@@ -256,14 +252,14 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 		return sb.toString();
 	}
 
-	public DLFolder getTrashFolder() {
+	public DLFolder getTrashContainer() {
 		DLFolder dlFolder = getFolder();
 
 		if (dlFolder.isInTrash()) {
 			return dlFolder;
 		}
 
-		return dlFolder.getTrashFolder();
+		return dlFolder.getTrashContainer();
 	}
 
 	public boolean hasLock() {
@@ -289,7 +285,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 
 	public boolean isInHiddenFolder() {
 		try {
-			long repositoryId = _dlFileVersion.getRepositoryId();
+			long repositoryId = getRepositoryId();
 
 			Repository repository = RepositoryLocalServiceUtil.getRepository(
 				repositoryId);
@@ -306,8 +302,8 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 		return false;
 	}
 
-	public boolean isInTrashFolder() {
-		if (getTrashFolder() != null) {
+	public boolean isInTrashContainer() {
+		if (getTrashContainer() != null) {
 			return true;
 		}
 		else {
@@ -330,13 +326,8 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 		super.setExtraSettings(_extraSettingsProperties.toString());
 	}
 
-	public void setFileVersion(DLFileVersion dlFileVersion) {
-		_dlFileVersion = dlFileVersion;
-	}
-
 	private static Log _log = LogFactoryUtil.getLog(DLFileEntryImpl.class);
 
-	private DLFileVersion _dlFileVersion;
 	private UnicodeProperties _extraSettingsProperties;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -179,12 +179,12 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Returns the document library file entry with the UUID in the group.
+	* Returns the document library file entry matching the UUID and group.
 	*
-	* @param uuid the UUID of document library file entry
-	* @param groupId the group id of the document library file entry
-	* @return the document library file entry
-	* @throws PortalException if a document library file entry with the UUID in the group could not be found
+	* @param uuid the document library file entry's UUID
+	* @param groupId the primary key of the group
+	* @return the matching document library file entry
+	* @throws PortalException if a matching document library file entry could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -268,7 +268,8 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated {@link #checkInFileEntry(long, long, String, ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #checkInFileEntry(long, long,
+	String, ServiceContext)}
 	*/
 	public void checkInFileEntry(long userId, long fileEntryId,
 		java.lang.String lockUuid)
@@ -282,7 +283,8 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated {@link #checkOutFileEntry(long, long, ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
+	long, ServiceContext)}
 	*/
 	public com.liferay.portlet.documentlibrary.model.DLFileEntry checkOutFileEntry(
 		long userId, long fileEntryId)
@@ -296,8 +298,8 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated {@link #checkOutFileEntry(long, long, String, long,
-	ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #checkOutFileEntry(long,
+	long, String, long, ServiceContext)}
 	*/
 	public com.liferay.portlet.documentlibrary.model.DLFileEntry checkOutFileEntry(
 		long userId, long fileEntryId, java.lang.String owner,
@@ -346,8 +348,8 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void deleteFileVersion(long userId, long fileEntryId,
-		java.lang.String version)
+	public com.liferay.portlet.documentlibrary.model.DLFileEntry deleteFileVersion(
+		long userId, long fileEntryId, java.lang.String version)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -423,11 +425,6 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getFileEntries(
 		long folderId, java.lang.String name)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntry> getFileEntriesByMimeType(
-		java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -519,11 +516,16 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 
 	public void incrementViewCounter(
 		com.liferay.portlet.documentlibrary.model.DLFileEntry dlFileEntry,
-		boolean incrementCounter, int increment)
+		int increment)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean isFileEntryCheckedOut(long fileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.model.Lock lockFileEntry(long userId,
+		long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -538,6 +540,9 @@ public interface DLFileEntryLocalService extends BaseLocalService,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	public void unlockFileEntry(long fileEntryId)
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.portlet.documentlibrary.model.DLFileEntry updateFileEntry(
 		long userId, long fileEntryId, java.lang.String sourceFileName,

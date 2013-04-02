@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portlet.wiki.attachments;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
@@ -24,8 +25,8 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.TestPropsValues;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.wiki.model.WikiNode;
 import com.liferay.portlet.wiki.model.WikiPage;
 import com.liferay.portlet.wiki.model.WikiPageConstants;
@@ -49,11 +50,10 @@ public class WikiAttachmentsTrashTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_group = ServiceTestUtil.addGroup();
+		_group = GroupTestUtil.addGroup();
 
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setScopeGroupId(_group.getGroupId());
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
+			_group.getGroupId());
 
 		_node = WikiNodeLocalServiceUtil.addNode(
 			TestPropsValues.getUserId(), ServiceTestUtil.randomString(), "",
@@ -99,6 +99,8 @@ public class WikiAttachmentsTrashTest {
 
 		Class<?> clazz = getClass();
 
+		String fileName = ServiceTestUtil.randomString() + ".docx";
+
 		byte[] fileBytes = FileUtil.getBytes(
 			clazz.getResourceAsStream("dependencies/OSX_Test.docx"));
 
@@ -108,11 +110,11 @@ public class WikiAttachmentsTrashTest {
 			file = FileUtil.createTempFile(fileBytes);
 		}
 
-		String fileName = ServiceTestUtil.randomString() + ".txt";
+		String mimeType = MimeTypesUtil.getExtensionContentType("docx");
 
 		WikiPageLocalServiceUtil.addPageAttachment(
 			TestPropsValues.getUserId(), _node.getNodeId(), _page.getTitle(),
-			fileName, file);
+			fileName, file, mimeType);
 
 		Assert.assertEquals(
 			initialNotInTrashCount + 1, _page.getAttachmentsFileEntriesCount());
@@ -127,8 +129,6 @@ public class WikiAttachmentsTrashTest {
 		FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
 			fileEntryId);
 
-		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
-
 		Assert.assertEquals(
 			initialNotInTrashCount, _page.getAttachmentsFileEntriesCount());
 		Assert.assertEquals(
@@ -138,7 +138,7 @@ public class WikiAttachmentsTrashTest {
 		if (restore) {
 			WikiPageLocalServiceUtil.restorePageAttachmentFromTrash(
 				TestPropsValues.getUserId(), _page.getNodeId(),
-				_page.getTitle(), dlFileEntry.getTitle());
+				_page.getTitle(), fileEntry.getTitle());
 
 			Assert.assertEquals(
 				initialNotInTrashCount + 1,
@@ -152,7 +152,7 @@ public class WikiAttachmentsTrashTest {
 		}
 		else {
 			WikiPageLocalServiceUtil.deletePageAttachment(
-				_page.getNodeId(), _page.getTitle(), dlFileEntry.getTitle());
+				_page.getNodeId(), _page.getTitle(), fileEntry.getTitle());
 
 			Assert.assertEquals(
 				initialNotInTrashCount, _page.getAttachmentsFileEntriesCount());

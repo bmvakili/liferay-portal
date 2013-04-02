@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -193,12 +193,12 @@ public class BookmarksEntryLocalServiceUtil {
 	}
 
 	/**
-	* Returns the bookmarks entry with the UUID in the group.
+	* Returns the bookmarks entry matching the UUID and group.
 	*
-	* @param uuid the UUID of bookmarks entry
-	* @param groupId the group id of the bookmarks entry
-	* @return the bookmarks entry
-	* @throws PortalException if a bookmarks entry with the UUID in the group could not be found
+	* @param uuid the bookmarks entry's UUID
+	* @param groupId the primary key of the group
+	* @return the matching bookmarks entry
+	* @throws PortalException if a matching bookmarks entry could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.bookmarks.model.BookmarksEntry getBookmarksEntryByUuidAndGroupId(
@@ -285,6 +285,13 @@ public class BookmarksEntryLocalServiceUtil {
 		getService().deleteEntries(groupId, folderId);
 	}
 
+	public static void deleteEntries(long groupId, long folderId,
+		boolean includeTrashedEntries)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteEntries(groupId, folderId, includeTrashedEntries);
+	}
+
 	public static com.liferay.portlet.bookmarks.model.BookmarksEntry deleteEntry(
 		com.liferay.portlet.bookmarks.model.BookmarksEntry entry)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -358,11 +365,52 @@ public class BookmarksEntryLocalServiceUtil {
 		return getService().getNoAssetEntries();
 	}
 
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntry(
+		long entryId, long parentFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveEntry(entryId, parentFolderId);
+	}
+
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryFromTrash(
+		long userId, long entryId, long parentFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveEntryFromTrash(userId, entryId, parentFolderId);
+	}
+
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryToTrash(
+		long userId, com.liferay.portlet.bookmarks.model.BookmarksEntry entry)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveEntryToTrash(userId, entry);
+	}
+
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryToTrash(
+		long userId, long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().moveEntryToTrash(userId, entryId);
+	}
+
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry openEntry(
+		long userId, com.liferay.portlet.bookmarks.model.BookmarksEntry entry)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().openEntry(userId, entry);
+	}
+
 	public static com.liferay.portlet.bookmarks.model.BookmarksEntry openEntry(
 		long userId, long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().openEntry(userId, entryId);
+	}
+
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry restoreEntryFromTrash(
+		long userId, long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().restoreEntryFromTrash(userId, entryId);
 	}
 
 	public static void subscribeEntry(long userId, long entryId)
@@ -400,6 +448,14 @@ public class BookmarksEntryLocalServiceUtil {
 			description, serviceContext);
 	}
 
+	public static com.liferay.portlet.bookmarks.model.BookmarksEntry updateStatus(
+		long userId, com.liferay.portlet.bookmarks.model.BookmarksEntry entry,
+		int status)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().updateStatus(userId, entry, status);
+	}
+
 	public static BookmarksEntryLocalService getService() {
 		if (_service == null) {
 			_service = (BookmarksEntryLocalService)PortalBeanLocatorUtil.locate(BookmarksEntryLocalService.class.getName());
@@ -412,7 +468,7 @@ public class BookmarksEntryLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(BookmarksEntryLocalService service) {
 	}

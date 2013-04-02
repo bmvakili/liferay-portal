@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,8 +43,9 @@ public class GhostscriptImpl implements Ghostscript {
 			sb.append("Cannot execute the Ghostscript command. Please install");
 			sb.append("ImageMagick and Ghostscript and enable ImageMagick in ");
 			sb.append("portal-ext.properties or in the Server Administration ");
-			sb.append("control panel at: http://<server>/group/control_panel/");
-			sb.append("manage/-/server/external-services");
+			sb.append("section of the Control Panel at: ");
+			sb.append("http://<server>/group/control_panel/manage/-/server/");
+			sb.append("external-services");
 
 			throw new IllegalStateException(sb.toString());
 		}
@@ -86,7 +87,7 @@ public class GhostscriptImpl implements Ghostscript {
 				_commandPath = getCommandPath();
 			}
 			catch (Exception e) {
-				_log.warn(e, e);
+				_log.error(e, e);
 			}
 		}
 	}
@@ -102,8 +103,14 @@ public class GhostscriptImpl implements Ghostscript {
 		}
 
 		if (commandPath == null) {
-			throw new FileNotFoundException(
-				"Unable to find Ghostscript command");
+			StringBundler sb = new StringBundler(4);
+
+			sb.append("Unable to find the Ghostscript command. Please verify ");
+			sb.append("the path specified in the Server Administration ");
+			sb.append("control panel at: http://<server>/group/control_panel/");
+			sb.append("manage/-/server/external-services");
+
+			throw new FileNotFoundException(sb.toString());
 		}
 
 		return commandPath;

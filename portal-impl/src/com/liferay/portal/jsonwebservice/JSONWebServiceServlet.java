@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -75,7 +75,10 @@ public class JSONWebServiceServlet extends JSONServlet {
 
 		String path = GetterUtil.getString(request.getPathInfo());
 
-		if (!path.equals(StringPool.SLASH) && !path.equals(StringPool.BLANK)) {
+		if ((!path.equals(StringPool.BLANK) &&
+			 !path.equals(StringPool.SLASH)) ||
+			(request.getParameter("discover") != null)) {
+
 			try {
 				ServicePreAction servicePreAction =
 					(ServicePreAction)InstancePool.get(

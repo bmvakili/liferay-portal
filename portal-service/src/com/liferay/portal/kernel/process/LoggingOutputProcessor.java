@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,8 +46,8 @@ public class LoggingOutputProcessor implements OutputProcessor<Void, Void> {
 	private void _processOut(boolean stdErr, InputStream inputStream)
 		throws ProcessException {
 
-		UnsyncBufferedReader unsyncBufferedReader =
-			new UnsyncBufferedReader(new InputStreamReader(inputStream));
+		UnsyncBufferedReader unsyncBufferedReader = new UnsyncBufferedReader(
+			new InputStreamReader(inputStream));
 
 		String line = null;
 

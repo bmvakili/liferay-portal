@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,16 +49,12 @@ MBMessage message = MBMessageAttachmentsUtil.getMessage(fileEntry.getFileEntryId
 			url="javascript:;"
 		/>
 
-		<%
-		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
-		%>
-
 		<portlet:actionURL var="deleteURL">
 			<portlet:param name="struts_action" value="/message_boards/edit_message_attachments" />
 			<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 			<portlet:param name="messageId" value="<%= String.valueOf(message.getMessageId()) %>" />
-			<portlet:param name="fileName" value="<%= dlFileEntry.getTitle() %>" />
+			<portlet:param name="fileName" value="<%= fileEntry.getTitle() %>" />
 		</portlet:actionURL>
 
 		<liferay-ui:icon-delete

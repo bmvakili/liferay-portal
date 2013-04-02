@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.messageboards.service.persistence;
 
-import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -37,6 +36,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnmodifiableList;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.security.permission.InlineSQLHelperUtil;
@@ -87,6 +87,1341 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
 			MBThreadModelImpl.FINDER_CACHE_ENABLED, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
+			MBThreadModelImpl.FINDER_CACHE_ENABLED, MBThreadImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
+			new String[] {
+				String.class.getName(),
+				
+			Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
+			MBThreadModelImpl.FINDER_CACHE_ENABLED, MBThreadImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
+			new String[] { String.class.getName() },
+			MBThreadModelImpl.UUID_COLUMN_BITMASK |
+			MBThreadModelImpl.PRIORITY_COLUMN_BITMASK |
+			MBThreadModelImpl.LASTPOSTDATE_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_UUID = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
+			MBThreadModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
+			new String[] { String.class.getName() });
+
+	/**
+	 * Returns all the message boards threads where uuid = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @return the matching message boards threads
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBThread> findByUuid(String uuid) throws SystemException {
+		return findByUuid(uuid, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the message boards threads where uuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBThreadModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param start the lower bound of the range of message boards threads
+	 * @param end the upper bound of the range of message boards threads (not inclusive)
+	 * @return the range of matching message boards threads
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBThread> findByUuid(String uuid, int start, int end)
+		throws SystemException {
+		return findByUuid(uuid, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the message boards threads where uuid = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBThreadModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param start the lower bound of the range of message boards threads
+	 * @param end the upper bound of the range of message boards threads (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching message boards threads
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBThread> findByUuid(String uuid, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		boolean pagination = true;
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			pagination = false;
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID;
+			finderArgs = new Object[] { uuid };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID;
+			finderArgs = new Object[] { uuid, start, end, orderByComparator };
+		}
+
+		List<MBThread> list = (List<MBThread>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (MBThread mbThread : list) {
+				if (!Validator.equals(uuid, mbThread.getUuid())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_MBTHREAD_WHERE);
+
+			boolean bindUuid = false;
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_UUID_1);
+			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_UUID_3);
+			}
+			else {
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_UUID_2);
+			}
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+			else
+			 if (pagination) {
+				query.append(MBThreadModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindUuid) {
+					qPos.add(uuid);
+				}
+
+				if (!pagination) {
+					list = (List<MBThread>)QueryUtil.list(q, getDialect(),
+							start, end, false);
+
+					Collections.sort(list);
+
+					list = new UnmodifiableList<MBThread>(list);
+				}
+				else {
+					list = (List<MBThread>)QueryUtil.list(q, getDialect(),
+							start, end);
+				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first message boards thread in the ordered set where uuid = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching message boards thread
+	 * @throws com.liferay.portlet.messageboards.NoSuchThreadException if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread findByUuid_First(String uuid,
+		OrderByComparator orderByComparator)
+		throws NoSuchThreadException, SystemException {
+		MBThread mbThread = fetchByUuid_First(uuid, orderByComparator);
+
+		if (mbThread != null) {
+			return mbThread;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("uuid=");
+		msg.append(uuid);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchThreadException(msg.toString());
+	}
+
+	/**
+	 * Returns the first message boards thread in the ordered set where uuid = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching message boards thread, or <code>null</code> if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread fetchByUuid_First(String uuid,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<MBThread> list = findByUuid(uuid, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last message boards thread in the ordered set where uuid = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching message boards thread
+	 * @throws com.liferay.portlet.messageboards.NoSuchThreadException if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread findByUuid_Last(String uuid,
+		OrderByComparator orderByComparator)
+		throws NoSuchThreadException, SystemException {
+		MBThread mbThread = fetchByUuid_Last(uuid, orderByComparator);
+
+		if (mbThread != null) {
+			return mbThread;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("uuid=");
+		msg.append(uuid);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchThreadException(msg.toString());
+	}
+
+	/**
+	 * Returns the last message boards thread in the ordered set where uuid = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching message boards thread, or <code>null</code> if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread fetchByUuid_Last(String uuid,
+		OrderByComparator orderByComparator) throws SystemException {
+		int count = countByUuid(uuid);
+
+		List<MBThread> list = findByUuid(uuid, count - 1, count,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the message boards threads before and after the current message boards thread in the ordered set where uuid = &#63;.
+	 *
+	 * @param threadId the primary key of the current message boards thread
+	 * @param uuid the uuid
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next message boards thread
+	 * @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread[] findByUuid_PrevAndNext(long threadId, String uuid,
+		OrderByComparator orderByComparator)
+		throws NoSuchThreadException, SystemException {
+		MBThread mbThread = findByPrimaryKey(threadId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			MBThread[] array = new MBThreadImpl[3];
+
+			array[0] = getByUuid_PrevAndNext(session, mbThread, uuid,
+					orderByComparator, true);
+
+			array[1] = mbThread;
+
+			array[2] = getByUuid_PrevAndNext(session, mbThread, uuid,
+					orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected MBThread getByUuid_PrevAndNext(Session session,
+		MBThread mbThread, String uuid, OrderByComparator orderByComparator,
+		boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_MBTHREAD_WHERE);
+
+		boolean bindUuid = false;
+
+		if (uuid == null) {
+			query.append(_FINDER_COLUMN_UUID_UUID_1);
+		}
+		else if (uuid.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_UUID_UUID_3);
+		}
+		else {
+			bindUuid = true;
+
+			query.append(_FINDER_COLUMN_UUID_UUID_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(MBThreadModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		if (bindUuid) {
+			qPos.add(uuid);
+		}
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(mbThread);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<MBThread> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the message boards threads where uuid = &#63; from the database.
+	 *
+	 * @param uuid the uuid
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByUuid(String uuid) throws SystemException {
+		for (MBThread mbThread : findByUuid(uuid, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
+			remove(mbThread);
+		}
+	}
+
+	/**
+	 * Returns the number of message boards threads where uuid = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @return the number of matching message boards threads
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUuid(String uuid) throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID;
+
+		Object[] finderArgs = new Object[] { uuid };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_MBTHREAD_WHERE);
+
+			boolean bindUuid = false;
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_UUID_1);
+			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_UUID_3);
+			}
+			else {
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_UUID_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindUuid) {
+					qPos.add(uuid);
+				}
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_UUID_UUID_1 = "mbThread.uuid IS NULL";
+	private static final String _FINDER_COLUMN_UUID_UUID_2 = "mbThread.uuid = ?";
+	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(mbThread.uuid IS NULL OR mbThread.uuid = '')";
+	public static final FinderPath FINDER_PATH_FETCH_BY_UUID_G = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
+			MBThreadModelImpl.FINDER_CACHE_ENABLED, MBThreadImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
+			new String[] { String.class.getName(), Long.class.getName() },
+			MBThreadModelImpl.UUID_COLUMN_BITMASK |
+			MBThreadModelImpl.GROUPID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_UUID_G = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
+			MBThreadModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
+			new String[] { String.class.getName(), Long.class.getName() });
+
+	/**
+	 * Returns the message boards thread where uuid = &#63; and groupId = &#63; or throws a {@link com.liferay.portlet.messageboards.NoSuchThreadException} if it could not be found.
+	 *
+	 * @param uuid the uuid
+	 * @param groupId the group ID
+	 * @return the matching message boards thread
+	 * @throws com.liferay.portlet.messageboards.NoSuchThreadException if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread findByUUID_G(String uuid, long groupId)
+		throws NoSuchThreadException, SystemException {
+		MBThread mbThread = fetchByUUID_G(uuid, groupId);
+
+		if (mbThread == null) {
+			StringBundler msg = new StringBundler(6);
+
+			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			msg.append("uuid=");
+			msg.append(uuid);
+
+			msg.append(", groupId=");
+			msg.append(groupId);
+
+			msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(msg.toString());
+			}
+
+			throw new NoSuchThreadException(msg.toString());
+		}
+
+		return mbThread;
+	}
+
+	/**
+	 * Returns the message boards thread where uuid = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param uuid the uuid
+	 * @param groupId the group ID
+	 * @return the matching message boards thread, or <code>null</code> if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread fetchByUUID_G(String uuid, long groupId)
+		throws SystemException {
+		return fetchByUUID_G(uuid, groupId, true);
+	}
+
+	/**
+	 * Returns the message boards thread where uuid = &#63; and groupId = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param uuid the uuid
+	 * @param groupId the group ID
+	 * @param retrieveFromCache whether to use the finder cache
+	 * @return the matching message boards thread, or <code>null</code> if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread fetchByUUID_G(String uuid, long groupId,
+		boolean retrieveFromCache) throws SystemException {
+		Object[] finderArgs = new Object[] { uuid, groupId };
+
+		Object result = null;
+
+		if (retrieveFromCache) {
+			result = FinderCacheUtil.getResult(FINDER_PATH_FETCH_BY_UUID_G,
+					finderArgs, this);
+		}
+
+		if (result instanceof MBThread) {
+			MBThread mbThread = (MBThread)result;
+
+			if (!Validator.equals(uuid, mbThread.getUuid()) ||
+					(groupId != mbThread.getGroupId())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler query = new StringBundler(4);
+
+			query.append(_SQL_SELECT_MBTHREAD_WHERE);
+
+			boolean bindUuid = false;
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_G_UUID_1);
+			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_G_UUID_3);
+			}
+			else {
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_G_UUID_2);
+			}
+
+			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindUuid) {
+					qPos.add(uuid);
+				}
+
+				qPos.add(groupId);
+
+				List<MBThread> list = q.list();
+
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G,
+						finderArgs, list);
+				}
+				else {
+					MBThread mbThread = list.get(0);
+
+					result = mbThread;
+
+					cacheResult(mbThread);
+
+					if ((mbThread.getUuid() == null) ||
+							!mbThread.getUuid().equals(uuid) ||
+							(mbThread.getGroupId() != groupId)) {
+						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G,
+							finderArgs, mbThread);
+					}
+				}
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_G,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (MBThread)result;
+		}
+	}
+
+	/**
+	 * Removes the message boards thread where uuid = &#63; and groupId = &#63; from the database.
+	 *
+	 * @param uuid the uuid
+	 * @param groupId the group ID
+	 * @return the message boards thread that was removed
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread removeByUUID_G(String uuid, long groupId)
+		throws NoSuchThreadException, SystemException {
+		MBThread mbThread = findByUUID_G(uuid, groupId);
+
+		return remove(mbThread);
+	}
+
+	/**
+	 * Returns the number of message boards threads where uuid = &#63; and groupId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param groupId the group ID
+	 * @return the number of matching message boards threads
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUUID_G(String uuid, long groupId)
+		throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID_G;
+
+		Object[] finderArgs = new Object[] { uuid, groupId };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_MBTHREAD_WHERE);
+
+			boolean bindUuid = false;
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_G_UUID_1);
+			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_G_UUID_3);
+			}
+			else {
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_G_UUID_2);
+			}
+
+			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindUuid) {
+					qPos.add(uuid);
+				}
+
+				qPos.add(groupId);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_UUID_G_UUID_1 = "mbThread.uuid IS NULL AND ";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "mbThread.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(mbThread.uuid IS NULL OR mbThread.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "mbThread.groupId = ?";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
+			MBThreadModelImpl.FINDER_CACHE_ENABLED, MBThreadImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+			new String[] {
+				String.class.getName(), Long.class.getName(),
+				
+			Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C =
+		new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
+			MBThreadModelImpl.FINDER_CACHE_ENABLED, MBThreadImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+			new String[] { String.class.getName(), Long.class.getName() },
+			MBThreadModelImpl.UUID_COLUMN_BITMASK |
+			MBThreadModelImpl.COMPANYID_COLUMN_BITMASK |
+			MBThreadModelImpl.PRIORITY_COLUMN_BITMASK |
+			MBThreadModelImpl.LASTPOSTDATE_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_UUID_C = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
+			MBThreadModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+			new String[] { String.class.getName(), Long.class.getName() });
+
+	/**
+	 * Returns all the message boards threads where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @return the matching message boards threads
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBThread> findByUuid_C(String uuid, long companyId)
+		throws SystemException {
+		return findByUuid_C(uuid, companyId, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the message boards threads where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBThreadModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of message boards threads
+	 * @param end the upper bound of the range of message boards threads (not inclusive)
+	 * @return the range of matching message boards threads
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBThread> findByUuid_C(String uuid, long companyId, int start,
+		int end) throws SystemException {
+		return findByUuid_C(uuid, companyId, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the message boards threads where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBThreadModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of message boards threads
+	 * @param end the upper bound of the range of message boards threads (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching message boards threads
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBThread> findByUuid_C(String uuid, long companyId, int start,
+		int end, OrderByComparator orderByComparator) throws SystemException {
+		boolean pagination = true;
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			pagination = false;
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C;
+			finderArgs = new Object[] { uuid, companyId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C;
+			finderArgs = new Object[] {
+					uuid, companyId,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<MBThread> list = (List<MBThread>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (MBThread mbThread : list) {
+				if (!Validator.equals(uuid, mbThread.getUuid()) ||
+						(companyId != mbThread.getCompanyId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(4 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(4);
+			}
+
+			query.append(_SQL_SELECT_MBTHREAD_WHERE);
+
+			boolean bindUuid = false;
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
+			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+			}
+			else {
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+			}
+
+			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+			else
+			 if (pagination) {
+				query.append(MBThreadModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindUuid) {
+					qPos.add(uuid);
+				}
+
+				qPos.add(companyId);
+
+				if (!pagination) {
+					list = (List<MBThread>)QueryUtil.list(q, getDialect(),
+							start, end, false);
+
+					Collections.sort(list);
+
+					list = new UnmodifiableList<MBThread>(list);
+				}
+				else {
+					list = (List<MBThread>)QueryUtil.list(q, getDialect(),
+							start, end);
+				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first message boards thread in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching message boards thread
+	 * @throws com.liferay.portlet.messageboards.NoSuchThreadException if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread findByUuid_C_First(String uuid, long companyId,
+		OrderByComparator orderByComparator)
+		throws NoSuchThreadException, SystemException {
+		MBThread mbThread = fetchByUuid_C_First(uuid, companyId,
+				orderByComparator);
+
+		if (mbThread != null) {
+			return mbThread;
+		}
+
+		StringBundler msg = new StringBundler(6);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("uuid=");
+		msg.append(uuid);
+
+		msg.append(", companyId=");
+		msg.append(companyId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchThreadException(msg.toString());
+	}
+
+	/**
+	 * Returns the first message boards thread in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching message boards thread, or <code>null</code> if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread fetchByUuid_C_First(String uuid, long companyId,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<MBThread> list = findByUuid_C(uuid, companyId, 0, 1,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last message boards thread in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching message boards thread
+	 * @throws com.liferay.portlet.messageboards.NoSuchThreadException if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread findByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator orderByComparator)
+		throws NoSuchThreadException, SystemException {
+		MBThread mbThread = fetchByUuid_C_Last(uuid, companyId,
+				orderByComparator);
+
+		if (mbThread != null) {
+			return mbThread;
+		}
+
+		StringBundler msg = new StringBundler(6);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("uuid=");
+		msg.append(uuid);
+
+		msg.append(", companyId=");
+		msg.append(companyId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchThreadException(msg.toString());
+	}
+
+	/**
+	 * Returns the last message boards thread in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching message boards thread, or <code>null</code> if a matching message boards thread could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread fetchByUuid_C_Last(String uuid, long companyId,
+		OrderByComparator orderByComparator) throws SystemException {
+		int count = countByUuid_C(uuid, companyId);
+
+		List<MBThread> list = findByUuid_C(uuid, companyId, count - 1, count,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the message boards threads before and after the current message boards thread in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param threadId the primary key of the current message boards thread
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next message boards thread
+	 * @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread[] findByUuid_C_PrevAndNext(long threadId, String uuid,
+		long companyId, OrderByComparator orderByComparator)
+		throws NoSuchThreadException, SystemException {
+		MBThread mbThread = findByPrimaryKey(threadId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			MBThread[] array = new MBThreadImpl[3];
+
+			array[0] = getByUuid_C_PrevAndNext(session, mbThread, uuid,
+					companyId, orderByComparator, true);
+
+			array[1] = mbThread;
+
+			array[2] = getByUuid_C_PrevAndNext(session, mbThread, uuid,
+					companyId, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected MBThread getByUuid_C_PrevAndNext(Session session,
+		MBThread mbThread, String uuid, long companyId,
+		OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_MBTHREAD_WHERE);
+
+		boolean bindUuid = false;
+
+		if (uuid == null) {
+			query.append(_FINDER_COLUMN_UUID_C_UUID_1);
+		}
+		else if (uuid.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+		}
+		else {
+			bindUuid = true;
+
+			query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+		}
+
+		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(MBThreadModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		if (bindUuid) {
+			qPos.add(uuid);
+		}
+
+		qPos.add(companyId);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(mbThread);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<MBThread> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the message boards threads where uuid = &#63; and companyId = &#63; from the database.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByUuid_C(String uuid, long companyId)
+		throws SystemException {
+		for (MBThread mbThread : findByUuid_C(uuid, companyId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+			remove(mbThread);
+		}
+	}
+
+	/**
+	 * Returns the number of message boards threads where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @return the number of matching message boards threads
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUuid_C(String uuid, long companyId)
+		throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID_C;
+
+		Object[] finderArgs = new Object[] { uuid, companyId };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_MBTHREAD_WHERE);
+
+			boolean bindUuid = false;
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
+			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+			}
+			else {
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+			}
+
+			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindUuid) {
+					qPos.add(uuid);
+				}
+
+				qPos.add(companyId);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_UUID_C_UUID_1 = "mbThread.uuid IS NULL AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "mbThread.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(mbThread.uuid IS NULL OR mbThread.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "mbThread.companyId = ?";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_GROUPID = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
 			MBThreadModelImpl.FINDER_CACHE_ENABLED, MBThreadImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
@@ -2536,10 +3871,10 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 	private static final String _FINDER_COLUMN_G_C_GROUPID_2 = "mbThread.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_GROUPID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_G_C_GROUPID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_G_C_GROUPID_2) + ")";
 	private static final String _FINDER_COLUMN_G_C_CATEGORYID_2 = "mbThread.categoryId = ?";
 	private static final String _FINDER_COLUMN_G_C_CATEGORYID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_G_C_CATEGORYID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_G_C_CATEGORYID_2) + ")";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_NOTC = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
 			MBThreadModelImpl.FINDER_CACHE_ENABLED, MBThreadImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_NotC",
@@ -4936,10 +6271,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 			query.append(_SQL_SELECT_MBTHREAD_WHERE);
 
+			boolean bindLastPostDate = false;
+
 			if (lastPostDate == null) {
 				query.append(_FINDER_COLUMN_L_P_LASTPOSTDATE_1);
 			}
 			else {
+				bindLastPostDate = true;
+
 				query.append(_FINDER_COLUMN_L_P_LASTPOSTDATE_2);
 			}
 
@@ -4965,7 +6304,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (lastPostDate != null) {
+				if (bindLastPostDate) {
 					qPos.add(CalendarUtil.getTimestamp(lastPostDate));
 				}
 
@@ -5171,10 +6510,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		query.append(_SQL_SELECT_MBTHREAD_WHERE);
 
+		boolean bindLastPostDate = false;
+
 		if (lastPostDate == null) {
 			query.append(_FINDER_COLUMN_L_P_LASTPOSTDATE_1);
 		}
 		else {
+			bindLastPostDate = true;
+
 			query.append(_FINDER_COLUMN_L_P_LASTPOSTDATE_2);
 		}
 
@@ -5248,7 +6591,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (lastPostDate != null) {
+		if (bindLastPostDate) {
 			qPos.add(CalendarUtil.getTimestamp(lastPostDate));
 		}
 
@@ -5309,10 +6652,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 			query.append(_SQL_COUNT_MBTHREAD_WHERE);
 
+			boolean bindLastPostDate = false;
+
 			if (lastPostDate == null) {
 				query.append(_FINDER_COLUMN_L_P_LASTPOSTDATE_1);
 			}
 			else {
+				bindLastPostDate = true;
+
 				query.append(_FINDER_COLUMN_L_P_LASTPOSTDATE_2);
 			}
 
@@ -5329,7 +6676,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (lastPostDate != null) {
+				if (bindLastPostDate) {
 					qPos.add(CalendarUtil.getTimestamp(lastPostDate));
 				}
 
@@ -5487,10 +6834,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 			query.append(_FINDER_COLUMN_G_C_L_CATEGORYID_2);
 
+			boolean bindLastPostDate = false;
+
 			if (lastPostDate == null) {
 				query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_1);
 			}
 			else {
+				bindLastPostDate = true;
+
 				query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_2);
 			}
 
@@ -5518,7 +6869,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 				qPos.add(categoryId);
 
-				if (lastPostDate != null) {
+				if (bindLastPostDate) {
 					qPos.add(CalendarUtil.getTimestamp(lastPostDate));
 				}
 
@@ -5739,10 +7090,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		query.append(_FINDER_COLUMN_G_C_L_CATEGORYID_2);
 
+		boolean bindLastPostDate = false;
+
 		if (lastPostDate == null) {
 			query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_1);
 		}
 		else {
+			bindLastPostDate = true;
+
 			query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_2);
 		}
 
@@ -5818,7 +7173,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		qPos.add(categoryId);
 
-		if (lastPostDate != null) {
+		if (bindLastPostDate) {
 			qPos.add(CalendarUtil.getTimestamp(lastPostDate));
 		}
 
@@ -5921,10 +7276,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		query.append(_FINDER_COLUMN_G_C_L_CATEGORYID_2);
 
+		boolean bindLastPostDate = false;
+
 		if (lastPostDate == null) {
 			query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_1);
 		}
 		else {
+			bindLastPostDate = true;
+
 			query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_2);
 		}
 
@@ -5975,7 +7334,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 			qPos.add(categoryId);
 
-			if (lastPostDate != null) {
+			if (bindLastPostDate) {
 				qPos.add(CalendarUtil.getTimestamp(lastPostDate));
 			}
 
@@ -6061,10 +7420,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		query.append(_FINDER_COLUMN_G_C_L_CATEGORYID_2);
 
+		boolean bindLastPostDate = false;
+
 		if (lastPostDate == null) {
 			query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_1);
 		}
 		else {
+			bindLastPostDate = true;
+
 			query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_2);
 		}
 
@@ -6170,7 +7533,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		qPos.add(categoryId);
 
-		if (lastPostDate != null) {
+		if (bindLastPostDate) {
 			qPos.add(CalendarUtil.getTimestamp(lastPostDate));
 		}
 
@@ -6235,10 +7598,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 			query.append(_FINDER_COLUMN_G_C_L_CATEGORYID_2);
 
+			boolean bindLastPostDate = false;
+
 			if (lastPostDate == null) {
 				query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_1);
 			}
 			else {
+				bindLastPostDate = true;
+
 				query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_2);
 			}
 
@@ -6257,7 +7624,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 				qPos.add(categoryId);
 
-				if (lastPostDate != null) {
+				if (bindLastPostDate) {
 					qPos.add(CalendarUtil.getTimestamp(lastPostDate));
 				}
 
@@ -6301,10 +7668,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		query.append(_FINDER_COLUMN_G_C_L_CATEGORYID_2);
 
+		boolean bindLastPostDate = false;
+
 		if (lastPostDate == null) {
 			query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_1);
 		}
 		else {
+			bindLastPostDate = true;
+
 			query.append(_FINDER_COLUMN_G_C_L_LASTPOSTDATE_2);
 		}
 
@@ -6328,7 +7699,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 			qPos.add(categoryId);
 
-			if (lastPostDate != null) {
+			if (bindLastPostDate) {
 				qPos.add(CalendarUtil.getTimestamp(lastPostDate));
 			}
 
@@ -7865,13 +9236,13 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 	private static final String _FINDER_COLUMN_G_C_S_GROUPID_2 = "mbThread.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_S_GROUPID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_G_C_S_GROUPID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_G_C_S_GROUPID_2) + ")";
 	private static final String _FINDER_COLUMN_G_C_S_CATEGORYID_2 = "mbThread.categoryId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_S_CATEGORYID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_G_C_S_CATEGORYID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_G_C_S_CATEGORYID_2) + ")";
 	private static final String _FINDER_COLUMN_G_C_S_STATUS_2 = "mbThread.status = ?";
 	private static final String _FINDER_COLUMN_G_C_S_STATUS_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_G_C_S_STATUS_2) + ")";
+		removeConjunction(_FINDER_COLUMN_G_C_S_STATUS_2) + ")";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_C_NOTS = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
 			MBThreadModelImpl.FINDER_CACHE_ENABLED, MBThreadImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_NotS",
@@ -9366,13 +10737,13 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 	private static final String _FINDER_COLUMN_G_C_NOTS_GROUPID_2 = "mbThread.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_NOTS_GROUPID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_G_C_NOTS_GROUPID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_G_C_NOTS_GROUPID_2) + ")";
 	private static final String _FINDER_COLUMN_G_C_NOTS_CATEGORYID_2 = "mbThread.categoryId = ? AND ";
 	private static final String _FINDER_COLUMN_G_C_NOTS_CATEGORYID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_G_C_NOTS_CATEGORYID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_G_C_NOTS_CATEGORYID_2) + ")";
 	private static final String _FINDER_COLUMN_G_C_NOTS_STATUS_2 = "mbThread.status != ?";
 	private static final String _FINDER_COLUMN_G_C_NOTS_STATUS_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_G_C_NOTS_STATUS_2) + ")";
+		removeConjunction(_FINDER_COLUMN_G_C_NOTS_STATUS_2) + ")";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_NOTC_S = new FinderPath(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
 			MBThreadModelImpl.FINDER_CACHE_ENABLED, MBThreadImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_NotC_S",
@@ -11254,8 +12625,11 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 		EntityCacheUtil.putResult(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
 			MBThreadImpl.class, mbThread.getPrimaryKey(), mbThread);
 
+		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G,
+			new Object[] { mbThread.getUuid(), mbThread.getGroupId() }, mbThread);
+
 		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_ROOTMESSAGEID,
-			new Object[] { Long.valueOf(mbThread.getRootMessageId()) }, mbThread);
+			new Object[] { mbThread.getRootMessageId() }, mbThread);
 
 		mbThread.resetOriginalValues();
 	}
@@ -11332,8 +12706,15 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	protected void cacheUniqueFindersCache(MBThread mbThread) {
 		if (mbThread.isNew()) {
 			Object[] args = new Object[] {
-					Long.valueOf(mbThread.getRootMessageId())
+					mbThread.getUuid(), mbThread.getGroupId()
 				};
+
+			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+				Long.valueOf(1));
+			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+				mbThread);
+
+			args = new Object[] { mbThread.getRootMessageId() };
 
 			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID, args,
 				Long.valueOf(1));
@@ -11344,10 +12725,20 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			MBThreadModelImpl mbThreadModelImpl = (MBThreadModelImpl)mbThread;
 
 			if ((mbThreadModelImpl.getColumnBitmask() &
-					FINDER_PATH_FETCH_BY_ROOTMESSAGEID.getColumnBitmask()) != 0) {
+					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbThread.getRootMessageId())
+						mbThread.getUuid(), mbThread.getGroupId()
 					};
+
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
+					Long.valueOf(1));
+				FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G, args,
+					mbThread);
+			}
+
+			if ((mbThreadModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_ROOTMESSAGEID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] { mbThread.getRootMessageId() };
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID,
 					args, Long.valueOf(1));
@@ -11360,16 +12751,30 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	protected void clearUniqueFindersCache(MBThread mbThread) {
 		MBThreadModelImpl mbThreadModelImpl = (MBThreadModelImpl)mbThread;
 
-		Object[] args = new Object[] { Long.valueOf(mbThread.getRootMessageId()) };
+		Object[] args = new Object[] { mbThread.getUuid(), mbThread.getGroupId() };
+
+		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+
+		if ((mbThreadModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
+			args = new Object[] {
+					mbThreadModelImpl.getOriginalUuid(),
+					mbThreadModelImpl.getOriginalGroupId()
+				};
+
+			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+
+		args = new Object[] { mbThread.getRootMessageId() };
 
 		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID, args);
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_ROOTMESSAGEID, args);
 
 		if ((mbThreadModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_ROOTMESSAGEID.getColumnBitmask()) != 0) {
-			args = new Object[] {
-					Long.valueOf(mbThreadModelImpl.getOriginalRootMessageId())
-				};
+			args = new Object[] { mbThreadModelImpl.getOriginalRootMessageId() };
 
 			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_ROOTMESSAGEID,
 				args);
@@ -11390,6 +12795,10 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 		mbThread.setNew(true);
 		mbThread.setPrimaryKey(threadId);
 
+		String uuid = PortalUUIDUtil.generate();
+
+		mbThread.setUuid(uuid);
+
 		return mbThread;
 	}
 
@@ -11403,7 +12812,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	 */
 	public MBThread remove(long threadId)
 		throws NoSuchThreadException, SystemException {
-		return remove(Long.valueOf(threadId));
+		return remove((Serializable)threadId);
 	}
 
 	/**
@@ -11489,6 +12898,12 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		MBThreadModelImpl mbThreadModelImpl = (MBThreadModelImpl)mbThread;
 
+		if (Validator.isNull(mbThread.getUuid())) {
+			String uuid = PortalUUIDUtil.generate();
+
+			mbThread.setUuid(uuid);
+		}
+
 		Session session = null;
 
 		try {
@@ -11518,16 +12933,52 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 		else {
 			if ((mbThreadModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] { mbThreadModelImpl.getOriginalUuid() };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
+					args);
+
+				args = new Object[] { mbThreadModelImpl.getUuid() };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID,
+					args);
+			}
+
+			if ((mbThreadModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						mbThreadModelImpl.getOriginalUuid(),
+						mbThreadModelImpl.getOriginalCompanyId()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
+					args);
+
+				args = new Object[] {
+						mbThreadModelImpl.getUuid(),
+						mbThreadModelImpl.getCompanyId()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C,
+					args);
+			}
+
+			if ((mbThreadModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getOriginalGroupId())
+						mbThreadModelImpl.getOriginalGroupId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
 					args);
 
-				args = new Object[] { Long.valueOf(mbThreadModelImpl.getGroupId()) };
+				args = new Object[] { mbThreadModelImpl.getGroupId() };
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
@@ -11537,8 +12988,8 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			if ((mbThreadModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbThreadModelImpl.getOriginalCategoryId())
+						mbThreadModelImpl.getOriginalGroupId(),
+						mbThreadModelImpl.getOriginalCategoryId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C, args);
@@ -11546,8 +12997,8 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getGroupId()),
-						Long.valueOf(mbThreadModelImpl.getCategoryId())
+						mbThreadModelImpl.getGroupId(),
+						mbThreadModelImpl.getCategoryId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C, args);
@@ -11558,8 +13009,8 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			if ((mbThreadModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getOriginalGroupId()),
-						Integer.valueOf(mbThreadModelImpl.getOriginalStatus())
+						mbThreadModelImpl.getOriginalGroupId(),
+						mbThreadModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_S, args);
@@ -11567,8 +13018,8 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getGroupId()),
-						Integer.valueOf(mbThreadModelImpl.getStatus())
+						mbThreadModelImpl.getGroupId(),
+						mbThreadModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_S, args);
@@ -11579,8 +13030,8 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			if ((mbThreadModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_P.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getOriginalCategoryId()),
-						Double.valueOf(mbThreadModelImpl.getOriginalPriority())
+						mbThreadModelImpl.getOriginalCategoryId(),
+						mbThreadModelImpl.getOriginalPriority()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_P, args);
@@ -11588,8 +13039,8 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getCategoryId()),
-						Double.valueOf(mbThreadModelImpl.getPriority())
+						mbThreadModelImpl.getCategoryId(),
+						mbThreadModelImpl.getPriority()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_P, args);
@@ -11601,7 +13052,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_L_P.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
 						mbThreadModelImpl.getOriginalLastPostDate(),
-						Double.valueOf(mbThreadModelImpl.getOriginalPriority())
+						mbThreadModelImpl.getOriginalPriority()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_L_P, args);
@@ -11610,7 +13061,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 				args = new Object[] {
 						mbThreadModelImpl.getLastPostDate(),
-						Double.valueOf(mbThreadModelImpl.getPriority())
+						mbThreadModelImpl.getPriority()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_L_P, args);
@@ -11621,9 +13072,8 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			if ((mbThreadModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_C_L.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbThreadModelImpl.getOriginalCategoryId()),
-						
+						mbThreadModelImpl.getOriginalGroupId(),
+						mbThreadModelImpl.getOriginalCategoryId(),
 						mbThreadModelImpl.getOriginalLastPostDate()
 					};
 
@@ -11632,9 +13082,8 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getGroupId()),
-						Long.valueOf(mbThreadModelImpl.getCategoryId()),
-						
+						mbThreadModelImpl.getGroupId(),
+						mbThreadModelImpl.getCategoryId(),
 						mbThreadModelImpl.getLastPostDate()
 					};
 
@@ -11646,9 +13095,9 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			if ((mbThreadModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_C_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbThreadModelImpl.getOriginalCategoryId()),
-						Integer.valueOf(mbThreadModelImpl.getOriginalStatus())
+						mbThreadModelImpl.getOriginalGroupId(),
+						mbThreadModelImpl.getOriginalCategoryId(),
+						mbThreadModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_S, args);
@@ -11656,9 +13105,9 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbThreadModelImpl.getGroupId()),
-						Long.valueOf(mbThreadModelImpl.getCategoryId()),
-						Integer.valueOf(mbThreadModelImpl.getStatus())
+						mbThreadModelImpl.getGroupId(),
+						mbThreadModelImpl.getCategoryId(),
+						mbThreadModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_S, args);
@@ -11686,9 +13135,14 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 		mbThreadImpl.setNew(mbThread.isNew());
 		mbThreadImpl.setPrimaryKey(mbThread.getPrimaryKey());
 
+		mbThreadImpl.setUuid(mbThread.getUuid());
 		mbThreadImpl.setThreadId(mbThread.getThreadId());
 		mbThreadImpl.setGroupId(mbThread.getGroupId());
 		mbThreadImpl.setCompanyId(mbThread.getCompanyId());
+		mbThreadImpl.setUserId(mbThread.getUserId());
+		mbThreadImpl.setUserName(mbThread.getUserName());
+		mbThreadImpl.setCreateDate(mbThread.getCreateDate());
+		mbThreadImpl.setModifiedDate(mbThread.getModifiedDate());
 		mbThreadImpl.setCategoryId(mbThread.getCategoryId());
 		mbThreadImpl.setRootMessageId(mbThread.getRootMessageId());
 		mbThreadImpl.setRootMessageUserId(mbThread.getRootMessageUserId());
@@ -11711,13 +13165,24 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	 *
 	 * @param primaryKey the primary key of the message boards thread
 	 * @return the message boards thread
-	 * @throws com.liferay.portal.NoSuchModelException if a message boards thread with the primary key could not be found
+	 * @throws com.liferay.portlet.messageboards.NoSuchThreadException if a message boards thread with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public MBThread findByPrimaryKey(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return findByPrimaryKey(((Long)primaryKey).longValue());
+		throws NoSuchThreadException, SystemException {
+		MBThread mbThread = fetchByPrimaryKey(primaryKey);
+
+		if (mbThread == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			}
+
+			throw new NoSuchThreadException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
+		}
+
+		return mbThread;
 	}
 
 	/**
@@ -11730,18 +13195,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	 */
 	public MBThread findByPrimaryKey(long threadId)
 		throws NoSuchThreadException, SystemException {
-		MBThread mbThread = fetchByPrimaryKey(threadId);
-
-		if (mbThread == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + threadId);
-			}
-
-			throw new NoSuchThreadException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				threadId);
-		}
-
-		return mbThread;
+		return findByPrimaryKey((Serializable)threadId);
 	}
 
 	/**
@@ -11754,19 +13208,8 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	@Override
 	public MBThread fetchByPrimaryKey(Serializable primaryKey)
 		throws SystemException {
-		return fetchByPrimaryKey(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Returns the message boards thread with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param threadId the primary key of the message boards thread
-	 * @return the message boards thread, or <code>null</code> if a message boards thread with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public MBThread fetchByPrimaryKey(long threadId) throws SystemException {
 		MBThread mbThread = (MBThread)EntityCacheUtil.getResult(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
-				MBThreadImpl.class, threadId);
+				MBThreadImpl.class, primaryKey);
 
 		if (mbThread == _nullMBThread) {
 			return null;
@@ -11778,20 +13221,19 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 			try {
 				session = openSession();
 
-				mbThread = (MBThread)session.get(MBThreadImpl.class,
-						Long.valueOf(threadId));
+				mbThread = (MBThread)session.get(MBThreadImpl.class, primaryKey);
 
 				if (mbThread != null) {
 					cacheResult(mbThread);
 				}
 				else {
 					EntityCacheUtil.putResult(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
-						MBThreadImpl.class, threadId, _nullMBThread);
+						MBThreadImpl.class, primaryKey, _nullMBThread);
 				}
 			}
 			catch (Exception e) {
 				EntityCacheUtil.removeResult(MBThreadModelImpl.ENTITY_CACHE_ENABLED,
-					MBThreadImpl.class, threadId);
+					MBThreadImpl.class, primaryKey);
 
 				throw processException(e);
 			}
@@ -11801,6 +13243,17 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 		}
 
 		return mbThread;
+	}
+
+	/**
+	 * Returns the message boards thread with the primary key or returns <code>null</code> if it could not be found.
+	 *
+	 * @param threadId the primary key of the message boards thread
+	 * @return the message boards thread, or <code>null</code> if a message boards thread with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBThread fetchByPrimaryKey(long threadId) throws SystemException {
+		return fetchByPrimaryKey((Serializable)threadId);
 	}
 
 	/**
@@ -11984,7 +13437,7 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 
 				for (String listenerClassName : listenerClassNames) {
 					listenersList.add((ModelListener<MBThread>)InstanceFactory.newInstance(
-							listenerClassName));
+							getClassLoader(), listenerClassName));
 				}
 
 				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
@@ -12006,17 +13459,6 @@ public class MBThreadPersistenceImpl extends BasePersistenceImpl<MBThread>
 	private static final String _SQL_SELECT_MBTHREAD_WHERE = "SELECT mbThread FROM MBThread mbThread WHERE ";
 	private static final String _SQL_COUNT_MBTHREAD = "SELECT COUNT(mbThread) FROM MBThread mbThread";
 	private static final String _SQL_COUNT_MBTHREAD_WHERE = "SELECT COUNT(mbThread) FROM MBThread mbThread WHERE ";
-
-	private static String _removeConjunction(String sql) {
-		int pos = sql.indexOf(" AND ");
-
-		if (pos != -1) {
-			sql = sql.substring(0, pos);
-		}
-
-		return sql;
-	}
-
 	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "mbThread.threadId";
 	private static final String _FILTER_SQL_SELECT_MBTHREAD_WHERE = "SELECT DISTINCT {mbThread.*} FROM MBThread mbThread WHERE ";
 	private static final String _FILTER_SQL_SELECT_MBTHREAD_NO_INLINE_DISTINCT_WHERE_1 =

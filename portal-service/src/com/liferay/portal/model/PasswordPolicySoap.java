@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -51,6 +51,7 @@ public class PasswordPolicySoap implements Serializable {
 		soapModel.setMinNumbers(model.getMinNumbers());
 		soapModel.setMinSymbols(model.getMinSymbols());
 		soapModel.setMinUpperCase(model.getMinUpperCase());
+		soapModel.setRegex(model.getRegex());
 		soapModel.setHistory(model.getHistory());
 		soapModel.setHistoryCount(model.getHistoryCount());
 		soapModel.setExpireable(model.getExpireable());
@@ -295,6 +296,14 @@ public class PasswordPolicySoap implements Serializable {
 		_minUpperCase = minUpperCase;
 	}
 
+	public String getRegex() {
+		return _regex;
+	}
+
+	public void setRegex(String regex) {
+		_regex = regex;
+	}
+
 	public boolean getHistory() {
 		return _history;
 	}
@@ -427,6 +436,7 @@ public class PasswordPolicySoap implements Serializable {
 	private int _minNumbers;
 	private int _minSymbols;
 	private int _minUpperCase;
+	private String _regex;
 	private boolean _history;
 	private int _historyCount;
 	private boolean _expireable;

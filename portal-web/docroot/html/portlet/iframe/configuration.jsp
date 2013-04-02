@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,7 +40,7 @@ String htmlAttributes =
 	<liferay-ui:panel-container extended="<%= true %>" id="iframeSettingsPanelContainer" persistState="<%= true %>">
 		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="iframeGeneralPanel" persistState="<%= true %>" title="general">
 			<aui:fieldset>
-				<aui:input cssClass="lfr-input-text-container" label="source-url" name="preferences--src--" prefix='<%= relative ? "..." : StringPool.BLANK %>' type="text" value="<%= src %>" />
+				<aui:input cssClass="lfr-input-text-container" label="source-url" name="preferences--src--" prefix="<%= relative ? StringPool.TRIPLE_PERIOD : StringPool.BLANK %>" type="text" value="<%= src %>" />
 
 				<aui:input label="relative-to-context-path" name="preferences--relative--" type="checkbox" value="<%= relative %>" />
 			</aui:fieldset>

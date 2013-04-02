@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -436,6 +436,10 @@ public class LangBuilder {
 	}
 
 	private String _fixEnglishTranslation(String key, String value) {
+
+		// http://en.wikibooks.org/wiki/Basic_Book_Design/Capitalizing_Words_in_Titles
+		// http://www.imdb.com
+
 		if (value.contains(" this ")) {
 			if (value.contains(".") || value.contains("?") ||
 				value.contains(":") ||
@@ -599,9 +603,9 @@ public class LangBuilder {
 
 			// Automatic translator does not support Arabic, Basque, Bulgarian,
 			// Catalan, Croatian, Czech, Danish, Estonian, Finnish, Galician,
-			// German, Hebrew, Hindi, Hungarian, Indonesian, Lao,
-			// Norwegian Bokmål, Persian, Polish, Romanian, Russian, Serbian,
-			// Slovak, Slovene, Swedish, Turkish, Ukrainian, or Vietnamese
+			// German, Hebrew, Hindi, Hungarian, Indonesian, Lao, Norwegian
+			// Bokmål, Persian, Polish, Romanian, Russian, Serbian, Slovak,
+			// Slovene, Swedish, Turkish, Ukrainian, or Vietnamese
 
 			return null;
 		}

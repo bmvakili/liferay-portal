@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.social.service.persistence;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
@@ -116,6 +118,8 @@ public class SocialActivityPersistenceTest {
 
 		newSocialActivity.setCreateDate(ServiceTestUtil.nextLong());
 
+		newSocialActivity.setActivitySetId(ServiceTestUtil.nextLong());
+
 		newSocialActivity.setMirrorActivityId(ServiceTestUtil.nextLong());
 
 		newSocialActivity.setClassNameId(ServiceTestUtil.nextLong());
@@ -142,6 +146,8 @@ public class SocialActivityPersistenceTest {
 			newSocialActivity.getUserId());
 		Assert.assertEquals(existingSocialActivity.getCreateDate(),
 			newSocialActivity.getCreateDate());
+		Assert.assertEquals(existingSocialActivity.getActivitySetId(),
+			newSocialActivity.getActivitySetId());
 		Assert.assertEquals(existingSocialActivity.getMirrorActivityId(),
 			newSocialActivity.getMirrorActivityId());
 		Assert.assertEquals(existingSocialActivity.getClassNameId(),
@@ -194,6 +200,26 @@ public class SocialActivityPersistenceTest {
 		SocialActivity missingSocialActivity = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingSocialActivity);
+	}
+
+	@Test
+	public void testActionableDynamicQuery() throws Exception {
+		final IntegerWrapper count = new IntegerWrapper();
+
+		ActionableDynamicQuery actionableDynamicQuery = new SocialActivityActionableDynamicQuery() {
+				@Override
+				protected void performAction(Object object) {
+					SocialActivity socialActivity = (SocialActivity)object;
+
+					Assert.assertNotNull(socialActivity);
+
+					count.increment();
+				}
+			};
+
+		actionableDynamicQuery.performActions();
+
+		Assert.assertEquals(count.getValue(), _persistence.countAll());
 	}
 
 	@Test
@@ -311,6 +337,8 @@ public class SocialActivityPersistenceTest {
 		socialActivity.setUserId(ServiceTestUtil.nextLong());
 
 		socialActivity.setCreateDate(ServiceTestUtil.nextLong());
+
+		socialActivity.setActivitySetId(ServiceTestUtil.nextLong());
 
 		socialActivity.setMirrorActivityId(ServiceTestUtil.nextLong());
 

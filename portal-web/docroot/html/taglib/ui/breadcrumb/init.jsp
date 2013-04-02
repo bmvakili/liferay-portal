@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -199,9 +199,9 @@ private void _buildPortletBreadcrumb(HttpServletRequest request, boolean showCur
 		String breadcrumbURL = breadcrumbEntry.getURL();
 
 		if (!showCurrentGroup) {
-			String parentGroupName = themeDisplay.getParentGroupName();
+			String siteGroupName = themeDisplay.getSiteGroupName();
 
-			if (parentGroupName.equals(breadcrumbTitle)) {
+			if (siteGroupName.equals(breadcrumbTitle)) {
 				continue;
 			}
 		}

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,20 +37,21 @@ if (containerModel != null) {
 PortletURL containerURL = renderResponse.createRenderURL();
 
 containerURL.setParameter("struts_action", "/trash/view_container_model");
-containerURL.setParameter("redirect", redirect);
+containerURL.setParameter("redirect", currentURL);
 containerURL.setParameter("className", className);
 containerURL.setParameter("classPK", String.valueOf(classPK));
 containerURL.setParameter("containerModelClassName", trashHandler.getContainerModelClassName());
 
-TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler, containerModel, containerURL);
+TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler.getContainerModelClassName(), containerModelId, containerURL);
 %>
 
 <div class="portlet-msg-alert">
-	<liferay-ui:message arguments="<%= trashRenderer.getTitle(locale) %>" key="the-original-folder-does-not-exist-anymore" />
+	<liferay-ui:message arguments="<%= new Object[] {trashHandler.getContainerModelName(), trashRenderer.getTitle(locale)} %>" key="the-original-x-does-not-exist-anymore" />
 </div>
 
 <aui:form method="post" name="fm">
 	<liferay-ui:header
+		showBackURL="<%= containerModel != null %>"
 		title='<%= LanguageUtil.format(pageContext, "select-x", trashHandler.getContainerModelName(), true) %>'
 	/>
 
@@ -108,12 +109,11 @@ TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler, containerMod
 			/>
 
 			<%
-			StringBundler sb = new StringBundler(10);
+			StringBundler sb = new StringBundler(9);
 
 			sb.append(renderResponse.getNamespace());
 			sb.append("selectContainer('");
-			sb.append(redirect);
-			sb.append("', '");
+			sb.append("'', '");
 			sb.append(className);
 			sb.append("', ");
 			sb.append(classPK);
@@ -132,7 +132,7 @@ TrashUtil.addContainerModelBreadcrumbEntries(request, trashHandler, containerMod
 		<aui:button-row>
 
 			<%
-			String taglibSelectOnClick = renderResponse.getNamespace() + "selectContainer('" + redirect + "', '" + className + "', " + classPK + ", " + containerModelId + ");";
+			String taglibSelectOnClick = renderResponse.getNamespace() + "selectContainer('', '" + className + "', " + classPK + ", " + containerModelId + ");";
 			%>
 
 			<aui:button

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.messageboards.service.persistence;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -22,7 +23,9 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
@@ -109,6 +112,8 @@ public class MBBanPersistenceTest {
 
 		MBBan newMBBan = _persistence.create(pk);
 
+		newMBBan.setUuid(ServiceTestUtil.randomString());
+
 		newMBBan.setGroupId(ServiceTestUtil.nextLong());
 
 		newMBBan.setCompanyId(ServiceTestUtil.nextLong());
@@ -127,6 +132,7 @@ public class MBBanPersistenceTest {
 
 		MBBan existingMBBan = _persistence.findByPrimaryKey(newMBBan.getPrimaryKey());
 
+		Assert.assertEquals(existingMBBan.getUuid(), newMBBan.getUuid());
 		Assert.assertEquals(existingMBBan.getBanId(), newMBBan.getBanId());
 		Assert.assertEquals(existingMBBan.getGroupId(), newMBBan.getGroupId());
 		Assert.assertEquals(existingMBBan.getCompanyId(),
@@ -181,6 +187,26 @@ public class MBBanPersistenceTest {
 		MBBan missingMBBan = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingMBBan);
+	}
+
+	@Test
+	public void testActionableDynamicQuery() throws Exception {
+		final IntegerWrapper count = new IntegerWrapper();
+
+		ActionableDynamicQuery actionableDynamicQuery = new MBBanActionableDynamicQuery() {
+				@Override
+				protected void performAction(Object object) {
+					MBBan mbBan = (MBBan)object;
+
+					Assert.assertNotNull(mbBan);
+
+					count.increment();
+				}
+			};
+
+		actionableDynamicQuery.performActions();
+
+		Assert.assertEquals(count.getValue(), _persistence.countAll());
 	}
 
 	@Test
@@ -266,6 +292,11 @@ public class MBBanPersistenceTest {
 
 		MBBanModelImpl existingMBBanModelImpl = (MBBanModelImpl)_persistence.findByPrimaryKey(newMBBan.getPrimaryKey());
 
+		Assert.assertTrue(Validator.equals(existingMBBanModelImpl.getUuid(),
+				existingMBBanModelImpl.getOriginalUuid()));
+		Assert.assertEquals(existingMBBanModelImpl.getGroupId(),
+			existingMBBanModelImpl.getOriginalGroupId());
+
 		Assert.assertEquals(existingMBBanModelImpl.getGroupId(),
 			existingMBBanModelImpl.getOriginalGroupId());
 		Assert.assertEquals(existingMBBanModelImpl.getBanUserId(),
@@ -276,6 +307,8 @@ public class MBBanPersistenceTest {
 		long pk = ServiceTestUtil.nextLong();
 
 		MBBan mbBan = _persistence.create(pk);
+
+		mbBan.setUuid(ServiceTestUtil.randomString());
 
 		mbBan.setGroupId(ServiceTestUtil.nextLong());
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,17 +90,17 @@ public class SocialActivitySettingLocalServiceTest
 
 		Assert.assertFalse(
 			SocialActivitySettingLocalServiceUtil.isEnabled(
-			_group.getGroupId(), classNameId));
+				_group.getGroupId(), classNameId));
 		Assert.assertTrue(
 			SocialActivitySettingLocalServiceUtil.isEnabled(
-			_group.getGroupId(), classNameId, 1));
+				_group.getGroupId(), classNameId, 1));
 
 		SocialActivitySettingLocalServiceUtil.updateActivitySetting(
 			_group.getGroupId(), TEST_MODEL, 1, false);
 
 		Assert.assertFalse(
 			SocialActivitySettingLocalServiceUtil.isEnabled(
-			_group.getGroupId(), classNameId, 1));
+				_group.getGroupId(), classNameId, 1));
 	}
 
 }

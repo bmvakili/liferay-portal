@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +27,12 @@ String htmlBottom = (String)request.getAttribute("liferay-ui:form-navigator:html
 String htmlTop = (String)request.getAttribute("liferay-ui:form-navigator:htmlTop");
 String jspPath = (String)request.getAttribute("liferay-ui:form-navigator:jspPath");
 boolean showButtons = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:form-navigator:showButtons"));
+
+if (Validator.isNull(backURL)) {
+	String redirect = ParamUtil.getString(request, "redirect");
+
+	backURL = redirect;
+}
 
 if (Validator.isNull(backURL)) {
 	PortletURL portletURL = liferayPortletResponse.createRenderURL();
@@ -197,15 +203,17 @@ if (Validator.isNotNull(historyKey)) {
 </aui:script>
 
 <aui:script use="aui-base">
-	var modifyLinks = A.all('.modify-link');
+	var sectionsContainer = A.one('#<portlet:namespace />sectionsContainer');
+
+	var modifyLinks = sectionsContainer.all('.modify-link');
 
 	if (modifyLinks) {
 		modifyLinks.on(
 			'click',
-			function() {
+			function(event) {
 				A.fire(
 					'formNavigator:trackChanges',
-					A.one('.selected .modify-link')
+					event.currentTarget
 				);
 			}
 		);

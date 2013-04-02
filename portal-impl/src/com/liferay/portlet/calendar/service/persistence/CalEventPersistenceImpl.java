@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,8 +14,11 @@
 
 package com.liferay.portlet.calendar.service.persistence;
 
+<<<<<<< HEAD
 import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.bean.BeanReference;
+=======
+>>>>>>> master
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -942,16 +945,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			query.append(_SQL_SELECT_CALEVENT_WHERE);
 
+			boolean bindUuid = false;
+
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_UUID_1);
 			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_UUID_3);
+			}
 			else {
-				if (uuid.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_UUID_UUID_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_UUID_UUID_2);
-				}
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_UUID_2);
 			}
 
 			if (orderByComparator != null) {
@@ -974,7 +979,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (uuid != null) {
+				if (bindUuid) {
 					qPos.add(uuid);
 				}
 
@@ -1157,16 +1162,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		query.append(_SQL_SELECT_CALEVENT_WHERE);
 
+		boolean bindUuid = false;
+
 		if (uuid == null) {
 			query.append(_FINDER_COLUMN_UUID_UUID_1);
 		}
+		else if (uuid.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_UUID_UUID_3);
+		}
 		else {
-			if (uuid.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_UUID_UUID_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_UUID_UUID_2);
-			}
+			bindUuid = true;
+
+			query.append(_FINDER_COLUMN_UUID_UUID_2);
 		}
 
 		if (orderByComparator != null) {
@@ -1238,7 +1245,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (uuid != null) {
+		if (bindUuid) {
 			qPos.add(uuid);
 		}
 
@@ -1261,6 +1268,102 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 	}
 
 	/**
+<<<<<<< HEAD
+=======
+	 * Removes all the cal events where uuid = &#63; from the database.
+	 *
+	 * @param uuid the uuid
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByUuid(String uuid) throws SystemException {
+		for (CalEvent calEvent : findByUuid(uuid, QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS, null)) {
+			remove(calEvent);
+		}
+	}
+
+	/**
+	 * Returns the number of cal events where uuid = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @return the number of matching cal events
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUuid(String uuid) throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID;
+
+		Object[] finderArgs = new Object[] { uuid };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_CALEVENT_WHERE);
+
+			boolean bindUuid = false;
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_UUID_1);
+			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_UUID_3);
+			}
+			else {
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_UUID_2);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindUuid) {
+					qPos.add(uuid);
+				}
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_UUID_UUID_1 = "calEvent.uuid IS NULL";
+	private static final String _FINDER_COLUMN_UUID_UUID_2 = "calEvent.uuid = ?";
+	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(calEvent.uuid IS NULL OR calEvent.uuid = '')";
+	public static final FinderPath FINDER_PATH_FETCH_BY_UUID_G = new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, CalEventImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
+			new String[] { String.class.getName(), Long.class.getName() },
+			CalEventModelImpl.UUID_COLUMN_BITMASK |
+			CalEventModelImpl.GROUPID_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_UUID_G = new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
+			new String[] { String.class.getName(), Long.class.getName() });
+
+	/**
+>>>>>>> master
 	 * Returns the cal event where uuid = &#63; and groupId = &#63; or throws a {@link com.liferay.portlet.calendar.NoSuchEventException} if it could not be found.
 	 *
 	 * @param uuid the uuid
@@ -1343,16 +1446,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			query.append(_SQL_SELECT_CALEVENT_WHERE);
 
+			boolean bindUuid = false;
+
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_G_UUID_1);
 			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_G_UUID_3);
+			}
 			else {
-				if (uuid.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_UUID_G_UUID_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_UUID_G_UUID_2);
-				}
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_G_UUID_2);
 			}
 
 			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
@@ -1370,7 +1475,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (uuid != null) {
+				if (bindUuid) {
 					qPos.add(uuid);
 				}
 
@@ -1378,13 +1483,120 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				List<CalEvent> list = q.list();
 
+<<<<<<< HEAD
 				result = list;
-
-				CalEvent calEvent = null;
-
+=======
 				if (list.isEmpty()) {
 					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G,
 						finderArgs, list);
+				}
+				else {
+					CalEvent calEvent = list.get(0);
+
+					result = calEvent;
+
+					cacheResult(calEvent);
+
+					if ((calEvent.getUuid() == null) ||
+							!calEvent.getUuid().equals(uuid) ||
+							(calEvent.getGroupId() != groupId)) {
+						FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G,
+							finderArgs, calEvent);
+					}
+				}
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_G,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (CalEvent)result;
+		}
+	}
+
+	/**
+	 * Removes the cal event where uuid = &#63; and groupId = &#63; from the database.
+	 *
+	 * @param uuid the uuid
+	 * @param groupId the group ID
+	 * @return the cal event that was removed
+	 * @throws SystemException if a system exception occurred
+	 */
+	public CalEvent removeByUUID_G(String uuid, long groupId)
+		throws NoSuchEventException, SystemException {
+		CalEvent calEvent = findByUUID_G(uuid, groupId);
+
+		return remove(calEvent);
+	}
+
+	/**
+	 * Returns the number of cal events where uuid = &#63; and groupId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param groupId the group ID
+	 * @return the number of matching cal events
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUUID_G(String uuid, long groupId)
+		throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID_G;
+
+		Object[] finderArgs = new Object[] { uuid, groupId };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_CALEVENT_WHERE);
+
+			boolean bindUuid = false;
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_G_UUID_1);
+			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_G_UUID_3);
+			}
+			else {
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_G_UUID_2);
+			}
+
+			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+>>>>>>> master
+
+				CalEvent calEvent = null;
+
+<<<<<<< HEAD
+				if (list.isEmpty()) {
+					FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G,
+						finderArgs, list);
+=======
+				if (bindUuid) {
+					qPos.add(uuid);
+>>>>>>> master
 				}
 				else {
 					calEvent = list.get(0);
@@ -1423,6 +1635,36 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	private static final String _FINDER_COLUMN_UUID_G_UUID_1 = "calEvent.uuid IS NULL AND ";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "calEvent.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(calEvent.uuid IS NULL OR calEvent.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "calEvent.groupId = ?";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C = new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, CalEventImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
+			new String[] {
+				String.class.getName(), Long.class.getName(),
+				
+			Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C =
+		new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, CalEventImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
+			new String[] { String.class.getName(), Long.class.getName() },
+			CalEventModelImpl.UUID_COLUMN_BITMASK |
+			CalEventModelImpl.COMPANYID_COLUMN_BITMASK |
+			CalEventModelImpl.STARTDATE_COLUMN_BITMASK |
+			CalEventModelImpl.TITLE_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_UUID_C = new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
+			new String[] { String.class.getName(), Long.class.getName() });
+
+>>>>>>> master
 	/**
 	 * Returns all the cal events where uuid = &#63; and companyId = &#63;.
 	 *
@@ -1517,16 +1759,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			query.append(_SQL_SELECT_CALEVENT_WHERE);
 
+			boolean bindUuid = false;
+
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
 			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+			}
 			else {
-				if (uuid.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_UUID_C_UUID_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_UUID_C_UUID_2);
-				}
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
 			}
 
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
@@ -1551,7 +1795,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (uuid != null) {
+				if (bindUuid) {
 					qPos.add(uuid);
 				}
 
@@ -1750,16 +1994,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		query.append(_SQL_SELECT_CALEVENT_WHERE);
 
+		boolean bindUuid = false;
+
 		if (uuid == null) {
 			query.append(_FINDER_COLUMN_UUID_C_UUID_1);
 		}
+		else if (uuid.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+		}
 		else {
-			if (uuid.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
-			}
+			bindUuid = true;
+
+			query.append(_FINDER_COLUMN_UUID_C_UUID_2);
 		}
 
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
@@ -1833,7 +2079,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (uuid != null) {
+		if (bindUuid) {
 			qPos.add(uuid);
 		}
 
@@ -1858,6 +2104,123 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 	}
 
 	/**
+<<<<<<< HEAD
+=======
+	 * Removes all the cal events where uuid = &#63; and companyId = &#63; from the database.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByUuid_C(String uuid, long companyId)
+		throws SystemException {
+		for (CalEvent calEvent : findByUuid_C(uuid, companyId,
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+			remove(calEvent);
+		}
+	}
+
+	/**
+	 * Returns the number of cal events where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @return the number of matching cal events
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByUuid_C(String uuid, long companyId)
+		throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID_C;
+
+		Object[] finderArgs = new Object[] { uuid, companyId };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_CALEVENT_WHERE);
+
+			boolean bindUuid = false;
+
+			if (uuid == null) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
+			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+			}
+			else {
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
+			}
+
+			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				if (bindUuid) {
+					qPos.add(uuid);
+				}
+
+				qPos.add(companyId);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_UUID_C_UUID_1 = "calEvent.uuid IS NULL AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "calEvent.uuid = ? AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(calEvent.uuid IS NULL OR calEvent.uuid = '') AND ";
+	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "calEvent.companyId = ?";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_COMPANYID =
+		new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, CalEventImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
+			new String[] {
+				Long.class.getName(),
+				
+			Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID =
+		new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, CalEventImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
+			new String[] { Long.class.getName() },
+			CalEventModelImpl.COMPANYID_COLUMN_BITMASK |
+			CalEventModelImpl.STARTDATE_COLUMN_BITMASK |
+			CalEventModelImpl.TITLE_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_COMPANYID = new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
+			new String[] { Long.class.getName() });
+
+	/**
+>>>>>>> master
 	 * Returns all the cal events where companyId = &#63;.
 	 *
 	 * @param companyId the company ID
@@ -3396,16 +3759,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			query.append(_FINDER_COLUMN_G_T_GROUPID_2);
 
+			boolean bindType = false;
+
 			if (type == null) {
 				query.append(_FINDER_COLUMN_G_T_TYPE_1);
 			}
+			else if (type.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_G_T_TYPE_3);
+			}
 			else {
-				if (type.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_G_T_TYPE_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_G_T_TYPE_2);
-				}
+				bindType = true;
+
+				query.append(_FINDER_COLUMN_G_T_TYPE_2);
 			}
 
 			if (orderByComparator != null) {
@@ -3430,7 +3795,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				qPos.add(groupId);
 
-				if (type != null) {
+				if (bindType) {
 					qPos.add(type);
 				}
 
@@ -3626,16 +3991,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		query.append(_FINDER_COLUMN_G_T_GROUPID_2);
 
+		boolean bindType = false;
+
 		if (type == null) {
 			query.append(_FINDER_COLUMN_G_T_TYPE_1);
 		}
+		else if (type.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_G_T_TYPE_3);
+		}
 		else {
-			if (type.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_G_T_TYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_G_T_TYPE_2);
-			}
+			bindType = true;
+
+			query.append(_FINDER_COLUMN_G_T_TYPE_2);
 		}
 
 		if (orderByComparator != null) {
@@ -3709,7 +4076,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		qPos.add(groupId);
 
-		if (type != null) {
+		if (bindType) {
 			qPos.add(type);
 		}
 
@@ -3983,16 +4350,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		query.append(_FINDER_COLUMN_G_T_GROUPID_2);
 
+		boolean bindType = false;
+
 		if (type == null) {
 			query.append(_FINDER_COLUMN_G_T_TYPE_1);
 		}
+		else if (type.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_G_T_TYPE_3);
+		}
 		else {
-			if (type.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_G_T_TYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_G_T_TYPE_2);
-			}
+			bindType = true;
+
+			query.append(_FINDER_COLUMN_G_T_TYPE_2);
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
@@ -4041,7 +4410,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			qPos.add(groupId);
 
-			if (type != null) {
+			if (bindType) {
 				qPos.add(type);
 			}
 
@@ -4123,16 +4492,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		query.append(_FINDER_COLUMN_G_T_GROUPID_2);
 
+		boolean bindType = false;
+
 		if (type == null) {
 			query.append(_FINDER_COLUMN_G_T_TYPE_1);
 		}
+		else if (type.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_G_T_TYPE_3);
+		}
 		else {
-			if (type.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_G_T_TYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_G_T_TYPE_2);
-			}
+			bindType = true;
+
+			query.append(_FINDER_COLUMN_G_T_TYPE_2);
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
@@ -4236,7 +4607,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		qPos.add(groupId);
 
-		if (type != null) {
+		if (bindType) {
 			qPos.add(type);
 		}
 
@@ -4345,13 +4716,11 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 				if (type == null) {
 					query.append(_FINDER_COLUMN_G_T_TYPE_4);
 				}
+				else if (type.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_G_T_TYPE_6);
+				}
 				else {
-					if (type.equals(StringPool.BLANK)) {
-						query.append(_FINDER_COLUMN_G_T_TYPE_6);
-					}
-					else {
-						query.append(_FINDER_COLUMN_G_T_TYPE_5);
-					}
+					query.append(_FINDER_COLUMN_G_T_TYPE_5);
 				}
 
 				if ((i + 1) < types.length) {
@@ -4516,7 +4885,38 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 				query = new StringBundler(4);
 			}
 
+<<<<<<< HEAD
 			query.append(_SQL_SELECT_CALEVENT_WHERE);
+=======
+			query.append(_FINDER_COLUMN_G_T_GROUPID_5);
+
+			conjunctionable = true;
+
+			if ((types == null) || (types.length > 0)) {
+				if (conjunctionable) {
+					query.append(WHERE_AND);
+				}
+
+				query.append(StringPool.OPEN_PARENTHESIS);
+
+				for (int i = 0; i < types.length; i++) {
+					String type = types[i];
+
+					if (type == null) {
+						query.append(_FINDER_COLUMN_G_T_TYPE_4);
+					}
+					else if (type.equals(StringPool.BLANK)) {
+						query.append(_FINDER_COLUMN_G_T_TYPE_6);
+					}
+					else {
+						query.append(_FINDER_COLUMN_G_T_TYPE_5);
+					}
+
+					if ((i + 1) < types.length) {
+						query.append(WHERE_OR);
+					}
+				}
+>>>>>>> master
 
 			query.append(_FINDER_COLUMN_G_R_GROUPID_2);
 
@@ -4579,11 +4979,44 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 	 * @throws com.liferay.portlet.calendar.NoSuchEventException if a matching cal event could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+<<<<<<< HEAD
 	public CalEvent findByG_R_First(long groupId, boolean repeating,
 		OrderByComparator orderByComparator)
 		throws NoSuchEventException, SystemException {
 		CalEvent calEvent = fetchByG_R_First(groupId, repeating,
 				orderByComparator);
+=======
+	public int countByG_T(long groupId, String type) throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_T;
+
+		Object[] finderArgs = new Object[] { groupId, type };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(3);
+
+			query.append(_SQL_COUNT_CALEVENT_WHERE);
+
+			query.append(_FINDER_COLUMN_G_T_GROUPID_2);
+
+			boolean bindType = false;
+
+			if (type == null) {
+				query.append(_FINDER_COLUMN_G_T_TYPE_1);
+			}
+			else if (type.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_G_T_TYPE_3);
+			}
+			else {
+				bindType = true;
+
+				query.append(_FINDER_COLUMN_G_T_TYPE_2);
+			}
+
+			String sql = query.toString();
+>>>>>>> master
 
 		if (calEvent != null) {
 			return calEvent;
@@ -4599,7 +5032,13 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 		msg.append(", repeating=");
 		msg.append(repeating);
 
+<<<<<<< HEAD
 		msg.append(StringPool.CLOSE_CURLY_BRACE);
+=======
+				if (bindType) {
+					qPos.add(type);
+				}
+>>>>>>> master
 
 		throw new NoSuchEventException(msg.toString());
 	}
@@ -4635,11 +5074,74 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 	 * @throws com.liferay.portlet.calendar.NoSuchEventException if a matching cal event could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+<<<<<<< HEAD
 	public CalEvent findByG_R_Last(long groupId, boolean repeating,
 		OrderByComparator orderByComparator)
 		throws NoSuchEventException, SystemException {
 		CalEvent calEvent = fetchByG_R_Last(groupId, repeating,
 				orderByComparator);
+=======
+	public int countByG_T(long groupId, String[] types)
+		throws SystemException {
+		Object[] finderArgs = new Object[] { groupId, StringUtil.merge(types) };
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_T,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler();
+
+			query.append(_SQL_COUNT_CALEVENT_WHERE);
+
+			boolean conjunctionable = false;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_G_T_GROUPID_5);
+
+			conjunctionable = true;
+
+			if ((types == null) || (types.length > 0)) {
+				if (conjunctionable) {
+					query.append(WHERE_AND);
+				}
+
+				query.append(StringPool.OPEN_PARENTHESIS);
+
+				for (int i = 0; i < types.length; i++) {
+					String type = types[i];
+
+					if (type == null) {
+						query.append(_FINDER_COLUMN_G_T_TYPE_4);
+					}
+					else if (type.equals(StringPool.BLANK)) {
+						query.append(_FINDER_COLUMN_G_T_TYPE_6);
+					}
+					else {
+						query.append(_FINDER_COLUMN_G_T_TYPE_5);
+					}
+
+					if ((i + 1) < types.length) {
+						query.append(WHERE_OR);
+					}
+				}
+
+				query.append(StringPool.CLOSE_PARENTHESIS);
+
+				conjunctionable = true;
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+>>>>>>> master
 
 		if (calEvent != null) {
 			return calEvent;
@@ -4676,8 +5178,23 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 		List<CalEvent> list = findByG_R(groupId, repeating, count - 1, count,
 				orderByComparator);
 
+<<<<<<< HEAD
 		if (!list.isEmpty()) {
 			return list.get(0);
+=======
+		boolean bindType = false;
+
+		if (type == null) {
+			query.append(_FINDER_COLUMN_G_T_TYPE_1);
+		}
+		else if (type.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_G_T_TYPE_3);
+		}
+		else {
+			bindType = true;
+
+			query.append(_FINDER_COLUMN_G_T_TYPE_2);
+>>>>>>> master
 		}
 
 		return null;
@@ -4709,7 +5226,13 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 			array[0] = getByG_R_PrevAndNext(session, calEvent, groupId,
 					repeating, orderByComparator, true);
 
+<<<<<<< HEAD
 			array[1] = calEvent;
+=======
+			if (bindType) {
+				qPos.add(type);
+			}
+>>>>>>> master
 
 			array[2] = getByG_R_PrevAndNext(session, calEvent, groupId,
 					repeating, orderByComparator, false);
@@ -4762,13 +5285,20 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 						query.append(WHERE_LESSER_THAN_HAS_NEXT);
 					}
 				}
+				else if (type.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_G_T_TYPE_6);
+				}
 				else {
+<<<<<<< HEAD
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN);
 					}
 					else {
 						query.append(WHERE_LESSER_THAN);
 					}
+=======
+					query.append(_FINDER_COLUMN_G_T_TYPE_5);
+>>>>>>> master
 				}
 			}
 
@@ -4816,6 +5346,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		qPos.add(repeating);
 
+<<<<<<< HEAD
 		if (orderByComparator != null) {
 			Object[] values = orderByComparator.getOrderByConditionValues(calEvent);
 
@@ -4833,6 +5364,41 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 			return null;
 		}
 	}
+=======
+	private static final String _FINDER_COLUMN_G_T_GROUPID_2 = "calEvent.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_T_GROUPID_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_T_GROUPID_2) + ")";
+	private static final String _FINDER_COLUMN_G_T_TYPE_1 = "calEvent.type IS NULL";
+	private static final String _FINDER_COLUMN_G_T_TYPE_2 = "calEvent.type = ?";
+	private static final String _FINDER_COLUMN_G_T_TYPE_3 = "(calEvent.type IS NULL OR calEvent.type = '')";
+	private static final String _FINDER_COLUMN_G_T_TYPE_4 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_T_TYPE_1) + ")";
+	private static final String _FINDER_COLUMN_G_T_TYPE_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_T_TYPE_2) + ")";
+	private static final String _FINDER_COLUMN_G_T_TYPE_6 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_T_TYPE_3) + ")";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_R = new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, CalEventImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_R",
+			new String[] {
+				Long.class.getName(), Boolean.class.getName(),
+				
+			Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_R = new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, CalEventImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_R",
+			new String[] { Long.class.getName(), Boolean.class.getName() },
+			CalEventModelImpl.GROUPID_COLUMN_BITMASK |
+			CalEventModelImpl.REPEATING_COLUMN_BITMASK |
+			CalEventModelImpl.STARTDATE_COLUMN_BITMASK |
+			CalEventModelImpl.TITLE_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_G_R = new FinderPath(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_R",
+			new String[] { Long.class.getName(), Boolean.class.getName() });
+>>>>>>> master
 
 	/**
 	 * Returns all the cal events that the user has permission to view where groupId = &#63; and repeating = &#63;.
@@ -5753,11 +6319,26 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				query.append(StringPool.CLOSE_PARENTHESIS);
 
+<<<<<<< HEAD
 				conjunctionable = true;
 			}
 
 			if (conjunctionable) {
 				query.append(WHERE_AND);
+=======
+			boolean bindType = false;
+
+			if (type == null) {
+				query.append(_FINDER_COLUMN_G_T_R_TYPE_1);
+			}
+			else if (type.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_G_T_R_TYPE_3);
+			}
+			else {
+				bindType = true;
+
+				query.append(_FINDER_COLUMN_G_T_R_TYPE_2);
+>>>>>>> master
 			}
 
 			query.append(_FINDER_COLUMN_G_T_R_REPEATING_5);
@@ -5786,8 +6367,13 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				qPos.add(groupId);
 
+<<<<<<< HEAD
 				if (types != null) {
 					qPos.add(types);
+=======
+				if (bindType) {
+					qPos.add(type);
+>>>>>>> master
 				}
 
 				qPos.add(repeating);
@@ -6038,16 +6624,18 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		query.append(_FINDER_COLUMN_G_T_R_GROUPID_2);
 
+		boolean bindType = false;
+
 		if (type == null) {
 			query.append(_FINDER_COLUMN_G_T_R_TYPE_1);
 		}
+		else if (type.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_3);
+		}
 		else {
-			if (type.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_G_T_R_TYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_G_T_R_TYPE_2);
-			}
+			bindType = true;
+
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_2);
 		}
 
 		query.append(_FINDER_COLUMN_G_T_R_REPEATING_2);
@@ -6153,7 +6741,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		qPos.add(groupId);
 
-		if (type != null) {
+		if (bindType) {
 			qPos.add(type);
 		}
 
@@ -6247,6 +6835,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 		boolean conjunctionable = false;
 
+<<<<<<< HEAD
 		if (conjunctionable) {
 			query.append(WHERE_AND);
 		}
@@ -6285,6 +6874,20 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 			query.append(StringPool.CLOSE_PARENTHESIS);
 
 			conjunctionable = true;
+=======
+		boolean bindType = false;
+
+		if (type == null) {
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_1);
+		}
+		else if (type.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_3);
+		}
+		else {
+			bindType = true;
+
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_2);
+>>>>>>> master
 		}
 
 		if (conjunctionable) {
@@ -6464,7 +7067,12 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 
+<<<<<<< HEAD
 				closeSession(session);
+=======
+			if (bindType) {
+				qPos.add(type);
+>>>>>>> master
 			}
 		}
 
@@ -6620,6 +7228,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			query.append(_SQL_COUNT_CALEVENT_WHERE);
 
+<<<<<<< HEAD
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_UUID_1);
 			}
@@ -6631,6 +7240,21 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 					query.append(_FINDER_COLUMN_UUID_UUID_2);
 				}
 			}
+=======
+		boolean bindType = false;
+
+		if (type == null) {
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_1);
+		}
+		else if (type.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_3);
+		}
+		else {
+			bindType = true;
+
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_2);
+		}
+>>>>>>> master
 
 			String sql = query.toString();
 
@@ -6710,7 +7334,13 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				Query q = session.createQuery(sql);
 
+<<<<<<< HEAD
 				QueryPos qPos = QueryPos.getInstance(q);
+=======
+		if (bindType) {
+			qPos.add(type);
+		}
+>>>>>>> master
 
 				if (uuid != null) {
 					qPos.add(uuid);
@@ -6783,8 +7413,19 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
+<<<<<<< HEAD
 				if (uuid != null) {
 					qPos.add(uuid);
+=======
+				if (type == null) {
+					query.append(_FINDER_COLUMN_G_T_R_TYPE_4);
+				}
+				else if (type.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_G_T_R_TYPE_6);
+				}
+				else {
+					query.append(_FINDER_COLUMN_G_T_R_TYPE_5);
+>>>>>>> master
 				}
 
 				qPos.add(companyId);
@@ -6944,8 +7585,20 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			SQLQuery q = session.createSQLQuery(sql);
 
+<<<<<<< HEAD
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
+=======
+					if (type == null) {
+						query.append(_FINDER_COLUMN_G_T_R_TYPE_4);
+					}
+					else if (type.equals(StringPool.BLANK)) {
+						query.append(_FINDER_COLUMN_G_T_R_TYPE_6);
+					}
+					else {
+						query.append(_FINDER_COLUMN_G_T_R_TYPE_5);
+					}
+>>>>>>> master
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
@@ -7037,16 +7690,27 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			query.append(_FINDER_COLUMN_G_T_GROUPID_2);
 
+			boolean bindType = false;
+
 			if (type == null) {
 				query.append(_FINDER_COLUMN_G_T_TYPE_1);
 			}
+			else if (type.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_G_T_R_TYPE_3);
+			}
 			else {
+<<<<<<< HEAD
 				if (type.equals(StringPool.BLANK)) {
 					query.append(_FINDER_COLUMN_G_T_TYPE_3);
 				}
 				else {
 					query.append(_FINDER_COLUMN_G_T_TYPE_2);
 				}
+=======
+				bindType = true;
+
+				query.append(_FINDER_COLUMN_G_T_R_TYPE_2);
+>>>>>>> master
 			}
 
 			String sql = query.toString();
@@ -7062,7 +7726,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				qPos.add(groupId);
 
-				if (type != null) {
+				if (bindType) {
 					qPos.add(type);
 				}
 
@@ -7129,13 +7793,20 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 					if (type == null) {
 						query.append(_FINDER_COLUMN_G_T_TYPE_4);
 					}
+					else if (type.equals(StringPool.BLANK)) {
+						query.append(_FINDER_COLUMN_G_T_R_TYPE_6);
+					}
 					else {
+<<<<<<< HEAD
 						if (type.equals(StringPool.BLANK)) {
 							query.append(_FINDER_COLUMN_G_T_TYPE_6);
 						}
 						else {
 							query.append(_FINDER_COLUMN_G_T_TYPE_5);
 						}
+=======
+						query.append(_FINDER_COLUMN_G_T_R_TYPE_5);
+>>>>>>> master
 					}
 
 					if ((i + 1) < types.length) {
@@ -7190,6 +7861,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 	 *
 	 * @param groupId the group ID
 	 * @param type the type
+<<<<<<< HEAD
 	 * @return the number of matching cal events that the user has permission to view
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -7198,6 +7870,124 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
 			return countByG_T(groupId, type);
 		}
+=======
+	 * @param repeating the repeating
+	 * @return the number of matching cal events that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int filterCountByG_T_R(long groupId, String type, boolean repeating)
+		throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return countByG_T_R(groupId, type, repeating);
+		}
+
+		StringBundler query = new StringBundler(4);
+
+		query.append(_FILTER_SQL_COUNT_CALEVENT_WHERE);
+
+		query.append(_FINDER_COLUMN_G_T_R_GROUPID_2);
+
+		boolean bindType = false;
+
+		if (type == null) {
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_1);
+		}
+		else if (type.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_3);
+		}
+		else {
+			bindType = true;
+
+			query.append(_FINDER_COLUMN_G_T_R_TYPE_2);
+		}
+
+		query.append(_FINDER_COLUMN_G_T_R_REPEATING_2);
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				CalEvent.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+
+			if (bindType) {
+				qPos.add(type);
+			}
+
+			qPos.add(repeating);
+
+			Long count = (Long)q.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the number of cal events that the user has permission to view where groupId = &#63; and type = any &#63; and repeating = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param types the types
+	 * @param repeating the repeating
+	 * @return the number of matching cal events that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int filterCountByG_T_R(long groupId, String[] types,
+		boolean repeating) throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return countByG_T_R(groupId, types, repeating);
+		}
+
+		StringBundler query = new StringBundler();
+
+		query.append(_FILTER_SQL_COUNT_CALEVENT_WHERE);
+
+		boolean conjunctionable = false;
+
+		if (conjunctionable) {
+			query.append(WHERE_AND);
+		}
+
+		query.append(_FINDER_COLUMN_G_T_R_GROUPID_5);
+
+		conjunctionable = true;
+
+		if ((types == null) || (types.length > 0)) {
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(StringPool.OPEN_PARENTHESIS);
+
+			for (int i = 0; i < types.length; i++) {
+				String type = types[i];
+
+				if (type == null) {
+					query.append(_FINDER_COLUMN_G_T_R_TYPE_4);
+				}
+				else if (type.equals(StringPool.BLANK)) {
+					query.append(_FINDER_COLUMN_G_T_R_TYPE_6);
+				}
+				else {
+					query.append(_FINDER_COLUMN_G_T_R_TYPE_5);
+				}
+>>>>>>> master
 
 		StringBundler query = new StringBundler(3);
 
@@ -7251,6 +8041,58 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 		}
 	}
 
+<<<<<<< HEAD
+=======
+	private static final String _FINDER_COLUMN_G_T_R_GROUPID_2 = "calEvent.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_T_R_GROUPID_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_T_R_GROUPID_2) + ")";
+	private static final String _FINDER_COLUMN_G_T_R_TYPE_1 = "calEvent.type IS NULL AND ";
+	private static final String _FINDER_COLUMN_G_T_R_TYPE_2 = "calEvent.type = ? AND ";
+	private static final String _FINDER_COLUMN_G_T_R_TYPE_3 = "(calEvent.type IS NULL OR calEvent.type = '') AND ";
+	private static final String _FINDER_COLUMN_G_T_R_TYPE_4 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_T_R_TYPE_1) + ")";
+	private static final String _FINDER_COLUMN_G_T_R_TYPE_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_T_R_TYPE_2) + ")";
+	private static final String _FINDER_COLUMN_G_T_R_TYPE_6 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_T_R_TYPE_3) + ")";
+	private static final String _FINDER_COLUMN_G_T_R_REPEATING_2 = "calEvent.repeating = ?";
+	private static final String _FINDER_COLUMN_G_T_R_REPEATING_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_T_R_REPEATING_2) + ")";
+
+	/**
+	 * Caches the cal event in the entity cache if it is enabled.
+	 *
+	 * @param calEvent the cal event
+	 */
+	public void cacheResult(CalEvent calEvent) {
+		EntityCacheUtil.putResult(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+			CalEventImpl.class, calEvent.getPrimaryKey(), calEvent);
+
+		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G,
+			new Object[] { calEvent.getUuid(), calEvent.getGroupId() }, calEvent);
+
+		calEvent.resetOriginalValues();
+	}
+
+	/**
+	 * Caches the cal events in the entity cache if it is enabled.
+	 *
+	 * @param calEvents the cal events
+	 */
+	public void cacheResult(List<CalEvent> calEvents) {
+		for (CalEvent calEvent : calEvents) {
+			if (EntityCacheUtil.getResult(
+						CalEventModelImpl.ENTITY_CACHE_ENABLED,
+						CalEventImpl.class, calEvent.getPrimaryKey()) == null) {
+				cacheResult(calEvent);
+			}
+			else {
+				calEvent.resetOriginalValues();
+			}
+		}
+	}
+
+>>>>>>> master
 	/**
 	 * Returns the number of cal events that the user has permission to view where groupId = &#63; and type = any &#63;.
 	 *
@@ -7274,15 +8116,103 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 		if (conjunctionable) {
 			query.append(WHERE_AND);
 		}
+<<<<<<< HEAD
+=======
+	}
+
+	protected void cacheUniqueFindersCache(CalEvent calEvent) {
+		if (calEvent.isNew()) {
+			Object[] args = new Object[] {
+					calEvent.getUuid(), calEvent.getGroupId()
+				};
+>>>>>>> master
 
 		query.append(_FINDER_COLUMN_G_T_GROUPID_5);
 
+<<<<<<< HEAD
 		conjunctionable = true;
+=======
+			if ((calEventModelImpl.getColumnBitmask() &
+					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						calEvent.getUuid(), calEvent.getGroupId()
+					};
+>>>>>>> master
 
 		if ((types == null) || (types.length > 0)) {
 			if (conjunctionable) {
 				query.append(WHERE_AND);
 			}
+<<<<<<< HEAD
+=======
+		}
+	}
+
+	protected void clearUniqueFindersCache(CalEvent calEvent) {
+		CalEventModelImpl calEventModelImpl = (CalEventModelImpl)calEvent;
+
+		Object[] args = new Object[] { calEvent.getUuid(), calEvent.getGroupId() };
+
+		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+
+		if ((calEventModelImpl.getColumnBitmask() &
+				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
+			args = new Object[] {
+					calEventModelImpl.getOriginalUuid(),
+					calEventModelImpl.getOriginalGroupId()
+				};
+
+			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
+			FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
+		}
+	}
+
+	/**
+	 * Creates a new cal event with the primary key. Does not add the cal event to the database.
+	 *
+	 * @param eventId the primary key for the new cal event
+	 * @return the new cal event
+	 */
+	public CalEvent create(long eventId) {
+		CalEvent calEvent = new CalEventImpl();
+
+		calEvent.setNew(true);
+		calEvent.setPrimaryKey(eventId);
+
+		String uuid = PortalUUIDUtil.generate();
+
+		calEvent.setUuid(uuid);
+
+		return calEvent;
+	}
+
+	/**
+	 * Removes the cal event with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param eventId the primary key of the cal event
+	 * @return the cal event that was removed
+	 * @throws com.liferay.portlet.calendar.NoSuchEventException if a cal event with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public CalEvent remove(long eventId)
+		throws NoSuchEventException, SystemException {
+		return remove((Serializable)eventId);
+	}
+
+	/**
+	 * Removes the cal event with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the cal event
+	 * @return the cal event that was removed
+	 * @throws com.liferay.portlet.calendar.NoSuchEventException if a cal event with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public CalEvent remove(Serializable primaryKey)
+		throws NoSuchEventException, SystemException {
+		Session session = null;
+>>>>>>> master
 
 			query.append(StringPool.OPEN_PARENTHESIS);
 
@@ -7493,11 +8423,27 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 				}
 			}
 
+<<<<<<< HEAD
 			query.append(_FINDER_COLUMN_G_T_R_REPEATING_2);
+=======
+			if ((calEventModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						calEventModelImpl.getOriginalUuid(),
+						calEventModelImpl.getOriginalCompanyId()
+					};
+>>>>>>> master
 
 			String sql = query.toString();
 
+<<<<<<< HEAD
 			Session session = null;
+=======
+				args = new Object[] {
+						calEventModelImpl.getUuid(),
+						calEventModelImpl.getCompanyId()
+					};
+>>>>>>> master
 
 			try {
 				session = openSession();
@@ -7524,13 +8470,22 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 					count = Long.valueOf(0);
 				}
 
+<<<<<<< HEAD
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_G_T_R,
 					finderArgs, count);
+=======
+			if ((calEventModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						calEventModelImpl.getOriginalCompanyId()
+					};
+>>>>>>> master
 
 				closeSession(session);
 			}
 		}
 
+<<<<<<< HEAD
 		return count.intValue();
 	}
 
@@ -7548,34 +8503,83 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 		Object[] finderArgs = new Object[] {
 				groupId, StringUtil.merge(types), repeating
 			};
+=======
+				args = new Object[] { calEventModelImpl.getCompanyId() };
+>>>>>>> master
 
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_T_R,
 				finderArgs, this);
 
+<<<<<<< HEAD
 		if (count == null) {
 			StringBundler query = new StringBundler();
+=======
+			if ((calEventModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						calEventModelImpl.getOriginalGroupId()
+					};
+>>>>>>> master
 
 			query.append(_SQL_COUNT_CALEVENT_WHERE);
 
+<<<<<<< HEAD
 			boolean conjunctionable = false;
+=======
+				args = new Object[] { calEventModelImpl.getGroupId() };
+>>>>>>> master
 
 			if (conjunctionable) {
 				query.append(WHERE_AND);
 			}
 
+<<<<<<< HEAD
 			query.append(_FINDER_COLUMN_G_T_R_GROUPID_5);
+=======
+			if ((calEventModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_T.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						calEventModelImpl.getOriginalGroupId(),
+						calEventModelImpl.getOriginalType()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_T, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_T,
+					args);
+
+				args = new Object[] {
+						calEventModelImpl.getGroupId(),
+						calEventModelImpl.getType()
+					};
+>>>>>>> master
 
 			conjunctionable = true;
 
+<<<<<<< HEAD
 			if ((types == null) || (types.length > 0)) {
 				if (conjunctionable) {
 					query.append(WHERE_AND);
 				}
+=======
+			if ((calEventModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_R.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						calEventModelImpl.getOriginalGroupId(),
+						calEventModelImpl.getOriginalRepeating()
+					};
+>>>>>>> master
 
 				query.append(StringPool.OPEN_PARENTHESIS);
 
+<<<<<<< HEAD
 				for (int i = 0; i < types.length; i++) {
 					String type = types[i];
+=======
+				args = new Object[] {
+						calEventModelImpl.getGroupId(),
+						calEventModelImpl.getRepeating()
+					};
+>>>>>>> master
 
 					if (type == null) {
 						query.append(_FINDER_COLUMN_G_T_R_TYPE_4);
@@ -7589,15 +8593,33 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 						}
 					}
 
+<<<<<<< HEAD
 					if ((i + 1) < types.length) {
 						query.append(WHERE_OR);
 					}
 				}
+=======
+			if ((calEventModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_T_R.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						calEventModelImpl.getOriginalGroupId(),
+						calEventModelImpl.getOriginalType(),
+						calEventModelImpl.getOriginalRepeating()
+					};
+>>>>>>> master
 
 				query.append(StringPool.CLOSE_PARENTHESIS);
 
+<<<<<<< HEAD
 				conjunctionable = true;
 			}
+=======
+				args = new Object[] {
+						calEventModelImpl.getGroupId(),
+						calEventModelImpl.getType(),
+						calEventModelImpl.getRepeating()
+					};
+>>>>>>> master
 
 			if (conjunctionable) {
 				query.append(WHERE_AND);
@@ -7620,6 +8642,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				qPos.add(groupId);
 
+<<<<<<< HEAD
 				if (types != null) {
 					qPos.add(types);
 				}
@@ -7630,23 +8653,47 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 			}
 			catch (Exception e) {
 				throw processException(e);
+=======
+	/**
+	 * Returns the cal event with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 *
+	 * @param primaryKey the primary key of the cal event
+	 * @return the cal event
+	 * @throws com.liferay.portlet.calendar.NoSuchEventException if a cal event with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public CalEvent findByPrimaryKey(Serializable primaryKey)
+		throws NoSuchEventException, SystemException {
+		CalEvent calEvent = fetchByPrimaryKey(primaryKey);
+
+		if (calEvent == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+>>>>>>> master
 			}
 			finally {
 				if (count == null) {
 					count = Long.valueOf(0);
 				}
 
+<<<<<<< HEAD
 				FinderCacheUtil.putResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_T_R,
 					finderArgs, count);
 
 				closeSession(session);
 			}
+=======
+			throw new NoSuchEventException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
+>>>>>>> master
 		}
 
 		return count.intValue();
 	}
 
 	/**
+<<<<<<< HEAD
 	 * Returns the number of cal events that the user has permission to view where groupId = &#63; and type = &#63; and repeating = &#63;.
 	 *
 	 * @param groupId the group ID
@@ -7686,6 +8733,32 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
 
 		Session session = null;
+=======
+	 * Returns the cal event with the primary key or throws a {@link com.liferay.portlet.calendar.NoSuchEventException} if it could not be found.
+	 *
+	 * @param eventId the primary key of the cal event
+	 * @return the cal event
+	 * @throws com.liferay.portlet.calendar.NoSuchEventException if a cal event with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public CalEvent findByPrimaryKey(long eventId)
+		throws NoSuchEventException, SystemException {
+		return findByPrimaryKey((Serializable)eventId);
+	}
+
+	/**
+	 * Returns the cal event with the primary key or returns <code>null</code> if it could not be found.
+	 *
+	 * @param primaryKey the primary key of the cal event
+	 * @return the cal event, or <code>null</code> if a cal event with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public CalEvent fetchByPrimaryKey(Serializable primaryKey)
+		throws SystemException {
+		CalEvent calEvent = (CalEvent)EntityCacheUtil.getResult(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+				CalEventImpl.class, primaryKey);
+>>>>>>> master
 
 		try {
 			session = openSession();
@@ -7695,9 +8768,25 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 			q.addScalar(COUNT_COLUMN_NAME,
 				com.liferay.portal.kernel.dao.orm.Type.LONG);
 
+<<<<<<< HEAD
 			QueryPos qPos = QueryPos.getInstance(q);
 
 			qPos.add(groupId);
+=======
+				calEvent = (CalEvent)session.get(CalEventImpl.class, primaryKey);
+
+				if (calEvent != null) {
+					cacheResult(calEvent);
+				}
+				else {
+					EntityCacheUtil.putResult(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+						CalEventImpl.class, primaryKey, _nullCalEvent);
+				}
+			}
+			catch (Exception e) {
+				EntityCacheUtil.removeResult(CalEventModelImpl.ENTITY_CACHE_ENABLED,
+					CalEventImpl.class, primaryKey);
+>>>>>>> master
 
 			if (type != null) {
 				qPos.add(type);
@@ -7705,7 +8794,30 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 			qPos.add(repeating);
 
+<<<<<<< HEAD
 			Long count = (Long)q.uniqueResult();
+=======
+	/**
+	 * Returns the cal event with the primary key or returns <code>null</code> if it could not be found.
+	 *
+	 * @param eventId the primary key of the cal event
+	 * @return the cal event, or <code>null</code> if a cal event with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public CalEvent fetchByPrimaryKey(long eventId) throws SystemException {
+		return fetchByPrimaryKey((Serializable)eventId);
+	}
+
+	/**
+	 * Returns all the cal events.
+	 *
+	 * @return the cal events
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<CalEvent> findAll() throws SystemException {
+		return findAll(QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+>>>>>>> master
 
 			return count.intValue();
 		}
@@ -7874,7 +8986,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 
 				for (String listenerClassName : listenerClassNames) {
 					listenersList.add((ModelListener<CalEvent>)InstanceFactory.newInstance(
-							listenerClassName));
+							getClassLoader(), listenerClassName));
 				}
 
 				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
@@ -7919,6 +9031,7 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 	private static final String _SQL_SELECT_CALEVENT_WHERE = "SELECT calEvent FROM CalEvent calEvent WHERE ";
 	private static final String _SQL_COUNT_CALEVENT = "SELECT COUNT(calEvent) FROM CalEvent calEvent";
 	private static final String _SQL_COUNT_CALEVENT_WHERE = "SELECT COUNT(calEvent) FROM CalEvent calEvent WHERE ";
+<<<<<<< HEAD
 	private static final String _FINDER_COLUMN_UUID_UUID_1 = "calEvent.uuid IS NULL";
 	private static final String _FINDER_COLUMN_UUID_UUID_2 = "calEvent.uuid = ?";
 	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(calEvent.uuid IS NULL OR calEvent.uuid = ?)";
@@ -7973,6 +9086,8 @@ public class CalEventPersistenceImpl extends BasePersistenceImpl<CalEvent>
 		return sql;
 	}
 
+=======
+>>>>>>> master
 	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "calEvent.eventId";
 	private static final String _FILTER_SQL_SELECT_CALEVENT_WHERE = "SELECT DISTINCT {calEvent.*} FROM CalEvent calEvent WHERE ";
 	private static final String _FILTER_SQL_SELECT_CALEVENT_NO_INLINE_DISTINCT_WHERE_1 =

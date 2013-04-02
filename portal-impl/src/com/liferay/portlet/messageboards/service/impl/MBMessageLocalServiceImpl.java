@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -62,7 +62,6 @@ import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetLinkConstants;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.util.LinkbackProducerUtil;
-import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.messageboards.MessageBodyException;
 import com.liferay.portlet.messageboards.MessageSubjectException;
 import com.liferay.portlet.messageboards.NoSuchDiscussionException;
@@ -190,7 +189,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 			if (discussion == null) {
 				mbDiscussionLocalService.addDiscussion(
-					classNameId, classPK, message.getThreadId());
+					userId, classNameId, classPK, message.getThreadId(),
+					serviceContext);
 			}
 		}
 
@@ -285,7 +285,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		if ((thread == null) ||
 			(parentMessageId == MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID)) {
 
-			thread = mbThreadLocalService.addThread(categoryId, message);
+			thread = mbThreadLocalService.addThread(
+				categoryId, message, serviceContext);
 		}
 
 		if ((priority != MBThreadConstants.PRIORITY_NOT_GIVEN) &&
@@ -307,7 +308,6 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		message.setSubject(subject);
 		message.setBody(body);
 		message.setFormat(format);
-		message.setAttachments(!inputStreamOVPs.isEmpty());
 		message.setAnonymous(anonymous);
 
 		if (message.isDiscussion()) {
@@ -319,13 +319,16 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			message.setClassPK(classPK);
 		}
 
+		message.setExpandoBridgeAttributes(serviceContext);
+
 		mbMessagePersistence.update(message);
 
 		// Attachments
 
 		if (!inputStreamOVPs.isEmpty()) {
 			PortletFileRepositoryUtil.addPortletFileEntries(
-				message.getGroupId(), userId, PortletKeys.MESSAGE_BOARDS,
+				message.getGroupId(), userId, MBMessage.class.getName(),
+				message.getMessageId(), PortletKeys.MESSAGE_BOARDS,
 				message.getAttachmentsFolderId(), inputStreamOVPs);
 		}
 
@@ -357,24 +360,12 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			serviceContext.getAssetLinkEntryIds(),
 			serviceContext.isAssetEntryVisible());
 
-		// Expando
-
-		ExpandoBridge expandoBridge = message.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
-
 		// Workflow
 
 		WorkflowHandlerRegistryUtil.startWorkflowInstance(
 			user.getCompanyId(), groupId, userId,
 			message.getWorkflowClassName(), message.getMessageId(), message,
 			serviceContext);
-
-		// Testing roll back
-
-		/*if (true) {
-			throw new SystemException("Testing roll back");
-		}*/
 
 		return message;
 	}
@@ -394,6 +385,23 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			userId, userName, groupId, categoryId, threadId, parentMessageId,
 			subject, body, format, inputStreamOVPs, anonymous, priority,
 			allowPingbacks, serviceContext);
+	}
+
+	public MBMessage addMessage(
+			long userId, String userName, long categoryId, String subject,
+			String body, ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
+
+		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
+			Collections.emptyList();
+
+		return addMessage(
+			userId, userName, category.getGroupId(), categoryId, 0, 0, subject,
+			body, MBMessageConstants.DEFAULT_FORMAT, inputStreamOVPs, false,
+			0.0, false, serviceContext);
 	}
 
 	public void addMessageResources(
@@ -495,10 +503,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 		// Attachments
 
-		if (message.isAttachments()) {
-			PortletFileRepositoryUtil.deleteFolder(
-				message.getAttachmentsFolderId());
-		}
+		PortletFileRepositoryUtil.deleteFolder(
+			message.getAttachmentsFolderId());
 
 		// Thread
 
@@ -528,13 +534,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 				(message.getCategoryId() !=
 					MBCategoryConstants.DISCUSSION_CATEGORY_ID)) {
 
-				MBCategory category = mbCategoryPersistence.findByPrimaryKey(
-					message.getCategoryId());
-
-				category.setThreadCount(category.getThreadCount() - 1);
-				category.setMessageCount(category.getMessageCount() - 1);
-
-				mbCategoryPersistence.update(category);
+				MBUtil.updateCategoryStatistics(
+					message.getCompanyId(), message.getCategoryId());
 			}
 		}
 		else {
@@ -622,13 +623,12 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			// Thread
 
 			if (message.isApproved()) {
-				int messageCount = mbMessagePersistence.countByT_S(
-					message.getThreadId(), WorkflowConstants.STATUS_APPROVED);
-
-				thread.setMessageCount(messageCount - 1);
+				MBUtil.updateThreadMessageCount(
+					thread.getCompanyId(), thread.getThreadId());
 			}
-
-			mbThreadPersistence.update(thread);
+			else {
+				mbThreadPersistence.update(thread);
+			}
 
 			// Category
 
@@ -638,12 +638,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 					MBCategoryConstants.DISCUSSION_CATEGORY_ID) &&
 				!message.isDraft()) {
 
-				MBCategory category = mbCategoryPersistence.findByPrimaryKey(
-					message.getCategoryId());
-
-				category.setMessageCount(category.getMessageCount() - 1);
-
-				mbCategoryPersistence.update(category);
+				MBUtil.updateCategoryMessageCount(
+					message.getCompanyId(), message.getCategoryId());
 			}
 		}
 
@@ -1369,8 +1365,6 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		message.setModifiedDate(modifiedDate);
 		message.setSubject(subject);
 		message.setBody(body);
-		message.setAttachments(
-			!inputStreamOVPs.isEmpty() || !existingFiles.isEmpty());
 		message.setAllowPingbacks(allowPingbacks);
 
 		if (priority != MBThreadConstants.PRIORITY_NOT_GIVEN) {
@@ -1417,7 +1411,9 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			List<FileEntry> fileEntries = message.getAttachmentsFileEntries();
 
 			for (FileEntry fileEntry : fileEntries) {
-				if (!existingFiles.contains(fileEntry.getTitle())) {
+				String fileEntryId = String.valueOf(fileEntry.getFileEntryId());
+
+				if (!existingFiles.contains(fileEntryId)) {
 					if (!TrashUtil.isTrashEnabled(message.getGroupId())) {
 						deleteMessageAttachment(
 							messageId, fileEntry.getTitle());
@@ -1430,7 +1426,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			}
 
 			PortletFileRepositoryUtil.addPortletFileEntries(
-				message.getGroupId(), userId, PortletKeys.MESSAGE_BOARDS,
+				message.getGroupId(), userId, MBMessage.class.getName(),
+				message.getMessageId(), PortletKeys.MESSAGE_BOARDS,
 				message.getAttachmentsFolderId(), inputStreamOVPs);
 		}
 		else {
@@ -1444,6 +1441,8 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 				}
 			}
 		}
+
+		message.setExpandoBridgeAttributes(serviceContext);
 
 		mbMessagePersistence.update(message);
 
@@ -1465,12 +1464,6 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			userId, message, serviceContext.getAssetCategoryIds(),
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds());
-
-		// Expando
-
-		ExpandoBridge expandoBridge = message.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		// Workflow
 
@@ -1633,9 +1626,7 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 			// Indexer
 
-			if (!message.isDiscussion()) {
-				indexer.reindex(message);
-			}
+			indexer.reindex(message);
 
 			// Ping
 
@@ -1648,12 +1639,9 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 			assetEntryLocalService.updateVisible(
 				message.getWorkflowClassName(), message.getMessageId(), false);
 
-			if (!message.isDiscussion()) {
+			// Indexer
 
-				// Indexer
-
-				indexer.delete(message);
-			}
+			indexer.delete(message);
 		}
 
 		// Statistics
@@ -2126,27 +2114,18 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 		if ((thread.getRootMessageId() == message.getMessageId()) &&
 			(oldStatus != status)) {
 
+			thread.setModifiedDate(modifiedDate);
 			thread.setStatus(status);
 			thread.setStatusByUserId(user.getUserId());
 			thread.setStatusByUserName(user.getFullName());
 			thread.setStatusDate(modifiedDate);
 		}
 
-		if ((status == WorkflowConstants.STATUS_APPROVED) &&
-			(oldStatus != WorkflowConstants.STATUS_APPROVED)) {
+		if (status == oldStatus) {
+			return;
+		}
 
-			// Thread
-
-			if ((category != null) &&
-				(thread.getRootMessageId() == message.getMessageId())) {
-
-				category.setThreadCount(category.getThreadCount() + 1);
-
-				mbCategoryPersistence.update(category);
-			}
-
-			thread.setMessageCount(thread.getMessageCount() + 1);
-
+		if (status == WorkflowConstants.STATUS_APPROVED) {
 			if (message.isAnonymous()) {
 				thread.setLastPostByUserId(0);
 			}
@@ -2156,42 +2135,39 @@ public class MBMessageLocalServiceImpl extends MBMessageLocalServiceBaseImpl {
 
 			thread.setLastPostDate(modifiedDate);
 
-			// Category
-
 			if (category != null) {
-				category.setMessageCount(category.getMessageCount() + 1);
 				category.setLastPostDate(modifiedDate);
 
-				mbCategoryPersistence.update(category);
+				category = mbCategoryPersistence.update(category);
 			}
 		}
-		else if ((oldStatus == WorkflowConstants.STATUS_APPROVED) &&
-				 (status != WorkflowConstants.STATUS_APPROVED)) {
+
+		if ((oldStatus == WorkflowConstants.STATUS_APPROVED) ||
+			(status == WorkflowConstants.STATUS_APPROVED)) {
 
 			// Thread
+
+			MBUtil.updateThreadMessageCount(
+				thread.getCompanyId(), thread.getThreadId());
+
+			// Category
 
 			if ((category != null) &&
 				(thread.getRootMessageId() == message.getMessageId())) {
 
-				category.setThreadCount(category.getThreadCount() - 1);
-
-				mbCategoryPersistence.update(category);
+				MBUtil.updateCategoryStatistics(
+					category.getCompanyId(), category.getCategoryId());
 			}
 
-			thread.setMessageCount(thread.getMessageCount() - 1);
+			if ((category != null) &&
+				!(thread.getRootMessageId() == message.getMessageId())) {
 
-			// Category
-
-			if (category != null) {
-				category.setMessageCount(category.getMessageCount() - 1);
-
-				mbCategoryPersistence.update(category);
+				MBUtil.updateCategoryMessageCount(
+					category.getCompanyId(), category.getCategoryId());
 			}
 		}
 
-		if (status != oldStatus) {
-			mbThreadPersistence.update(thread);
-		}
+		mbThreadPersistence.update(thread);
 	}
 
 	protected void validate(String subject, String body)

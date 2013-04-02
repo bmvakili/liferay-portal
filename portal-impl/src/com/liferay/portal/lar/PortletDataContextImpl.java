@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,9 @@ package com.liferay.portal.lar;
 import com.liferay.portal.NoSuchRoleException;
 import com.liferay.portal.NoSuchTeamException;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -24,6 +27,7 @@ import com.liferay.portal.kernel.lar.PortletDataContextListener;
 import com.liferay.portal.kernel.lar.PortletDataException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerControl;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
+import com.liferay.portal.kernel.lar.StagedModelPathUtil;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -31,11 +35,15 @@ import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PrimitiveLongList;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.model.AttachedModel;
@@ -48,6 +56,7 @@ import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.ResourcedModel;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.impl.LockImpl;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
@@ -386,6 +395,23 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_commentsMap.put(getPrimaryKeyString(className, classPK), messages);
 	}
 
+	/**
+	 * @see #isWithinDateRange(Date)
+	 */
+	public void addDateRangeCriteria(
+		DynamicQuery dynamicQuery, String modifiedDatePropertyName) {
+
+		if (!hasDateRange()) {
+			return;
+		}
+
+		Property modifiedDateProperty = PropertyFactoryUtil.forName(
+			modifiedDatePropertyName);
+
+		dynamicQuery.add(modifiedDateProperty.ge(_startDate));
+		dynamicQuery.add(modifiedDateProperty.lt(_endDate));
+	}
+
 	public void addExpando(
 			Element element, String path, ClassedModel classedModel)
 		throws PortalException, SystemException {
@@ -632,6 +658,13 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	public ServiceContext createServiceContext(
+		StagedModel stagedModel, String namespace) {
+
+		return createServiceContext(
+			StagedModelPathUtil.getPath(stagedModel), stagedModel, namespace);
+	}
+
+	public ServiceContext createServiceContext(
 		String path, ClassedModel classedModel, String namespace) {
 
 		return createServiceContext(null, path, classedModel, namespace);
@@ -716,8 +749,65 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _expandoColumnsMap;
 	}
 
+	public Element getExportDataGroupElement(
+		Class<? extends StagedModel> clazz) {
+
+		return getExportDataGroupElement(clazz.getSimpleName());
+	}
+
+	public Element getExportDataRootElement() {
+		return _exportDataRootElement;
+	}
+
+	public Element getExportDataStagedModelElement(StagedModel stagedModel) {
+		Class<?> clazz = stagedModel.getModelClass();
+
+		Element groupElement = getExportDataGroupElement(clazz.getSimpleName());
+
+		return groupElement.addElement("staged-model");
+	}
+
 	public long getGroupId() {
 		return _groupId;
+	}
+
+	public Element getImportDataGroupElement(
+		Class<? extends StagedModel> clazz) {
+
+		return getImportDataGroupElement(clazz.getSimpleName());
+	}
+
+	public Element getImportDataRootElement() {
+		return _importDataRootElement;
+	}
+
+	public Element getImportDataStagedModelElement(StagedModel stagedModel) {
+		String path = StagedModelPathUtil.getPath(stagedModel);
+
+		return getImportDataStagedModelElement(stagedModel, "path", path);
+	}
+
+	public Element getImportDataStagedModelElement(
+		StagedModel stagedModel, String attribute, String value) {
+
+		Class<?> clazz = stagedModel.getModelClass();
+
+		Element groupElement = getImportDataGroupElement(clazz.getSimpleName());
+
+		if (groupElement == null) {
+			return null;
+		}
+
+		StringBundler sb = new StringBundler(4);
+
+		sb.append("staged-model");
+		sb.append("[@" + attribute + "='");
+		sb.append(value);
+		sb.append("']");
+
+		XPath xPath = SAXReaderUtil.createXPath(sb.toString());
+
+		return (Element)xPath.selectSingleNode(groupElement);
 	}
 
 	public String getLayoutPath(long layoutId) {
@@ -847,11 +937,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 	public Object getZipEntryAsObject(Element element, String path) {
 		Object object = fromXML(getZipEntryAsString(path));
 
-		Element classNameElement = element.element("class-name");
+		Attribute classNameAttribute = element.attribute("class-name");
 
-		if (classNameElement != null) {
+		if (classNameAttribute != null) {
 			BeanPropertiesUtil.setProperty(
-				object, "className", classNameElement.getText());
+				object, "className", classNameAttribute.getText());
 		}
 
 		return object;
@@ -1220,7 +1310,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	public boolean isPathNotProcessed(String path) {
-		return !addPrimaryKey(String.class, path);
+		return !isPathProcessed(path);
+	}
+
+	public boolean isPathProcessed(String path) {
+		return addPrimaryKey(String.class, path);
 	}
 
 	public boolean isPerformDirectBinaryImport() {
@@ -1232,6 +1326,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _privateLayout;
 	}
 
+	/**
+	 * @see #addDateRangeCriteria(DynamicQuery, String)
+	 */
 	public boolean isWithinDateRange(Date modifiedDate) {
 		if (!hasDateRange()) {
 			return true;
@@ -1254,8 +1351,16 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_xStream.setClassLoader(classLoader);
 	}
 
+	public void setExportDataRootElement(Element exportDataRootElement) {
+		_exportDataRootElement = exportDataRootElement;
+	}
+
 	public void setGroupId(long groupId) {
 		_groupId = groupId;
+	}
+
+	public void setImportDataRootElement(Element importDataRootElement) {
+		_importDataRootElement = importDataRootElement;
 	}
 
 	public void setOldPlid(long oldPlid) {
@@ -1428,6 +1533,40 @@ public class PortletDataContextImpl implements PortletDataContext {
 			path.substring(pos));
 	}
 
+	protected Element getExportDataGroupElement(String name) {
+		if (_exportDataRootElement == null) {
+			throw new IllegalStateException(
+				"Root data element not initialized");
+		}
+
+		Element groupElement = _exportDataRootElement.element(name);
+
+		if (groupElement == null) {
+			groupElement = _exportDataRootElement.addElement(name);
+		}
+
+		return groupElement;
+	}
+
+	protected Element getImportDataGroupElement(String name) {
+		if (_importDataRootElement == null) {
+			throw new IllegalStateException(
+				"Root data element not initialized");
+		}
+
+		if (Validator.isNull(name)) {
+			return SAXReaderUtil.createElement("EMPTY-ELEMENT");
+		}
+
+		Element groupElement = _importDataRootElement.element(name);
+
+		if (groupElement == null) {
+			return SAXReaderUtil.createElement("EMPTY-ELEMENT");
+		}
+
+		return groupElement;
+	}
+
 	protected String getPrimaryKeyString(Class<?> clazz, long classPK) {
 		return getPrimaryKeyString(clazz.getName(), String.valueOf(classPK));
 	}
@@ -1470,6 +1609,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_xStream.alias("RatingsEntry", RatingsEntryImpl.class);
 		_xStream.alias("WikiNode", WikiNodeImpl.class);
 		_xStream.alias("WikiPage", WikiPageImpl.class);
+
+		_xStream.omitField(HashMap.class, "cache_bitmask");
 	}
 
 	protected boolean isResourceMain(ClassedModel classedModel) {
@@ -1532,7 +1673,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private Date _endDate;
 	private Map<String, List<ExpandoColumn>> _expandoColumnsMap =
 		new HashMap<String, List<ExpandoColumn>>();
+	private Element _exportDataRootElement;
 	private long _groupId;
+	private Element _importDataRootElement;
 	private Map<String, Lock> _locksMap = new HashMap<String, Lock>();
 	private Map<String, Map<?, ?>> _newPrimaryKeysMaps =
 		new HashMap<String, Map<?, ?>>();

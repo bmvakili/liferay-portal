@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -136,7 +136,9 @@ boolean showIconsActions = themeDisplay.isSignedIn() && (hasConfigurationPermiss
 				%>
 
 				<liferay-ui:icon
+					cssClass="icon-action icon-action-edit"
 					image="edit"
+					label="<%= true %>"
 					message="edit-question"
 					url="<%= editQuestionURL %>"
 				/>
@@ -144,8 +146,9 @@ boolean showIconsActions = themeDisplay.isSignedIn() && (hasConfigurationPermiss
 
 			<c:if test="<%= hasConfigurationPermission %>">
 				<liferay-ui:icon
-					cssClass="portlet-configuration"
+					cssClass="icon-action icon-action-configuration"
 					image="configuration"
+					label="<%= true %>"
 					message="select-question"
 					method="get"
 					onClick="<%= portletDisplay.getURLConfigurationJS() %>"
@@ -165,7 +168,9 @@ boolean showIconsActions = themeDisplay.isSignedIn() && (hasConfigurationPermiss
 				%>
 
 				<liferay-ui:icon
+					cssClass="icon-action icon-action-add"
 					image="add_article"
+					label="<%= true %>"
 					message="add-question"
 					url="<%= addQuestionURL %>"
 				/>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,8 +25,8 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
+import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portal.util.TestPropsValues;
-import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
 import com.liferay.portlet.messageboards.model.MBMessageConstants;
@@ -54,11 +54,10 @@ public class MBAttachmentsTrashTest {
 	public void setUp() throws Exception {
 		User user = TestPropsValues.getUser();
 
-		_group = ServiceTestUtil.addGroup();
+		_group = GroupTestUtil.addGroup();
 
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setScopeGroupId(_group.getGroupId());
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
+			_group.getGroupId());
 
 		_message = MBMessageLocalServiceUtil.addMessage(
 			user.getUserId(), user.getFullName(), _group.getGroupId(),
@@ -120,12 +119,11 @@ public class MBAttachmentsTrashTest {
 		List<String> existingFiles = new ArrayList<String>();
 
 		for (FileEntry fileEntry : fileEntries) {
-			existingFiles.add(fileEntry.getTitle());
+			existingFiles.add(String.valueOf(fileEntry.getFileEntryId()));
 		}
 
-		ServiceContext serviceContext = new ServiceContext();
-
-		serviceContext.setScopeGroupId(_group.getGroupId());
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
+			_group.getGroupId());
 
 		String fileName = "OSX_Test.docx";
 
@@ -148,8 +146,6 @@ public class MBAttachmentsTrashTest {
 		FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
 			fileEntryId);
 
-		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
-
 		Assert.assertEquals(
 			initialNotInTrashCount, _message.getAttachmentsFileEntriesCount());
 		Assert.assertEquals(
@@ -159,7 +155,7 @@ public class MBAttachmentsTrashTest {
 		if (restore) {
 			MBMessageLocalServiceUtil.restoreMessageAttachmentFromTrash(
 				TestPropsValues.getUserId(), _message.getMessageId(),
-				dlFileEntry.getTitle());
+				fileEntry.getTitle());
 
 			Assert.assertEquals(
 				initialNotInTrashCount + 1,
@@ -173,7 +169,7 @@ public class MBAttachmentsTrashTest {
 		}
 		else {
 			MBMessageLocalServiceUtil.deleteMessageAttachment(
-				_message.getMessageId(), dlFileEntry.getTitle());
+				_message.getMessageId(), fileEntry.getTitle());
 
 			Assert.assertEquals(
 				initialNotInTrashCount,

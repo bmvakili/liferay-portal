@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,6 +40,8 @@ portletURL.setParameter("organizationId", String.valueOf(organization.getOrganiz
 	localizeTitle="<%= false %>"
 	title="<%= organization.getName() %>"
 />
+
+<liferay-ui:membership-policy-error />
 
 <portlet:actionURL var="editAssignmentsURL">
 	<portlet:param name="struts_action" value="/users_admin/edit_organization_assignments" />

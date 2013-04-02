@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -173,6 +173,14 @@ public class Validator_IW {
 
 	public boolean isIPAddress(java.lang.String ipAddress) {
 		return Validator.isIPAddress(ipAddress);
+	}
+
+	public boolean isIPv4Address(java.lang.String ipAddress) {
+		return Validator.isIPv4Address(ipAddress);
+	}
+
+	public boolean isIPv6Address(java.lang.String ipAddress) {
+		return Validator.isIPv6Address(ipAddress);
 	}
 
 	public boolean isJulianDate(int month, int day, int year) {

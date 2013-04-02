@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -243,51 +243,6 @@ public class ImageLocalServiceWrapper implements ImageLocalService,
 		return _imageLocalService.getCompanyLogo(imageId);
 	}
 
-	public com.liferay.portal.model.Image getDefaultCompanyLogo() {
-		return _imageLocalService.getDefaultCompanyLogo();
-	}
-
-	public com.liferay.portal.model.Image getDefaultOrganizationLogo() {
-		return _imageLocalService.getDefaultOrganizationLogo();
-	}
-
-	public com.liferay.portal.model.Image getDefaultSpacer() {
-		return _imageLocalService.getDefaultSpacer();
-	}
-
-	public com.liferay.portal.model.Image getDefaultUserFemalePortrait() {
-		return _imageLocalService.getDefaultUserFemalePortrait();
-	}
-
-	public com.liferay.portal.model.Image getDefaultUserMalePortrait() {
-		return _imageLocalService.getDefaultUserMalePortrait();
-	}
-
-	public com.liferay.portal.model.Image getImage(byte[] bytes)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _imageLocalService.getImage(bytes);
-	}
-
-	public com.liferay.portal.model.Image getImage(java.io.File file)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _imageLocalService.getImage(file);
-	}
-
-	public com.liferay.portal.model.Image getImage(java.io.InputStream is)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _imageLocalService.getImage(is);
-	}
-
-	public com.liferay.portal.model.Image getImage(java.io.InputStream is,
-		boolean cleanUpStream)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _imageLocalService.getImage(is, cleanUpStream);
-	}
-
 	public com.liferay.portal.model.Image getImageOrDefault(long imageId) {
 		return _imageLocalService.getImageOrDefault(imageId);
 	}
@@ -300,10 +255,6 @@ public class ImageLocalServiceWrapper implements ImageLocalService,
 	public java.util.List<com.liferay.portal.model.Image> getImagesBySize(
 		int size) throws com.liferay.portal.kernel.exception.SystemException {
 		return _imageLocalService.getImagesBySize(size);
-	}
-
-	public boolean isNullOrDefaultSpacer(byte[] bytes) {
-		return _imageLocalService.isNullOrDefaultSpacer(bytes);
 	}
 
 	public com.liferay.portal.model.Image updateImage(long imageId, byte[] bytes)
@@ -342,14 +293,14 @@ public class ImageLocalServiceWrapper implements ImageLocalService,
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public ImageLocalService getWrappedImageLocalService() {
 		return _imageLocalService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedImageLocalService(ImageLocalService imageLocalService) {
 		_imageLocalService = imageLocalService;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.dynamicdatamapping.service;
 
+import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.StringPool;
@@ -24,11 +25,15 @@ import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.dynamicdatamapping.RequiredTemplateException;
 import com.liferay.portlet.dynamicdatamapping.TemplateDuplicateTemplateKeyException;
 import com.liferay.portlet.dynamicdatamapping.TemplateNameException;
 import com.liferay.portlet.dynamicdatamapping.TemplateScriptException;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplateConstants;
+import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.util.JournalTestUtil;
 
 import java.util.List;
 
@@ -51,7 +56,7 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 	@Test
 	public void testAddTemplateWithDuplicateKey() throws Exception {
 		String templateKey = ServiceTestUtil.randomString();
-		String language = DDMTemplateConstants.LANG_TYPE_VM;
+		String language = TemplateConstants.LANG_TYPE_VM;
 
 		try {
 			addTemplate(
@@ -73,7 +78,7 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 
 	@Test
 	public void testAddTemplateWithoutName() throws Exception {
-		String language = DDMTemplateConstants.LANG_TYPE_VM;
+		String language = TemplateConstants.LANG_TYPE_VM;
 
 		try {
 			addTemplate(
@@ -95,7 +100,7 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 				_classNameId, 0, null, "Test Template",
 				DDMTemplateConstants.TEMPLATE_TYPE_FORM,
 				DDMTemplateConstants.TEMPLATE_MODE_CREATE,
-				DDMTemplateConstants.LANG_TYPE_VM, StringPool.BLANK);
+				TemplateConstants.LANG_TYPE_VM, StringPool.BLANK);
 
 			Assert.fail();
 		}
@@ -126,13 +131,39 @@ public class DDMTemplateServiceTest extends BaseDDMServiceTestCase {
 	}
 
 	@Test
+	public void testDeleteTemplateReferencedByJournalArticles()
+		throws Exception {
+
+		DDMStructure structure = addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class.getName()),
+			"Test Structure");
+
+		DDMTemplate template = addDisplayTemplate(
+			structure.getPrimaryKey(), "Test Display Template");
+
+		JournalTestUtil.addArticleWithXMLContent(
+			group.getGroupId(), "<title>Test Article</title>",
+			structure.getStructureKey(), template.getTemplateKey());
+
+		try {
+			DDMTemplateLocalServiceUtil.deleteTemplate(
+				template.getTemplateId());
+
+			Assert.fail();
+		}
+		catch (RequiredTemplateException rse) {
+		}
+	}
+
+	@Test
 	public void testFetchTemplate() throws Exception {
 		DDMTemplate template = addDisplayTemplate(
 			_classNameId, 0, "Test Template");
 
 		Assert.assertNotNull(
 			DDMTemplateLocalServiceUtil.fetchTemplate(
-				template.getGroupId(), template.getTemplateKey()));
+				template.getGroupId(), _classNameId,
+				template.getTemplateKey()));
 	}
 
 	@Test

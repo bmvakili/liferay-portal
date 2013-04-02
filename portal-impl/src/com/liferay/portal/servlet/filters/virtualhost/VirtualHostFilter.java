@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,7 @@ import com.liferay.portal.model.impl.LayoutImpl;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.servlet.I18nServlet;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
+import com.liferay.portal.util.Portal;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -81,6 +82,7 @@ public class VirtualHostFilter extends BasePortalFilter {
 		friendlyURL = friendlyURL.toLowerCase();
 
 		if (PortalInstances.isVirtualHostsIgnorePath(friendlyURL) ||
+			friendlyURL.startsWith(_PATH_MODULE_SLASH) ||
 			friendlyURL.startsWith(_PRIVATE_GROUP_SERVLET_MAPPING_SLASH) ||
 			friendlyURL.startsWith(_PRIVATE_USER_SERVLET_MAPPING_SLASH) ||
 			friendlyURL.startsWith(_PUBLIC_GROUP_SERVLET_MAPPING_SLASH)) {
@@ -245,7 +247,9 @@ public class VirtualHostFilter extends BasePortalFilter {
 				Group group = GroupLocalServiceUtil.getGroup(
 					layoutSet.getGroupId());
 
-				if (group.isGuest() && friendlyURL.equals(StringPool.SLASH)) {
+				if (group.isGuest() && friendlyURL.equals(StringPool.SLASH) &&
+					!layoutSet.isPrivateLayout()) {
+
 					String homeURL = PortalUtil.getRelativeHomeURL(request);
 
 					if (Validator.isNotNull(homeURL)) {
@@ -289,6 +293,9 @@ public class VirtualHostFilter extends BasePortalFilter {
 	}
 
 	private static final String _PATH_DOCUMENTS = "/documents/";
+
+	private static final String _PATH_MODULE_SLASH =
+		Portal.PATH_MODULE + StringPool.SLASH;
 
 	private static final String _PRIVATE_GROUP_SERVLET_MAPPING =
 		PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING;

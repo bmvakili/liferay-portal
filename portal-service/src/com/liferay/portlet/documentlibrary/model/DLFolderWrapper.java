@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -664,7 +664,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	}
 
 	/**
-	* @deprecated Renamed to {@link #isApproved()}
+	* @deprecated As of 6.1.0, replaced by {@link #isApproved()}
 	*/
 	public boolean getApproved() {
 		return _dlFolder.getApproved();
@@ -829,6 +829,16 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	}
 
 	public void setExpandoBridgeAttributes(
+		com.liferay.portal.model.BaseModel<?> baseModel) {
+		_dlFolder.setExpandoBridgeAttributes(baseModel);
+	}
+
+	public void setExpandoBridgeAttributes(
+		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+		_dlFolder.setExpandoBridgeAttributes(expandoBridge);
+	}
+
+	public void setExpandoBridgeAttributes(
 		com.liferay.portal.service.ServiceContext serviceContext) {
 		_dlFolder.setExpandoBridgeAttributes(serviceContext);
 	}
@@ -874,6 +884,12 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 		_dlFolder.persist();
 	}
 
+	public java.util.List<java.lang.Long> getAncestorFolderIds()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFolder.getAncestorFolderIds();
+	}
+
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getAncestors()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -898,8 +914,8 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 		return _dlFolder.getPathArray();
 	}
 
-	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashFolder() {
-		return _dlFolder.getTrashFolder();
+	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashContainer() {
+		return _dlFolder.getTrashContainer();
 	}
 
 	public boolean hasInheritableLock() {
@@ -910,8 +926,12 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 		return _dlFolder.hasLock();
 	}
 
-	public boolean isInTrashFolder() {
-		return _dlFolder.isInTrashFolder();
+	public boolean isInHiddenFolder() {
+		return _dlFolder.isInHiddenFolder();
+	}
+
+	public boolean isInTrashContainer() {
+		return _dlFolder.isInTrashContainer();
 	}
 
 	public boolean isLocked() {
@@ -923,7 +943,7 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedModel}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
 	 */
 	public DLFolder getWrappedDLFolder() {
 		return _dlFolder;

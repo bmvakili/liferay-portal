@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -120,6 +120,10 @@ public class SearchContainerTag<R> extends ParamAndPropertyAncestorTagImpl {
 				_searchContainer.setRowChecker(_rowChecker);
 			}
 
+			if (_total != 0) {
+				_searchContainer.setTotal(_total);
+			}
+
 			pageContext.setAttribute(_var, _searchContainer);
 
 			return EVAL_BODY_INCLUDE;
@@ -183,6 +187,10 @@ public class SearchContainerTag<R> extends ParamAndPropertyAncestorTagImpl {
 
 	public DisplayTerms getSearchTerms() {
 		return _searchTerms;
+	}
+
+	public int getTotal() {
+		return _total;
 	}
 
 	public String getVar() {
@@ -277,6 +285,10 @@ public class SearchContainerTag<R> extends ParamAndPropertyAncestorTagImpl {
 		_searchTerms = searchTerms;
 	}
 
+	public void setTotal(int total) {
+		_total = total;
+	}
+
 	public void setVar(String var) {
 		_var = var;
 	}
@@ -303,6 +315,7 @@ public class SearchContainerTag<R> extends ParamAndPropertyAncestorTagImpl {
 	private RowChecker _rowChecker;
 	private SearchContainer<R> _searchContainer;
 	private DisplayTerms _searchTerms;
+	private int _total;
 	private String _var = DEFAULT_VAR;
 
 }

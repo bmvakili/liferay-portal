@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
  */
 --%>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <%@ page import="com.liferay.portal.kernel.util.ContentTypes" %>
 <%@ page import="com.liferay.portal.kernel.util.HtmlUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
@@ -21,7 +23,9 @@
 <%
 String cssPath = ParamUtil.getString(request, "cssPath");
 String cssClasses = ParamUtil.getString(request, "cssClasses");
+boolean inlineEdit = ParamUtil.getBoolean(request, "inlineEdit");
 String languageId = ParamUtil.getString(request, "languageId");
+boolean resizable = ParamUtil.getBoolean(request, "resizable");
 
 response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
 %>
@@ -54,15 +58,29 @@ if (!CKEDITOR.stylesSet.get('liferayStyles')) {
 	);
 }
 
+CKEDITOR.config.autoParagraph = false;
+
+CKEDITOR.config.autoSaveTimeout = 3000;
+
 CKEDITOR.config.bodyClass = 'html-editor <%= HtmlUtil.escapeJS(cssClasses) %>';
+
+CKEDITOR.config.closeNoticeTimeout = 8000;
 
 CKEDITOR.config.contentsCss = '<%= HtmlUtil.escapeJS(cssPath) %>/main.css';
 
 CKEDITOR.config.entities = false;
 
+CKEDITOR.config.extraPlugins = 'ajaxsave,restore';
+
 CKEDITOR.config.height = 265;
 
 CKEDITOR.config.language = '<%= HtmlUtil.escapeJS(languageId) %>';
+
+CKEDITOR.config.resize_enabled = <%= resizable %>;
+
+<c:if test="<%= resizable %>">
+	CKEDITOR.config.resize_dir = 'vertical';
+</c:if>
 
 CKEDITOR.config.stylesCombo_stylesSet = 'liferayStyles';
 
@@ -87,18 +105,26 @@ CKEDITOR.config.toolbar_email = [
 ];
 
 CKEDITOR.config.toolbar_liferay = [
-	['Styles', 'FontSize', '-', 'TextColor', 'BGColor'],
 	['Bold', 'Italic', 'Underline', 'Strike'],
-	['Subscript', 'Superscript'],
+
+	<c:if test="<%= inlineEdit %>">
+		['AjaxSave', '-', 'Restore'],
+	</c:if>
+
+	['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', ],
+	['Styles', 'FontSize', '-', 'TextColor', 'BGColor'],
 	'/',
-	['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'SelectAll', 'RemoveFormat'],
-	['Find', 'Replace', 'SpellChecker', 'Scayt'],
 	['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
 	['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-	'/',
-	['Source'],
-	['Link', 'Unlink', 'Anchor'],
-	['Image', 'Flash', 'Table', '-', 'Smiley', 'SpecialChar']
+	['Image', 'Link', 'Unlink', 'Anchor'],
+	['Flash', 'Table', '-', 'Smiley', 'SpecialChar'],
+	['Find', 'Replace', 'SpellChecker', 'Scayt'],
+	['SelectAll', 'RemoveFormat'],
+	['Subscript', 'Superscript']
+
+	<c:if test="<%= !inlineEdit %>">
+		,['Source']
+	</c:if>
 ];
 
 CKEDITOR.config.toolbar_liferayArticle = [

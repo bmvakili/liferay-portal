@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,7 +37,9 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.portlet.trash.util.TrashUtil;
 
+import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -60,10 +62,6 @@ public class DLFileEntryAssetRenderer
 		_fileEntry = fileEntry;
 		_fileVersion = fileVersion;
 		_type = type;
-	}
-
-	public String getAssetRendererFactoryClassName() {
-		return DLFileEntryAssetRendererFactory.CLASS_NAME;
 	}
 
 	public String getClassName() {
@@ -93,6 +91,11 @@ public class DLFileEntryAssetRenderer
 		}
 	}
 
+	@Override
+	public Date getDisplayDate() {
+		return _fileEntry.getModifiedDate();
+	}
+
 	public long getGroupId() {
 		return _fileEntry.getGroupId();
 	}
@@ -113,13 +116,35 @@ public class DLFileEntryAssetRenderer
 		return HtmlUtil.stripHtml(_fileEntry.getDescription());
 	}
 
+	@Override
+	public String getThumbnailPath(PortletRequest portletRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		String thumbnailSrc = DLUtil.getThumbnailSrc(
+			_fileEntry, null, themeDisplay);
+
+		if (Validator.isNotNull(thumbnailSrc)) {
+			return thumbnailSrc;
+		}
+
+		return themeDisplay.getPathThemeImages() +
+			"/file_system/large/document.png";
+	}
+
 	public String getTitle(Locale locale) {
+		String title = null;
+
 		if (_type == AssetRendererFactory.TYPE_LATEST) {
-			return _fileVersion.getTitle();
+			title = _fileVersion.getTitle();
 		}
 		else {
-			return _fileEntry.getTitle();
+			title = _fileEntry.getTitle();
 		}
+
+		return TrashUtil.getOriginalTitle(title);
 	}
 
 	public String getType() {
@@ -165,6 +190,17 @@ public class DLFileEntryAssetRenderer
 		portletURL.setParameter("title", String.valueOf(_fileEntry.getTitle()));
 
 		return portletURL;
+	}
+
+	@Override
+	public String getURLImagePreview(PortletRequest portletRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return DLUtil.getImagePreviewURL(
+			_fileEntry, _fileVersion, themeDisplay);
 	}
 
 	@Override
@@ -248,7 +284,8 @@ public class DLFileEntryAssetRenderer
 					WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
 			}
 
-			return "/html/portlet/document_library/asset/" + template + ".jsp";
+			return "/html/portlet/document_library/asset/file_entry_" +
+				template + ".jsp";
 		}
 		else {
 			return null;

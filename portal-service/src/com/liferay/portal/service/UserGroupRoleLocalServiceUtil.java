@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -252,15 +252,16 @@ public class UserGroupRoleLocalServiceUtil {
 		getService().setBeanIdentifier(beanIdentifier);
 	}
 
-	public static void addUserGroupRoles(long userId, long groupId,
-		long[] roleIds)
+	public static java.util.List<com.liferay.portal.model.UserGroupRole> addUserGroupRoles(
+		long userId, long groupId, long[] roleIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().addUserGroupRoles(userId, groupId, roleIds);
+		return getService().addUserGroupRoles(userId, groupId, roleIds);
 	}
 
-	public static void addUserGroupRoles(long[] userIds, long groupId,
-		long roleId) throws com.liferay.portal.kernel.exception.SystemException {
-		getService().addUserGroupRoles(userIds, groupId, roleId);
+	public static java.util.List<com.liferay.portal.model.UserGroupRole> addUserGroupRoles(
+		long[] userIds, long groupId, long roleId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().addUserGroupRoles(userIds, groupId, roleId);
 	}
 
 	public static void deleteUserGroupRoles(long userId, long groupId,
@@ -277,6 +278,12 @@ public class UserGroupRoleLocalServiceUtil {
 	public static void deleteUserGroupRoles(long[] userIds, long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		getService().deleteUserGroupRoles(userIds, groupId);
+	}
+
+	public static void deleteUserGroupRoles(long[] userIds, long groupId,
+		int roleType)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getService().deleteUserGroupRoles(userIds, groupId, roleType);
 	}
 
 	public static void deleteUserGroupRoles(long[] userIds, long groupId,
@@ -308,6 +315,12 @@ public class UserGroupRoleLocalServiceUtil {
 		long userId, long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getUserGroupRoles(userId, groupId);
+	}
+
+	public static java.util.List<com.liferay.portal.model.UserGroupRole> getUserGroupRolesByGroup(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getUserGroupRolesByGroup(groupId);
 	}
 
 	public static java.util.List<com.liferay.portal.model.UserGroupRole> getUserGroupRolesByGroupAndRole(
@@ -360,7 +373,7 @@ public class UserGroupRoleLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(UserGroupRoleLocalService service) {
 	}

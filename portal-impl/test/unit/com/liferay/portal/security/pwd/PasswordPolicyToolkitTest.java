@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,6 +38,7 @@ public class PasswordPolicyToolkitTest extends TestCase {
 		_passwordPolicy.setMinUpperCase(2);
 		_passwordPolicy.setMinNumbers(1);
 		_passwordPolicy.setMinSymbols(1);
+		_passwordPolicy.setRegex(".{5,}");
 	}
 
 	public void testGeneratePassword() {
@@ -74,6 +75,10 @@ public class PasswordPolicyToolkitTest extends TestCase {
 
 	public void testValidateMinUpperChars() {
 		assertEquals(false, validate("xh9fxM@w"));
+	}
+
+	public void testValidateRegex() {
+		assertEquals(false, validate("xH9fxM@"));
 	}
 
 	public void testValidateValid() {

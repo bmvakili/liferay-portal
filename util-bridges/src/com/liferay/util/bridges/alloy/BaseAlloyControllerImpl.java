@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,11 +44,15 @@ import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.transaction.Isolation;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.ServiceBeanMethodInvocationFactoryUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
@@ -101,6 +105,9 @@ import javax.servlet.jsp.PageContext;
  */
 public abstract class BaseAlloyControllerImpl implements AlloyController {
 
+	public static final String TOUCH =
+		BaseAlloyControllerImpl.class.getName() + "#TOUCH#";
+
 	public void afterPropertiesSet() {
 		initClass();
 		initServletVariables();
@@ -122,7 +129,14 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 		}
 
 		if (lifecycle.equals(PortletRequest.ACTION_PHASE)) {
-			executeAction(method);
+			Class<?> superClass = clazz.getSuperclass();
+
+			Method executeActionMethod = superClass.getDeclaredMethod(
+				"executeAction", new Class<?>[] {Method.class});
+
+			ServiceBeanMethodInvocationFactoryUtil.proceed(
+				this, BaseAlloyControllerImpl.class, executeActionMethod,
+				new Object[] {method}, new String[] {"transactionAdvice"});
 		}
 		else if (lifecycle.equals(PortletRequest.RENDER_PHASE)) {
 			executeRender(method);
@@ -202,6 +216,10 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 		return null;
 	}
 
+	@Transactional(
+		isolation = Isolation.PORTAL, propagation = Propagation.REQUIRES_NEW,
+		rollbackFor = {Exception.class}
+	)
 	protected void executeAction(Method method) throws Exception {
 		if (method != null) {
 			method.invoke(this);
@@ -244,6 +262,32 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 		}
 		else {
 			portletRequestDispatcher.include(portletRequest, portletResponse);
+		}
+
+		Boolean touch = (Boolean)portletContext.getAttribute(
+			TOUCH + portlet.getRootPortletId());
+
+		if (touch == null) {
+			String touchPath =
+				"/WEB-INF/jsp/" + portlet.getFriendlyURLMapping() +
+					"/views/touch.jsp";
+
+			if (log.isDebugEnabled()) {
+				log.debug(
+					"Touch " + portlet.getRootPortletId() + " by including " +
+						touchPath);
+			}
+
+			portletContext.setAttribute(
+				TOUCH + portlet.getRootPortletId(), Boolean.FALSE);
+
+			portletRequestDispatcher = portletContext.getRequestDispatcher(
+				touchPath);
+
+			if (portletRequestDispatcher != null) {
+				portletRequestDispatcher.include(
+					portletRequest, portletResponse);
+			}
 		}
 	}
 
@@ -746,21 +790,22 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 			HttpServletResponse response = PortalUtil.getHttpServletResponse(
 				actionResponse);
 
-			response.setContentType(ContentTypes.TEXT_JAVASCRIPT);
+			response.setContentType(ContentTypes.APPLICATION_JSON);
 
 			ServletResponseUtil.write(response, json.toString());
 		}
 		else if (mimeResponse != null) {
-			mimeResponse.setContentType(ContentTypes.TEXT_JAVASCRIPT);
+			mimeResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
 			PortletResponseUtil.write(mimeResponse, json.toString());
 		}
 	}
 
 	protected static final String CALLED_PROCESS_ACTION =
-		"CALLED_PROCESS_ACTION";
+		BaseAlloyControllerImpl.class.getName() + "#CALLED_PROCESS_ACTION";
 
-	protected static final String VIEW_PATH = "VIEW_PATH";
+	protected static final String VIEW_PATH =
+		BaseAlloyControllerImpl.class.getName() + "#VIEW_PATH";
 
 	protected static Log log = LogFactoryUtil.getLog(
 		BaseAlloyControllerImpl.class);

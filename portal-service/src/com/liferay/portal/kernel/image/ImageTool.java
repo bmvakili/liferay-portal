@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.image;
+
+import com.liferay.portal.model.Image;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -56,6 +58,28 @@ public interface ImageTool {
 
 	public byte[] getBytes(RenderedImage renderedImage, String contentType)
 		throws IOException;
+
+	public Image getDefaultCompanyLogo();
+
+	public Image getDefaultOrganizationLogo();
+
+	public Image getDefaultSpacer();
+
+	public Image getDefaultUserFemalePortrait();
+
+	public Image getDefaultUserMalePortrait();
+
+	public Image getImage(byte[] bytes)
+		throws IOException;
+
+	public Image getImage(File file) throws IOException;
+
+	public Image getImage(InputStream is) throws IOException;
+
+	public Image getImage(InputStream is, boolean cleanUpStream)
+		throws IOException;
+
+	public boolean isNullOrDefaultSpacer(byte[] bytes);
 
 	public ImageBag read(byte[] bytes) throws IOException;
 

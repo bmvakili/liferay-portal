@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -189,19 +189,21 @@ public class LayoutLocalServiceUtil {
 	}
 
 	/**
-	* Returns the layout with the UUID in the group.
+	* Returns the layout matching the UUID, group, and privacy.
 	*
-	* @param uuid the UUID of layout
-	* @param groupId the group id of the layout
-	* @return the layout
-	* @throws PortalException if a layout with the UUID in the group could not be found
+	* @param uuid the layout's UUID
+	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout is private to the group
+	* @return the matching layout
+	* @throws PortalException if a matching layout could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Layout getLayoutByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
+		java.lang.String uuid, long groupId, boolean privateLayout)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService().getLayoutByUuidAndGroupId(uuid, groupId);
+		return getService()
+				   .getLayoutByUuidAndGroupId(uuid, groupId, privateLayout);
 	}
 
 	/**
@@ -301,12 +303,12 @@ public class LayoutLocalServiceUtil {
 	normalized when accessed see {@link
 	com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
 	String)}.
-	* @param serviceContext the service context. Must set the universally
-	unique identifier (UUID) for the layout. Can set the creation
-	date, modification date and the expando bridge attributes for the
-	layout. For layouts that belong to a layout set prototype, an
-	attribute named 'layoutUpdateable' can be set to specify whether
-	site administrators can modify this page within their site. For
+	* @param serviceContext the service context to be applied. Must set the
+	UUID for the layout. Can set the creation date, modification date
+	and the expando bridge attributes for the layout. For layouts
+	that belong to a layout set prototype, an attribute named
+	'layoutUpdateable' can be set to specify whether site
+	administrators can modify this page within their site. For
 	layouts that are created from a layout prototype, attributes
 	named 'layoutPrototypeUuid' and 'layoutPrototypeLinkedEnabled'
 	can be specified to provide the unique identifier of the source
@@ -336,7 +338,8 @@ public class LayoutLocalServiceUtil {
 	}
 
 	/**
-	* Adds a layout.
+	* Adds a layout with single entry maps for name, title, and description to
+	* the default locale.
 	*
 	* <p>
 	* This method handles the creation of the layout including its resources,
@@ -379,12 +382,12 @@ public class LayoutLocalServiceUtil {
 	normalized when accessed see {@link
 	com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
 	String)}.
-	* @param serviceContext the service context. Must set the universally
-	unique identifier (UUID) for the layout. Can set the creation
-	date and modification date for the layout. For layouts that
-	belong to a layout set prototype, an attribute named
-	'layoutUpdateable' can be set to specify whether site
-	administrators can modify this page within their site.
+	* @param serviceContext the service context to be applied. Must set the
+	UUID for the layout. Can set the creation date and modification
+	date for the layout. For layouts that belong to a layout set
+	prototype, an attribute named 'layoutUpdateable' can be set to
+	specify whether site administrators can modify this page within
+	their site.
 	* @return the layout
 	* @throws PortalException if a group or user with the primary key could not
 	be found
@@ -409,7 +412,7 @@ public class LayoutLocalServiceUtil {
 	* @param layout the layout
 	* @param updateLayoutSet whether the layout set's page counter needs to be
 	updated
-	* @param serviceContext the service context
+	* @param serviceContext the service context to be applied
 	* @throws PortalException if a portal exception occurred
 	* @throws SystemException if a system exception occurred
 	*/
@@ -428,7 +431,7 @@ public class LayoutLocalServiceUtil {
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
 	* @param layoutId the primary key of the layout
-	* @param serviceContext the service context
+	* @param serviceContext the service context to be applied
 	* @throws PortalException if a matching layout could not be found , or if
 	some other portal exception occurred
 	* @throws SystemException if a system exception occurred
@@ -446,7 +449,7 @@ public class LayoutLocalServiceUtil {
 	* layouts, and associated resources.
 	*
 	* @param plid the primary key of the layout
-	* @param serviceContext the service context
+	* @param serviceContext the service context to be applied
 	* @throws PortalException if a layout with the primary key could not be
 	found , or if some other portal exception occurred
 	* @throws SystemException if a system exception occurred
@@ -464,7 +467,7 @@ public class LayoutLocalServiceUtil {
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param serviceContext the service context
+	* @param serviceContext the service context to be applied
 	* @throws PortalException if a group with the primary key could not be
 	found or if a layout set for the group and privacy could not be
 	found
@@ -632,19 +635,20 @@ public class LayoutLocalServiceUtil {
 	}
 
 	/**
-	* Returns the layout matching the universally unique identifier and group
-	* ID
+	* Returns the layout matching the UUID, group, and privacy.
 	*
-	* @param uuid the universally unique identifier of the scope layout
+	* @param uuid the layout's UUID
 	* @param groupId the primary key of the group
+	* @param privateLayout whether the layout is private to the group
 	* @return the layout, or <code>null</code> if a matching layout could not
 	be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portal.model.Layout fetchLayoutByUuidAndGroupId(
-		java.lang.String uuid, long groupId)
+		java.lang.String uuid, long groupId, boolean privateLayout)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().fetchLayoutByUuidAndGroupId(uuid, groupId);
+		return getService()
+				   .fetchLayoutByUuidAndGroupId(uuid, groupId, privateLayout);
 	}
 
 	/**
@@ -820,8 +824,7 @@ public class LayoutLocalServiceUtil {
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
 	* @param layoutIds the primary keys of the layouts
-	* @return the matching layouts, or <code>null</code> if no matches were
-	found
+	* @return the matching layouts, or an empty list if no matches were found
 	* @throws PortalException if a group or layout with the primary key could
 	not be found
 	* @throws SystemException if a system exception occurred
@@ -921,6 +924,18 @@ public class LayoutLocalServiceUtil {
 	}
 
 	/**
+	* Returns all the layouts without resource permissions
+	*
+	* @param roleId the primary key of the role
+	* @return all the layouts without resource permissions
+	* @throws SystemException if a system exception occurred
+	*/
+	public static java.util.List<com.liferay.portal.model.Layout> getNoPermissionLayouts(
+		long roleId) throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().getNoPermissionLayouts(roleId);
+	}
+
+	/**
 	* Returns all the layouts whose friendly URLs are <code>null</code>
 	*
 	* @return all the layouts whose friendly URLs are <code>null</code>
@@ -991,13 +1006,21 @@ public class LayoutLocalServiceUtil {
 	}
 
 	public static boolean hasLayoutSetPrototypeLayout(
-		java.lang.String layoutSetPrototypeUuid, java.lang.String layoutUuid,
-		long companyId)
+		long layoutSetPrototypeId, java.lang.String layoutUuid)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .hasLayoutSetPrototypeLayout(layoutSetPrototypeId, layoutUuid);
+	}
+
+	public static boolean hasLayoutSetPrototypeLayout(
+		java.lang.String layoutSetPrototypeUuid, long companyId,
+		java.lang.String layoutUuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .hasLayoutSetPrototypeLayout(layoutSetPrototypeUuid,
-			layoutUuid, companyId);
+			companyId, layoutUuid);
 	}
 
 	/**
@@ -1142,7 +1165,7 @@ public class LayoutLocalServiceUtil {
 	* @param privateLayout whether the layout is private to the group
 	* @param parentLayoutId the primary key of the parent layout
 	* @param layoutIds the primary keys of the layouts
-	* @param serviceContext the service context
+	* @param serviceContext the service context to be applied
 	* @throws PortalException if a group or layout with the primary key could
 	not be found, if no layouts were specified, if the first layout
 	was not page-able, if the first layout was hidden, or if some
@@ -1209,11 +1232,11 @@ public class LayoutLocalServiceUtil {
 	String)}.
 	* @param iconImage whether the icon image will be updated
 	* @param iconBytes the byte array of the layout's new icon image
-	* @param serviceContext the service context. Can set the modification date
-	and expando bridge attributes for the layout. For layouts that
-	are linked to a layout prototype, attributes named
-	'layoutPrototypeUuid' and 'layoutPrototypeLinkedEnabled' can be
-	specified to provide the unique identifier of the source
+	* @param serviceContext the service context to be applied. Can set the
+	modification date and expando bridge attributes for the layout.
+	For layouts that are linked to a layout prototype, attributes
+	named 'layoutPrototypeUuid' and 'layoutPrototypeLinkedEnabled'
+	can be specified to provide the unique identifier of the source
 	prototype and a boolean to determined whether a link to it should
 	be enabled to activate propagation of changes made to the linked
 	page in the prototype.
@@ -1474,12 +1497,11 @@ public class LayoutLocalServiceUtil {
 
 	/**
 	* Updates the names of the portlets within scope of the group, the scope of
-	* the layout's universally unique identifier, and the privacy.
+	* the layout's UUID, and the privacy.
 	*
 	* @param groupId the primary key of the group
 	* @param privateLayout whether the layout is private to the group
-	* @param layoutId the primary key of the layout whose universally unique
-	identifier to match
+	* @param layoutId the primary key of the layout whose UUID to match
 	* @param name the new name for the portlets
 	* @param languageId the primary key of the language
 	* @throws PortalException if a matching layout could not be found
@@ -1508,7 +1530,7 @@ public class LayoutLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(LayoutLocalService service) {
 	}

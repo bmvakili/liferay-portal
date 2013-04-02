@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,15 +32,8 @@ long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folder
 
 <div class="lfr-search-combobox search-button-container" id="<portlet:namespace />fileEntrySearchContainer">
 	<aui:form action="<%= searchURL.toString() %>" method="get" name="fm1" onSubmit="event.preventDefault();">
+		<aui:input cssClass="keywords lfr-search-combobox-item" id="keywords" label="" name="keywords" type="text" />
 
-		<aui:layout>
-			<aui:column columnWidth="70">
-				<aui:input cssClass="keywords lfr-search-combobox-item" id="keywords" label="" name="keywords" type="text" />
-			</aui:column>
-
-			<aui:column columnWidth="30">
-				<aui:button cssClass="lfr-search-combobox-item" name="search" type="submit" value="search" />
-			</aui:column>
-		</aui:layout>
+		<aui:button cssClass="lfr-search-combobox-item" name="search" type="submit" value="search" />
 	</aui:form>
 </div>

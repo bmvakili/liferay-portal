@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,11 +17,20 @@
 <%@ include file="/html/portlet/user_groups_admin/init.jsp" %>
 
 <%
+String callback = ParamUtil.getString(request, "callback", "selectUserGroup");
 String target = ParamUtil.getString(request, "target");
+
+User selUser = PortalUtil.getSelectedUser(request);
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/user_groups_admin/select_user_group");
+
+if (selUser != null) {
+	portletURL.setParameter("p_u_i_d", String.valueOf(selUser.getUserId()));
+}
+
+portletURL.setParameter("callback", callback);
 %>
 
 <aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
@@ -70,19 +79,24 @@ portletURL.setParameter("struts_action", "/user_groups_admin/select_user_group")
 		>
 
 			<%
-			StringBundler sb = new StringBundler(9);
+			String rowHREF = null;
 
-			sb.append("javascript:opener.");
-			sb.append(renderResponse.getNamespace());
-			sb.append("selectUserGroup('");
-			sb.append(userGroup.getUserGroupId());
-			sb.append("', '");
-			sb.append(UnicodeFormatter.toString(userGroup.getName()));
-			sb.append("', '");
-			sb.append(target);
-			sb.append("'); window.close();");
+			if (UserGroupMembershipPolicyUtil.isMembershipAllowed((selUser != null) ? selUser.getUserId() : 0, userGroup.getUserGroupId())) {
+				StringBundler sb = new StringBundler(10);
 
-			String rowHREF = sb.toString();
+				sb.append("javascript:opener.");
+				sb.append(renderResponse.getNamespace());
+				sb.append(callback);
+				sb.append("('");
+				sb.append(userGroup.getUserGroupId());
+				sb.append("', '");
+				sb.append(UnicodeFormatter.toString(userGroup.getName()));
+				sb.append("', '");
+				sb.append(target);
+				sb.append("'); window.close();");
+
+				rowHREF = sb.toString();
+			}
 			%>
 
 			<liferay-ui:search-container-column-text

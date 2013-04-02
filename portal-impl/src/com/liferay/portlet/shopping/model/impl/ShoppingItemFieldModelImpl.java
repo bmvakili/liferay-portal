@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -96,7 +96,7 @@ public class ShoppingItemFieldModelImpl extends BaseModelImpl<ShoppingItemField>
 	}
 
 	public Serializable getPrimaryKeyObj() {
-		return new Long(_itemFieldId);
+		return _itemFieldId;
 	}
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
@@ -285,8 +285,7 @@ public class ShoppingItemFieldModelImpl extends BaseModelImpl<ShoppingItemField>
 			return value;
 		}
 
-		value = getName().toLowerCase()
-					.compareTo(shoppingItemField.getName().toLowerCase());
+		value = getName().compareToIgnoreCase(shoppingItemField.getName());
 
 		if (value != 0) {
 			return value;

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,24 +20,21 @@
 String redirect = ParamUtil.getString(request, "redirect");
 
 String openId = ParamUtil.getString(request, "openId");
-
-PasswordPolicy passwordPolicy = PasswordPolicyLocalServiceUtil.getDefaultPasswordPolicy(company.getCompanyId());
-
-Calendar birthday = CalendarFactoryUtil.getCalendar();
-
-birthday.set(Calendar.MONTH, Calendar.JANUARY);
-birthday.set(Calendar.DATE, 1);
-birthday.set(Calendar.YEAR, 1970);
-
 boolean male = ParamUtil.getBoolean(request, "male", true);
+
+Calendar birthdayCalendar = CalendarFactoryUtil.getCalendar();
+
+birthdayCalendar.set(Calendar.MONTH, Calendar.JANUARY);
+birthdayCalendar.set(Calendar.DATE, 1);
+birthdayCalendar.set(Calendar.YEAR, 1970);
 %>
 
-<portlet:actionURL secure="<%= PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS || request.isSecure() %>" var="createAccoutURL">
-	<portlet:param name="saveLastPath" value="0" />
+<portlet:actionURL secure="<%= PropsValues.COMPANY_SECURITY_AUTH_REQUIRES_HTTPS || request.isSecure() %>" var="createAccountURL">
 	<portlet:param name="struts_action" value="/login/create_account" />
 </portlet:actionURL>
 
-<aui:form action="<%= createAccoutURL %>" method="post" name="fm">
+<aui:form action="<%= createAccountURL %>" method="post" name="fm">
+	<aui:input name="saveLastPath" type="hidden" value="<%= false %>" />
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.ADD %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="openId" type="hidden" value="<%= openId %>" />
@@ -95,6 +92,11 @@ boolean male = ParamUtil.getBoolean(request, "male", true);
 		</c:if>
 
 		<c:if test="<%= upe.getType() == UserPasswordException.PASSWORD_LENGTH %>">
+
+			<%
+			PasswordPolicy passwordPolicy = PasswordPolicyLocalServiceUtil.getDefaultPasswordPolicy(company.getCompanyId());
+			%>
+
 			<%= LanguageUtil.format(pageContext, "that-password-is-too-short-or-too-long-please-make-sure-your-password-is-between-x-and-512-characters", String.valueOf(passwordPolicy.getMinLength()), false) %>
 		</c:if>
 
@@ -146,7 +148,7 @@ boolean male = ParamUtil.getBoolean(request, "male", true);
 
 			<c:choose>
 				<c:when test="<%= PrefsPropsUtil.getBoolean(company.getCompanyId(), PropsKeys.FIELD_ENABLE_COM_LIFERAY_PORTAL_MODEL_CONTACT_BIRTHDAY) %>">
-					<aui:input name="birthday" value="<%= birthday %>" />
+					<aui:input name="birthday" value="<%= birthdayCalendar %>" />
 				</c:when>
 				<c:otherwise>
 					<aui:input name="birthdayMonth" type="hidden" value="<%= Calendar.JANUARY %>" />

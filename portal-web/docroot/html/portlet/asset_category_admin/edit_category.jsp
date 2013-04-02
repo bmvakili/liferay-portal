@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -152,11 +152,11 @@ else {
 					<aui:button type="submit" />
 
 					<c:if test="<%= category != null %>">
-						<c:if test="<%= permissionChecker.hasPermission(scopeGroupId, AssetCategory.class.getName(), category.getCategoryId(), ActionKeys.DELETE) %>">
+						<c:if test="<%= AssetCategoryPermission.contains(permissionChecker, category, ActionKeys.DELETE) %>">
 							<aui:button id="deleteCategoryButton" value="delete" />
 						</c:if>
 
-						<c:if test="<%= permissionChecker.hasPermission(scopeGroupId, AssetCategory.class.getName(), category.getCategoryId(), ActionKeys.PERMISSIONS) %>">
+						<c:if test="<%= AssetCategoryPermission.contains(permissionChecker, category, ActionKeys.PERMISSIONS) %>">
 							<liferay-security:permissionsURL
 								modelResource="<%= AssetCategory.class.getName() %>"
 								modelResourceDescription="<%= category.getTitle(locale) %>"

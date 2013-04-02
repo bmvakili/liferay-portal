@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.messageboards.service.persistence;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceTestUtil;
@@ -143,8 +145,6 @@ public class MBMessagePersistenceTest {
 
 		newMBMessage.setFormat(ServiceTestUtil.randomString());
 
-		newMBMessage.setAttachments(ServiceTestUtil.randomBoolean());
-
 		newMBMessage.setAnonymous(ServiceTestUtil.randomBoolean());
 
 		newMBMessage.setPriority(ServiceTestUtil.nextDouble());
@@ -199,8 +199,6 @@ public class MBMessagePersistenceTest {
 		Assert.assertEquals(existingMBMessage.getBody(), newMBMessage.getBody());
 		Assert.assertEquals(existingMBMessage.getFormat(),
 			newMBMessage.getFormat());
-		Assert.assertEquals(existingMBMessage.getAttachments(),
-			newMBMessage.getAttachments());
 		Assert.assertEquals(existingMBMessage.getAnonymous(),
 			newMBMessage.getAnonymous());
 		AssertUtils.assertEquals(existingMBMessage.getPriority(),
@@ -258,6 +256,26 @@ public class MBMessagePersistenceTest {
 		MBMessage missingMBMessage = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingMBMessage);
+	}
+
+	@Test
+	public void testActionableDynamicQuery() throws Exception {
+		final IntegerWrapper count = new IntegerWrapper();
+
+		ActionableDynamicQuery actionableDynamicQuery = new MBMessageActionableDynamicQuery() {
+				@Override
+				protected void performAction(Object object) {
+					MBMessage mbMessage = (MBMessage)object;
+
+					Assert.assertNotNull(mbMessage);
+
+					count.increment();
+				}
+			};
+
+		actionableDynamicQuery.performActions();
+
+		Assert.assertEquals(count.getValue(), _persistence.countAll());
 	}
 
 	@Test
@@ -387,8 +405,6 @@ public class MBMessagePersistenceTest {
 		mbMessage.setBody(ServiceTestUtil.randomString());
 
 		mbMessage.setFormat(ServiceTestUtil.randomString());
-
-		mbMessage.setAttachments(ServiceTestUtil.randomBoolean());
 
 		mbMessage.setAnonymous(ServiceTestUtil.randomBoolean());
 

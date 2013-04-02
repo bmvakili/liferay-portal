@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,11 +31,12 @@ if (reminderAttempts == null) {
 %>
 
 <portlet:actionURL var="forgotPasswordURL">
-	<portlet:param name="saveLastPath" value="0" />
 	<portlet:param name="struts_action" value="/login/forgot_password" />
 </portlet:actionURL>
 
 <aui:form action="<%= forgotPasswordURL %>" method="post" name="fm">
+	<aui:input name="saveLastPath" type="hidden" value="<%= false %>" />
+
 	<portlet:renderURL var="redirectURL" />
 
 	<aui:input name="redirect" type="hidden" value="<%= redirectURL %>" />

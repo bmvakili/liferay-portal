@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,19 +22,19 @@
 	<div class="lfr-header-row">
 		<div class="lfr-header-row-content">
 			<div class="categories-admin-actions toolbar">
-				<c:if test="<%= AssetPermission.contains(permissionChecker, themeDisplay.getParentGroupId(), ActionKeys.ADD_VOCABULARY) %>">
+				<c:if test="<%= AssetPermission.contains(permissionChecker, themeDisplay.getSiteGroupId(), ActionKeys.ADD_VOCABULARY) %>">
 					<aui:button name="addVocabularyButton" value="add-vocabulary" />
 				</c:if>
 
-				<c:if test="<%= AssetPermission.contains(permissionChecker, themeDisplay.getParentGroupId(), ActionKeys.ADD_CATEGORY) %>">
+				<c:if test="<%= AssetPermission.contains(permissionChecker, themeDisplay.getSiteGroupId(), ActionKeys.ADD_CATEGORY) %>">
 					<aui:button cssClass="add-category-button" disabled="<%= true %>" name="addCategoryButton" value="add-category" />
 				</c:if>
 
-				<c:if test="<%= GroupPermissionUtil.contains(permissionChecker, themeDisplay.getParentGroupId(), ActionKeys.PERMISSIONS) %>">
+				<c:if test="<%= AssetPermission.contains(permissionChecker, themeDisplay.getSiteGroupId(), ActionKeys.PERMISSIONS) && GroupPermissionUtil.contains(permissionChecker, themeDisplay.getSiteGroupId(), ActionKeys.PERMISSIONS) %>">
 					<liferay-security:permissionsURL
 						modelResource="com.liferay.portlet.asset"
 						modelResourceDescription="<%= themeDisplay.getScopeGroupName() %>"
-						resourcePrimKey="<%= String.valueOf(themeDisplay.getParentGroupId()) %>"
+						resourcePrimKey="<%= String.valueOf(themeDisplay.getSiteGroupId()) %>"
 						var="permissionsURL"
 						windowState="<%= LiferayWindowState.POP_UP.toString() %>"
 					/>

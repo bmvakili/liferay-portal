@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.NoSuchSubscriptionException;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
@@ -27,6 +26,7 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -1620,6 +1620,28 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 	private static final String _FINDER_COLUMN_C_C_C_COMPANYID_2 = "subscription.companyId = ? AND ";
 	private static final String _FINDER_COLUMN_C_C_C_CLASSNAMEID_2 = "subscription.classNameId = ? AND ";
 	private static final String _FINDER_COLUMN_C_C_C_CLASSPK_2 = "subscription.classPK = ?";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_U_C_C = new FinderPath(SubscriptionModelImpl.ENTITY_CACHE_ENABLED,
+			SubscriptionModelImpl.FINDER_CACHE_ENABLED, SubscriptionImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Long.class.getName(),
+				
+			Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_U_C_C =
+		new FinderPath(SubscriptionModelImpl.ENTITY_CACHE_ENABLED,
+			SubscriptionModelImpl.FINDER_CACHE_ENABLED, SubscriptionImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_U_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Long.class.getName()
+			},
+			SubscriptionModelImpl.COMPANYID_COLUMN_BITMASK |
+			SubscriptionModelImpl.USERID_COLUMN_BITMASK |
+			SubscriptionModelImpl.CLASSNAMEID_COLUMN_BITMASK |
+			SubscriptionModelImpl.CLASSPK_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_U_C_C = new FinderPath(SubscriptionModelImpl.ENTITY_CACHE_ENABLED,
 			SubscriptionModelImpl.FINDER_CACHE_ENABLED, SubscriptionImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_U_C_C",
@@ -1638,6 +1660,239 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 				Long.class.getName(), Long.class.getName(), Long.class.getName(),
 				Long.class.getName()
 			});
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_COUNT_BY_C_U_C_C = new FinderPath(SubscriptionModelImpl.ENTITY_CACHE_ENABLED,
+			SubscriptionModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByC_U_C_C",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Long.class.getName()
+			});
+
+	/**
+	 * Returns all the subscriptions where companyId = &#63; and userId = &#63; and classNameId = &#63; and classPK = any &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.SubscriptionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param userId the user ID
+	 * @param classNameId the class name ID
+	 * @param classPKs the class p ks
+	 * @return the matching subscriptions
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Subscription> findByC_U_C_C(long companyId, long userId,
+		long classNameId, long[] classPKs) throws SystemException {
+		return findByC_U_C_C(companyId, userId, classNameId, classPKs,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the subscriptions where companyId = &#63; and userId = &#63; and classNameId = &#63; and classPK = any &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.SubscriptionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param userId the user ID
+	 * @param classNameId the class name ID
+	 * @param classPKs the class p ks
+	 * @param start the lower bound of the range of subscriptions
+	 * @param end the upper bound of the range of subscriptions (not inclusive)
+	 * @return the range of matching subscriptions
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Subscription> findByC_U_C_C(long companyId, long userId,
+		long classNameId, long[] classPKs, int start, int end)
+		throws SystemException {
+		return findByC_U_C_C(companyId, userId, classNameId, classPKs, start,
+			end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the subscriptions where companyId = &#63; and userId = &#63; and classNameId = &#63; and classPK = any &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.SubscriptionModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param userId the user ID
+	 * @param classNameId the class name ID
+	 * @param classPKs the class p ks
+	 * @param start the lower bound of the range of subscriptions
+	 * @param end the upper bound of the range of subscriptions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching subscriptions
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Subscription> findByC_U_C_C(long companyId, long userId,
+		long classNameId, long[] classPKs, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		if ((classPKs != null) && (classPKs.length == 1)) {
+			Subscription subscription = fetchByC_U_C_C(companyId, userId,
+					classNameId, classPKs[0]);
+
+			if (subscription == null) {
+				return Collections.emptyList();
+			}
+			else {
+				List<Subscription> list = new ArrayList<Subscription>(1);
+
+				list.add(subscription);
+
+				return list;
+			}
+		}
+
+		boolean pagination = true;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			pagination = false;
+			finderArgs = new Object[] {
+					companyId, userId, classNameId, StringUtil.merge(classPKs)
+				};
+		}
+		else {
+			finderArgs = new Object[] {
+					companyId, userId, classNameId, StringUtil.merge(classPKs),
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<Subscription> list = (List<Subscription>)FinderCacheUtil.getResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_C_U_C_C,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (Subscription subscription : list) {
+				if ((companyId != subscription.getCompanyId()) ||
+						(userId != subscription.getUserId()) ||
+						(classNameId != subscription.getClassNameId()) ||
+						!ArrayUtil.contains(classPKs, subscription.getClassPK())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = new StringBundler();
+
+			query.append(_SQL_SELECT_SUBSCRIPTION_WHERE);
+
+			boolean conjunctionable = false;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_C_U_C_C_COMPANYID_5);
+
+			conjunctionable = true;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_C_U_C_C_USERID_5);
+
+			conjunctionable = true;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_C_U_C_C_CLASSNAMEID_5);
+
+			conjunctionable = true;
+
+			if ((classPKs == null) || (classPKs.length > 0)) {
+				if (conjunctionable) {
+					query.append(WHERE_AND);
+				}
+
+				query.append(StringPool.OPEN_PARENTHESIS);
+
+				for (int i = 0; i < classPKs.length; i++) {
+					query.append(_FINDER_COLUMN_C_U_C_C_CLASSPK_5);
+
+					if ((i + 1) < classPKs.length) {
+						query.append(WHERE_OR);
+					}
+				}
+
+				query.append(StringPool.CLOSE_PARENTHESIS);
+
+				conjunctionable = true;
+			}
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+			else
+			 if (pagination) {
+				query.append(SubscriptionModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				qPos.add(userId);
+
+				qPos.add(classNameId);
+
+				if (classPKs != null) {
+					qPos.add(classPKs);
+				}
+
+				if (!pagination) {
+					list = (List<Subscription>)QueryUtil.list(q, getDialect(),
+							start, end, false);
+
+					Collections.sort(list);
+
+					list = new UnmodifiableList<Subscription>(list);
+				}
+				else {
+					list = (List<Subscription>)QueryUtil.list(q, getDialect(),
+							start, end);
+				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_C_U_C_C,
+					finderArgs, list);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_C_U_C_C,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
 
 	/**
 	 * Returns the subscription where companyId = &#63; and userId = &#63; and classNameId = &#63; and classPK = &#63; or throws a {@link com.liferay.portal.NoSuchSubscriptionException} if it could not be found.
@@ -1898,10 +2153,128 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 		return count.intValue();
 	}
 
+	/**
+	 * Returns the number of subscriptions where companyId = &#63; and userId = &#63; and classNameId = &#63; and classPK = any &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param userId the user ID
+	 * @param classNameId the class name ID
+	 * @param classPKs the class p ks
+	 * @return the number of matching subscriptions
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByC_U_C_C(long companyId, long userId, long classNameId,
+		long[] classPKs) throws SystemException {
+		Object[] finderArgs = new Object[] {
+				companyId, userId, classNameId, StringUtil.merge(classPKs)
+			};
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_C_U_C_C,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler();
+
+			query.append(_SQL_COUNT_SUBSCRIPTION_WHERE);
+
+			boolean conjunctionable = false;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_C_U_C_C_COMPANYID_5);
+
+			conjunctionable = true;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_C_U_C_C_USERID_5);
+
+			conjunctionable = true;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_C_U_C_C_CLASSNAMEID_5);
+
+			conjunctionable = true;
+
+			if ((classPKs == null) || (classPKs.length > 0)) {
+				if (conjunctionable) {
+					query.append(WHERE_AND);
+				}
+
+				query.append(StringPool.OPEN_PARENTHESIS);
+
+				for (int i = 0; i < classPKs.length; i++) {
+					query.append(_FINDER_COLUMN_C_U_C_C_CLASSPK_5);
+
+					if ((i + 1) < classPKs.length) {
+						query.append(WHERE_OR);
+					}
+				}
+
+				query.append(StringPool.CLOSE_PARENTHESIS);
+
+				conjunctionable = true;
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(companyId);
+
+				qPos.add(userId);
+
+				qPos.add(classNameId);
+
+				if (classPKs != null) {
+					qPos.add(classPKs);
+				}
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_C_U_C_C,
+					finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_C_U_C_C,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
 	private static final String _FINDER_COLUMN_C_U_C_C_COMPANYID_2 = "subscription.companyId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_C_C_COMPANYID_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_C_U_C_C_COMPANYID_2) + ")";
 	private static final String _FINDER_COLUMN_C_U_C_C_USERID_2 = "subscription.userId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_C_C_USERID_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_C_U_C_C_USERID_2) + ")";
 	private static final String _FINDER_COLUMN_C_U_C_C_CLASSNAMEID_2 = "subscription.classNameId = ? AND ";
+	private static final String _FINDER_COLUMN_C_U_C_C_CLASSNAMEID_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_C_U_C_C_CLASSNAMEID_2) + ")";
 	private static final String _FINDER_COLUMN_C_U_C_C_CLASSPK_2 = "subscription.classPK = ?";
+	private static final String _FINDER_COLUMN_C_U_C_C_CLASSPK_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_C_U_C_C_CLASSPK_2) + ")";
 
 	/**
 	 * Caches the subscription in the entity cache if it is enabled.
@@ -1914,10 +2287,8 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 
 		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_U_C_C,
 			new Object[] {
-				Long.valueOf(subscription.getCompanyId()),
-				Long.valueOf(subscription.getUserId()),
-				Long.valueOf(subscription.getClassNameId()),
-				Long.valueOf(subscription.getClassPK())
+				subscription.getCompanyId(), subscription.getUserId(),
+				subscription.getClassNameId(), subscription.getClassPK()
 			}, subscription);
 
 		subscription.resetOriginalValues();
@@ -1995,10 +2366,8 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 	protected void cacheUniqueFindersCache(Subscription subscription) {
 		if (subscription.isNew()) {
 			Object[] args = new Object[] {
-					Long.valueOf(subscription.getCompanyId()),
-					Long.valueOf(subscription.getUserId()),
-					Long.valueOf(subscription.getClassNameId()),
-					Long.valueOf(subscription.getClassPK())
+					subscription.getCompanyId(), subscription.getUserId(),
+					subscription.getClassNameId(), subscription.getClassPK()
 				};
 
 			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_C_U_C_C, args,
@@ -2012,10 +2381,8 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 			if ((subscriptionModelImpl.getColumnBitmask() &
 					FINDER_PATH_FETCH_BY_C_U_C_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(subscription.getCompanyId()),
-						Long.valueOf(subscription.getUserId()),
-						Long.valueOf(subscription.getClassNameId()),
-						Long.valueOf(subscription.getClassPK())
+						subscription.getCompanyId(), subscription.getUserId(),
+						subscription.getClassNameId(), subscription.getClassPK()
 					};
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_C_U_C_C, args,
@@ -2030,10 +2397,8 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 		SubscriptionModelImpl subscriptionModelImpl = (SubscriptionModelImpl)subscription;
 
 		Object[] args = new Object[] {
-				Long.valueOf(subscription.getCompanyId()),
-				Long.valueOf(subscription.getUserId()),
-				Long.valueOf(subscription.getClassNameId()),
-				Long.valueOf(subscription.getClassPK())
+				subscription.getCompanyId(), subscription.getUserId(),
+				subscription.getClassNameId(), subscription.getClassPK()
 			};
 
 		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_U_C_C, args);
@@ -2042,10 +2407,10 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 		if ((subscriptionModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_U_C_C.getColumnBitmask()) != 0) {
 			args = new Object[] {
-					Long.valueOf(subscriptionModelImpl.getOriginalCompanyId()),
-					Long.valueOf(subscriptionModelImpl.getOriginalUserId()),
-					Long.valueOf(subscriptionModelImpl.getOriginalClassNameId()),
-					Long.valueOf(subscriptionModelImpl.getOriginalClassPK())
+					subscriptionModelImpl.getOriginalCompanyId(),
+					subscriptionModelImpl.getOriginalUserId(),
+					subscriptionModelImpl.getOriginalClassNameId(),
+					subscriptionModelImpl.getOriginalClassPK()
 				};
 
 			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_U_C_C, args);
@@ -2078,7 +2443,7 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 	 */
 	public Subscription remove(long subscriptionId)
 		throws NoSuchSubscriptionException, SystemException {
-		return remove(Long.valueOf(subscriptionId));
+		return remove((Serializable)subscriptionId);
 	}
 
 	/**
@@ -2196,16 +2561,14 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 			if ((subscriptionModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(subscriptionModelImpl.getOriginalUserId())
+						subscriptionModelImpl.getOriginalUserId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
 					args);
 
-				args = new Object[] {
-						Long.valueOf(subscriptionModelImpl.getUserId())
-					};
+				args = new Object[] { subscriptionModelImpl.getUserId() };
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
@@ -2215,8 +2578,8 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 			if ((subscriptionModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(subscriptionModelImpl.getOriginalUserId()),
-						Long.valueOf(subscriptionModelImpl.getOriginalClassNameId())
+						subscriptionModelImpl.getOriginalUserId(),
+						subscriptionModelImpl.getOriginalClassNameId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C, args);
@@ -2224,8 +2587,8 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 					args);
 
 				args = new Object[] {
-						Long.valueOf(subscriptionModelImpl.getUserId()),
-						Long.valueOf(subscriptionModelImpl.getClassNameId())
+						subscriptionModelImpl.getUserId(),
+						subscriptionModelImpl.getClassNameId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C, args);
@@ -2236,9 +2599,9 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 			if ((subscriptionModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(subscriptionModelImpl.getOriginalCompanyId()),
-						Long.valueOf(subscriptionModelImpl.getOriginalClassNameId()),
-						Long.valueOf(subscriptionModelImpl.getOriginalClassPK())
+						subscriptionModelImpl.getOriginalCompanyId(),
+						subscriptionModelImpl.getOriginalClassNameId(),
+						subscriptionModelImpl.getOriginalClassPK()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
@@ -2246,13 +2609,38 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 					args);
 
 				args = new Object[] {
-						Long.valueOf(subscriptionModelImpl.getCompanyId()),
-						Long.valueOf(subscriptionModelImpl.getClassNameId()),
-						Long.valueOf(subscriptionModelImpl.getClassPK())
+						subscriptionModelImpl.getCompanyId(),
+						subscriptionModelImpl.getClassNameId(),
+						subscriptionModelImpl.getClassPK()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_C,
+					args);
+			}
+
+			if ((subscriptionModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_U_C_C.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						subscriptionModelImpl.getOriginalCompanyId(),
+						subscriptionModelImpl.getOriginalUserId(),
+						subscriptionModelImpl.getOriginalClassNameId(),
+						subscriptionModelImpl.getOriginalClassPK()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_U_C_C, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_U_C_C,
+					args);
+
+				args = new Object[] {
+						subscriptionModelImpl.getCompanyId(),
+						subscriptionModelImpl.getUserId(),
+						subscriptionModelImpl.getClassNameId(),
+						subscriptionModelImpl.getClassPK()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_U_C_C, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_U_C_C,
 					args);
 			}
 		}
@@ -2294,13 +2682,24 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 	 *
 	 * @param primaryKey the primary key of the subscription
 	 * @return the subscription
-	 * @throws com.liferay.portal.NoSuchModelException if a subscription with the primary key could not be found
+	 * @throws com.liferay.portal.NoSuchSubscriptionException if a subscription with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Subscription findByPrimaryKey(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return findByPrimaryKey(((Long)primaryKey).longValue());
+		throws NoSuchSubscriptionException, SystemException {
+		Subscription subscription = fetchByPrimaryKey(primaryKey);
+
+		if (subscription == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			}
+
+			throw new NoSuchSubscriptionException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
+		}
+
+		return subscription;
 	}
 
 	/**
@@ -2313,18 +2712,7 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 	 */
 	public Subscription findByPrimaryKey(long subscriptionId)
 		throws NoSuchSubscriptionException, SystemException {
-		Subscription subscription = fetchByPrimaryKey(subscriptionId);
-
-		if (subscription == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + subscriptionId);
-			}
-
-			throw new NoSuchSubscriptionException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				subscriptionId);
-		}
-
-		return subscription;
+		return findByPrimaryKey((Serializable)subscriptionId);
 	}
 
 	/**
@@ -2337,20 +2725,8 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 	@Override
 	public Subscription fetchByPrimaryKey(Serializable primaryKey)
 		throws SystemException {
-		return fetchByPrimaryKey(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Returns the subscription with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param subscriptionId the primary key of the subscription
-	 * @return the subscription, or <code>null</code> if a subscription with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public Subscription fetchByPrimaryKey(long subscriptionId)
-		throws SystemException {
 		Subscription subscription = (Subscription)EntityCacheUtil.getResult(SubscriptionModelImpl.ENTITY_CACHE_ENABLED,
-				SubscriptionImpl.class, subscriptionId);
+				SubscriptionImpl.class, primaryKey);
 
 		if (subscription == _nullSubscription) {
 			return null;
@@ -2363,20 +2739,19 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 				session = openSession();
 
 				subscription = (Subscription)session.get(SubscriptionImpl.class,
-						Long.valueOf(subscriptionId));
+						primaryKey);
 
 				if (subscription != null) {
 					cacheResult(subscription);
 				}
 				else {
 					EntityCacheUtil.putResult(SubscriptionModelImpl.ENTITY_CACHE_ENABLED,
-						SubscriptionImpl.class, subscriptionId,
-						_nullSubscription);
+						SubscriptionImpl.class, primaryKey, _nullSubscription);
 				}
 			}
 			catch (Exception e) {
 				EntityCacheUtil.removeResult(SubscriptionModelImpl.ENTITY_CACHE_ENABLED,
-					SubscriptionImpl.class, subscriptionId);
+					SubscriptionImpl.class, primaryKey);
 
 				throw processException(e);
 			}
@@ -2386,6 +2761,18 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 		}
 
 		return subscription;
+	}
+
+	/**
+	 * Returns the subscription with the primary key or returns <code>null</code> if it could not be found.
+	 *
+	 * @param subscriptionId the primary key of the subscription
+	 * @return the subscription, or <code>null</code> if a subscription with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Subscription fetchByPrimaryKey(long subscriptionId)
+		throws SystemException {
+		return fetchByPrimaryKey((Serializable)subscriptionId);
 	}
 
 	/**
@@ -2570,7 +2957,7 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 
 				for (String listenerClassName : listenerClassNames) {
 					listenersList.add((ModelListener<Subscription>)InstanceFactory.newInstance(
-							listenerClassName));
+							getClassLoader(), listenerClassName));
 				}
 
 				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);

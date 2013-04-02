@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -79,17 +79,19 @@ public class WikiPageServiceUtil {
 	}
 
 	public static void addPageAttachment(long nodeId, java.lang.String title,
-		java.lang.String fileName, java.io.File file)
+		java.lang.String fileName, java.io.File file, java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().addPageAttachment(nodeId, title, fileName, file);
+		getService().addPageAttachment(nodeId, title, fileName, file, mimeType);
 	}
 
 	public static void addPageAttachment(long nodeId, java.lang.String title,
-		java.lang.String fileName, java.io.InputStream inputStream)
+		java.lang.String fileName, java.io.InputStream inputStream,
+		java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().addPageAttachment(nodeId, title, fileName, inputStream);
+		getService()
+			.addPageAttachment(nodeId, title, fileName, inputStream, mimeType);
 	}
 
 	public static void addPageAttachments(long nodeId, java.lang.String title,
@@ -99,14 +101,14 @@ public class WikiPageServiceUtil {
 		getService().addPageAttachments(nodeId, title, inputStreamOVPs);
 	}
 
-	public static java.lang.String addTempPageAttachment(long nodeId,
+	public static void addTempPageAttachment(long nodeId,
 		java.lang.String fileName, java.lang.String tempFolderName,
-		java.io.InputStream inputStream)
+		java.io.InputStream inputStream, java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService()
-				   .addTempPageAttachment(nodeId, fileName, tempFolderName,
-			inputStream);
+		getService()
+			.addTempPageAttachment(nodeId, fileName, tempFolderName,
+			inputStream, mimeType);
 	}
 
 	public static void changeParent(long nodeId, java.lang.String title,
@@ -123,6 +125,10 @@ public class WikiPageServiceUtil {
 		getService().deletePage(nodeId, title);
 	}
 
+	/**
+	* @deprecated As of 6.2.0 replaced by {@link #discardDraft(long, String,
+	double)}
+	*/
 	public static void deletePage(long nodeId, java.lang.String title,
 		double version)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -157,6 +163,13 @@ public class WikiPageServiceUtil {
 		getService().deleteTrashPageAttachments(nodeId, title);
 	}
 
+	public static void discardDraft(long nodeId, java.lang.String title,
+		double version)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().discardDraft(nodeId, title, version);
+	}
+
 	public static java.util.List<com.liferay.portlet.wiki.model.WikiPage> getChildren(
 		long groupId, long nodeId, boolean head, java.lang.String parentTitle)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -178,6 +191,10 @@ public class WikiPageServiceUtil {
 		return getService().getNodePages(nodeId, max);
 	}
 
+	/**
+	* @deprecated As of 6.2.0, replaced by {@link #getNodePagesRSS(long, int,
+	String, double, String, String, String, String)}
+	*/
 	public static java.lang.String getNodePagesRSS(long nodeId, int max,
 		java.lang.String type, double version, java.lang.String displayStyle,
 		java.lang.String feedURL, java.lang.String entryURL)
@@ -186,6 +203,17 @@ public class WikiPageServiceUtil {
 		return getService()
 				   .getNodePagesRSS(nodeId, max, type, version, displayStyle,
 			feedURL, entryURL);
+	}
+
+	public static java.lang.String getNodePagesRSS(long nodeId, int max,
+		java.lang.String type, double version, java.lang.String displayStyle,
+		java.lang.String feedURL, java.lang.String entryURL,
+		java.lang.String attachmentURLPrefix)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getNodePagesRSS(nodeId, max, type, version, displayStyle,
+			feedURL, entryURL, attachmentURLPrefix);
 	}
 
 	public static java.util.List<com.liferay.portlet.wiki.model.WikiPage> getOrphans(
@@ -252,6 +280,11 @@ public class WikiPageServiceUtil {
 		return getService().getPagesCount(groupId, userId, nodeId, status);
 	}
 
+	/**
+	* @deprecated As of 6.2.0, replaced by {@link #getPagesRSS(long, long,
+	String, int, String, double, String, String, String, String,
+	java.util.Locale)}
+	*/
 	public static java.lang.String getPagesRSS(long companyId, long nodeId,
 		java.lang.String title, int max, java.lang.String type, double version,
 		java.lang.String displayStyle, java.lang.String feedURL,
@@ -261,6 +294,18 @@ public class WikiPageServiceUtil {
 		return getService()
 				   .getPagesRSS(companyId, nodeId, title, max, type, version,
 			displayStyle, feedURL, entryURL, locale);
+	}
+
+	public static java.lang.String getPagesRSS(long companyId, long nodeId,
+		java.lang.String title, int max, java.lang.String type, double version,
+		java.lang.String displayStyle, java.lang.String feedURL,
+		java.lang.String entryURL, java.lang.String attachmentURLPrefix,
+		java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getPagesRSS(companyId, nodeId, title, max, type, version,
+			displayStyle, feedURL, entryURL, attachmentURLPrefix, locale);
 	}
 
 	public static java.util.List<com.liferay.portlet.wiki.model.WikiPage> getRecentChanges(
@@ -369,7 +414,7 @@ public class WikiPageServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(WikiPageService service) {
 	}

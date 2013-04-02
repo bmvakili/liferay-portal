@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,12 +14,33 @@
 
 package com.liferay.portal.kernel.log;
 
+import java.io.InputStream;
+
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class Jdk14LogFactoryImpl implements LogFactory {
+
+	public Jdk14LogFactoryImpl() {
+		try {
+			Class<?> clazz = getClass();
+
+			InputStream inputStream = clazz.getResourceAsStream(
+				"/logging.properties");
+
+			if (inputStream != null) {
+				LogManager logManager = LogManager.getLogManager();
+
+				logManager.readConfiguration(inputStream);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public Log getLog(Class<?> c) {
 		return getLog(c.getName());

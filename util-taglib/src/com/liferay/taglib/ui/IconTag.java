@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,12 +15,15 @@
 package com.liferay.taglib.ui;
 
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.taglib.util.IncludeTag;
 
 import java.util.Map;
+
+import javax.portlet.PortletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -162,6 +165,14 @@ public class IconTag extends IncludeTag {
 			if (Validator.isNotNull(id) && Validator.isNotNull(message)) {
 				id = id.concat(StringPool.UNDERLINE).concat(
 					FriendlyURLNormalizerUtil.normalize(message));
+
+				PortletResponse portletResponse =
+					(PortletResponse)request.getAttribute(
+						JavaConstants.JAVAX_PORTLET_RESPONSE);
+
+				id = PortalUtil.getUniqueElementId(
+					getOriginalServletRequest(), portletResponse.getNamespace(),
+					id);
 			}
 			else {
 				id = PortalUtil.generateRandomKey(

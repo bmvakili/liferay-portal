@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.webdav.WebDAVStorage;
 import com.liferay.portal.kernel.webdav.WebDAVUtil;
+import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portal.webdav.WebDAVServlet;
 import com.liferay.portal.webdav.methods.Method;
 
@@ -73,6 +74,14 @@ public class BaseWebDAVTestCase {
 		mockHttpServletRequest.setContextPath(_CONTEXT_PATH);
 		mockHttpServletRequest.setServletPath(_SERVLET_PATH);
 		mockHttpServletRequest.setPathInfo(_PATH_INFO_PREFACE + path);
+
+		try {
+			mockHttpServletRequest.setRemoteUser(
+				String.valueOf(TestPropsValues.getUserId()));
+		}
+		catch (Exception e) {
+			Assert.fail("User ID cannot be initialized");
+		}
 
 		if (headers == null) {
 			headers = new HashMap<String, String>();

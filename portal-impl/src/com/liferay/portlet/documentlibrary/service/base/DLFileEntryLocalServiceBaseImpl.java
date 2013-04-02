@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,6 +33,8 @@ import com.liferay.portal.service.ImageLocalService;
 import com.liferay.portal.service.ImageService;
 import com.liferay.portal.service.LockLocalService;
 import com.liferay.portal.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.service.RepositoryLocalService;
+import com.liferay.portal.service.RepositoryService;
 import com.liferay.portal.service.ResourceLocalService;
 import com.liferay.portal.service.UserLocalService;
 import com.liferay.portal.service.UserService;
@@ -41,6 +43,7 @@ import com.liferay.portal.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.service.persistence.ImagePersistence;
 import com.liferay.portal.service.persistence.LockFinder;
 import com.liferay.portal.service.persistence.LockPersistence;
+import com.liferay.portal.service.persistence.RepositoryPersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 import com.liferay.portal.service.persistence.WebDAVPropsPersistence;
@@ -285,12 +288,12 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the document library file entry with the UUID in the group.
+	 * Returns the document library file entry matching the UUID and group.
 	 *
-	 * @param uuid the UUID of document library file entry
-	 * @param groupId the group id of the document library file entry
-	 * @return the document library file entry
-	 * @throws PortalException if a document library file entry with the UUID in the group could not be found
+	 * @param uuid the document library file entry's UUID
+	 * @param groupId the primary key of the group
+	 * @return the matching document library file entry
+	 * @throws PortalException if a matching document library file entry could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public DLFileEntry getDLFileEntryByUuidAndGroupId(String uuid, long groupId)
@@ -1058,6 +1061,62 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	 */
 	public void setLockFinder(LockFinder lockFinder) {
 		this.lockFinder = lockFinder;
+	}
+
+	/**
+	 * Returns the repository local service.
+	 *
+	 * @return the repository local service
+	 */
+	public RepositoryLocalService getRepositoryLocalService() {
+		return repositoryLocalService;
+	}
+
+	/**
+	 * Sets the repository local service.
+	 *
+	 * @param repositoryLocalService the repository local service
+	 */
+	public void setRepositoryLocalService(
+		RepositoryLocalService repositoryLocalService) {
+		this.repositoryLocalService = repositoryLocalService;
+	}
+
+	/**
+	 * Returns the repository remote service.
+	 *
+	 * @return the repository remote service
+	 */
+	public RepositoryService getRepositoryService() {
+		return repositoryService;
+	}
+
+	/**
+	 * Sets the repository remote service.
+	 *
+	 * @param repositoryService the repository remote service
+	 */
+	public void setRepositoryService(RepositoryService repositoryService) {
+		this.repositoryService = repositoryService;
+	}
+
+	/**
+	 * Returns the repository persistence.
+	 *
+	 * @return the repository persistence
+	 */
+	public RepositoryPersistence getRepositoryPersistence() {
+		return repositoryPersistence;
+	}
+
+	/**
+	 * Sets the repository persistence.
+	 *
+	 * @param repositoryPersistence the repository persistence
+	 */
+	public void setRepositoryPersistence(
+		RepositoryPersistence repositoryPersistence) {
+		this.repositoryPersistence = repositoryPersistence;
 	}
 
 	/**
@@ -1900,6 +1959,12 @@ public abstract class DLFileEntryLocalServiceBaseImpl
 	protected LockPersistence lockPersistence;
 	@BeanReference(type = LockFinder.class)
 	protected LockFinder lockFinder;
+	@BeanReference(type = RepositoryLocalService.class)
+	protected RepositoryLocalService repositoryLocalService;
+	@BeanReference(type = RepositoryService.class)
+	protected RepositoryService repositoryService;
+	@BeanReference(type = RepositoryPersistence.class)
+	protected RepositoryPersistence repositoryPersistence;
 	@BeanReference(type = ResourceLocalService.class)
 	protected ResourceLocalService resourceLocalService;
 	@BeanReference(type = UserLocalService.class)

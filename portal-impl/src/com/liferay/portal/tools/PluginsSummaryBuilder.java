@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -436,7 +436,9 @@ public class PluginsSummaryBuilder {
 
 			Set<String> ticketIds = _extractTicketIds(pluginDir, range);
 
-			if (range.endsWith("^.." + _latestHASH) && ticketIds.isEmpty()) {
+			if (range.endsWith("^.." + _latestHASH) && ticketIds.isEmpty() &&
+				(relengChangeLogEntries.size() > 1)) {
+
 				continue;
 			}
 
@@ -565,7 +567,7 @@ public class PluginsSummaryBuilder {
 		String value = GetterUtil.getString(
 			properties.getProperty(key), defaultValue);
 
-		if (sb.length() > 0) {
+		if (sb.index() > 0) {
 			sb.append(StringPool.NEW_LINE);
 		}
 

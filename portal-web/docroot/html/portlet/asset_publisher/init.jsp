@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,10 +17,9 @@
 <%@ include file="/html/portlet/init.jsp" %>
 
 <%@ page import="com.liferay.portal.NoSuchModelException" %><%@
-page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandler" %><%@
-page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandlerRegistryUtil" %><%@
-page import="com.liferay.portal.kernel.repository.model.FileEntry" %><%@
 page import="com.liferay.portal.kernel.search.Hits" %><%@
+page import="com.liferay.portal.kernel.template.TemplateHandler" %><%@
+page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><%@
 page import="com.liferay.portal.kernel.xml.Document" %><%@
 page import="com.liferay.portal.kernel.xml.Element" %><%@
 page import="com.liferay.portal.kernel.xml.SAXReaderUtil" %><%@
@@ -46,16 +45,10 @@ page import="com.liferay.portlet.asset.service.persistence.AssetEntryQuery" %><%
 page import="com.liferay.portlet.asset.util.AssetUtil" %><%@
 page import="com.liferay.portlet.assetpublisher.search.AssetDisplayTerms" %><%@
 page import="com.liferay.portlet.assetpublisher.search.AssetSearch" %><%@
-page import="com.liferay.portlet.assetpublisher.search.AssetSearchTerms" %><%@
 page import="com.liferay.portlet.assetpublisher.util.AssetPublisherHelperUtil" %><%@
 page import="com.liferay.portlet.assetpublisher.util.AssetPublisherUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntry" %><%@
-page import="com.liferay.portlet.documentlibrary.model.DLFileEntryConstants" %><%@
-page import="com.liferay.portlet.documentlibrary.model.DLFolderConstants" %><%@
-page import="com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DocumentConversionUtil" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructure" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil" %><%@
 page import="com.liferay.portlet.journal.model.JournalArticle" %><%@
 page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateConstants" %><%@
 page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateUtil" %><%@
@@ -77,8 +70,6 @@ if (Validator.isNull(selectionStyle)) {
 	selectionStyle = "dynamic";
 }
 
-boolean defaultScope = GetterUtil.getBoolean(preferences.getValue("defaultScope", null), true);
-
 long[] groupIds = AssetPublisherUtil.getGroupIds(preferences, scopeGroupId, layout);
 
 long[] availableClassNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds();
@@ -95,13 +86,16 @@ boolean anyAssetType = GetterUtil.getBoolean(preferences.getValue("anyAssetType"
 
 long[] classNameIds = AssetPublisherUtil.getClassNameIds(preferences, availableClassNameIds);
 
-long[] classTypeIds = GetterUtil.getLongValues(portletPreferences.getValues("classTypeIds", null));
+long[] classTypeIds = GetterUtil.getLongValues(preferences.getValues("classTypeIds", null));
 
 String customUserAttributes = GetterUtil.getString(preferences.getValue("customUserAttributes", StringPool.BLANK));
 
 AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 
 String[] allAssetTagNames = new String[0];
+
+String ddmStructureFieldName = StringPool.BLANK;
+String ddmStructureFieldValue = StringPool.BLANK;
 
 if (selectionStyle.equals("dynamic")) {
 	if (!ArrayUtil.contains(groupIds, scopeGroupId)) {
@@ -115,6 +109,16 @@ if (selectionStyle.equals("dynamic")) {
 
 	assetEntryQuery.setClassTypeIds(classTypeIds);
 
+	if ((classNameIds.length == 1) && (classTypeIds.length == 1)) {
+		ddmStructureFieldName = GetterUtil.getString(preferences.getValue("ddmStructureFieldName", StringPool.BLANK));
+		ddmStructureFieldValue = GetterUtil.getString(preferences.getValue("ddmStructureFieldValue", StringPool.BLANK));
+
+		if (Validator.isNotNull(ddmStructureFieldName) && Validator.isNotNull(ddmStructureFieldValue)) {
+			assetEntryQuery.setAttribute("ddmStructureFieldValue", ddmStructureFieldValue);
+			assetEntryQuery.setAttribute("ddmStructureFieldName", ddmStructureFieldName);
+		}
+	}
+
 	AssetPublisherUtil.addUserAttributes(user, StringUtil.split(customUserAttributes), assetEntryQuery);
 }
 
@@ -126,7 +130,11 @@ String assetCategoryTitle = null;
 String assetVocabularyTitle = null;
 
 if (assetCategoryId > 0) {
-	assetEntryQuery.setAllCategoryIds(new long[] {assetCategoryId});
+	long[] allAssetCategoryIds = assetEntryQuery.getAllCategoryIds();
+
+	if (!ArrayUtil.contains(allAssetCategoryIds, assetCategoryId)) {
+		assetEntryQuery.setAllCategoryIds(ArrayUtil.append(allAssetCategoryIds, assetCategoryId));
+	}
 
 	AssetCategory assetCategory = AssetCategoryLocalServiceUtil.getCategory(assetCategoryId);
 
@@ -148,9 +156,9 @@ String assetTagName = ParamUtil.getString(request, "tag");
 if (Validator.isNotNull(assetTagName)) {
 	allAssetTagNames = new String[] {assetTagName};
 
-	long[] assetTagIds = AssetTagLocalServiceUtil.getTagIds(scopeGroupId, allAssetTagNames);
+	long[] assetTagIds = AssetTagLocalServiceUtil.getTagIds(groupIds, allAssetTagNames);
 
-	assetEntryQuery.setAllTagIds(assetTagIds);
+	assetEntryQuery.setAnyTagIds(assetTagIds);
 
 	PortalUtil.setPageKeywords(assetTagName, request);
 }
@@ -184,7 +192,13 @@ String orderByColumn2 = GetterUtil.getString(preferences.getValue("orderByColumn
 String orderByType1 = GetterUtil.getString(preferences.getValue("orderByType1", "DESC"));
 String orderByType2 = GetterUtil.getString(preferences.getValue("orderByType2", "ASC"));
 boolean excludeZeroViewCount = GetterUtil.getBoolean(preferences.getValue("excludeZeroViewCount", null));
-int delta = GetterUtil.getInteger(preferences.getValue("delta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
+
+int delta = GetterUtil.getInteger(preferences.getValue("delta", null), SearchContainer.DEFAULT_DELTA);
+
+if (portletName.equals(PortletKeys.RECENT_CONTENT)) {
+	delta = PropsValues.RECENT_CONTENT_MAX_DISPLAY_ITEMS;
+}
+
 String paginationType = GetterUtil.getString(preferences.getValue("paginationType", "none"));
 boolean showAvailableLocales = GetterUtil.getBoolean(preferences.getValue("showAvailableLocales", null));
 boolean showMetadataDescriptions = GetterUtil.getBoolean(preferences.getValue("showMetadataDescriptions", null), true);
@@ -199,7 +213,7 @@ if (defaultAssetPublisherPortletId.equals(portletDisplay.getId()) || (Validator.
 	defaultAssetPublisher = true;
 }
 
-boolean enablePermissions = GetterUtil.getBoolean(preferences.getValue("enablePermissions", null));
+boolean enablePermissions = PropsValues.ASSET_PUBLISHER_SEARCH_WITH_INDEX ? true : GetterUtil.getBoolean(preferences.getValue("enablePermissions", null));
 
 assetEntryQuery.setEnablePermissions(enablePermissions);
 
@@ -225,7 +239,7 @@ String allMetadataFields = "create-date,modified-date,publish-date,expiration-da
 String[] metadataFields = StringUtil.split(preferences.getValue("metadataFields", defaultMetadataFields));
 
 boolean enableRSS = !PortalUtil.isRSSFeedsEnabled() ? false : GetterUtil.getBoolean(preferences.getValue("enableRss", null));
-int rssDelta = GetterUtil.getInteger(preferences.getValue("rssDelta", "20"));
+int rssDelta = GetterUtil.getInteger(preferences.getValue("rssDelta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
 String rssDisplayStyle = preferences.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_ABSTRACT);
 String rssFeedType = preferences.getValue("rssFeedType", RSSUtil.FEED_TYPE_DEFAULT);
 String rssName = preferences.getValue("rssName", portletDisplay.getTitle());

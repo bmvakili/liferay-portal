@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.dynamicdatamapping.service.persistence;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceTestUtil;
@@ -221,6 +223,26 @@ public class DDMStructurePersistenceTest {
 	}
 
 	@Test
+	public void testActionableDynamicQuery() throws Exception {
+		final IntegerWrapper count = new IntegerWrapper();
+
+		ActionableDynamicQuery actionableDynamicQuery = new DDMStructureActionableDynamicQuery() {
+				@Override
+				protected void performAction(Object object) {
+					DDMStructure ddmStructure = (DDMStructure)object;
+
+					Assert.assertNotNull(ddmStructure);
+
+					count.increment();
+				}
+			};
+
+		actionableDynamicQuery.performActions();
+
+		Assert.assertEquals(count.getValue(), _persistence.countAll());
+	}
+
+	@Test
 	public void testDynamicQueryByPrimaryKeyExisting()
 		throws Exception {
 		DDMStructure newDDMStructure = addDDMStructure();
@@ -312,6 +334,8 @@ public class DDMStructurePersistenceTest {
 
 		Assert.assertEquals(existingDDMStructureModelImpl.getGroupId(),
 			existingDDMStructureModelImpl.getOriginalGroupId());
+		Assert.assertEquals(existingDDMStructureModelImpl.getClassNameId(),
+			existingDDMStructureModelImpl.getOriginalClassNameId());
 		Assert.assertTrue(Validator.equals(
 				existingDDMStructureModelImpl.getStructureKey(),
 				existingDDMStructureModelImpl.getOriginalStructureKey()));

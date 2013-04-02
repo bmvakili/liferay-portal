@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -179,7 +179,6 @@ else if (dlFileEntryType != null) {
 
 <portlet:actionURL var="editFileEntryURL">
 	<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
-	<portlet:param name="uploader" value="classic" />
 </portlet:actionURL>
 
 <aui:form action="<%= editFileEntryURL %>" cssClass="lfr-dynamic-form" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileEntry(" + saveAsDraft + ");" %>'>
@@ -279,7 +278,7 @@ else if (dlFileEntryType != null) {
 			</c:if>
 		</aui:field-wrapper>
 
-		<aui:input name="file" style="width: auto;" type="file">
+		<aui:input name="file" onChange='<%= renderResponse.getNamespace() + "validateTitle();" %>' style="width: auto;" type="file">
 			<aui:validator name="acceptFiles">
 				'<%= StringUtil.merge(PrefsPropsUtil.getStringArray(PropsKeys.DL_FILE_EXTENSIONS, StringPool.COMMA)) %>'
 			</aui:validator>
@@ -318,7 +317,7 @@ else if (dlFileEntryType != null) {
 							for (DLFileEntryType curDLFileEntryType : dlFileEntryTypes) {
 							%>
 
-								<aui:option label="<%= HtmlUtil.escapeAttribute(curDLFileEntryType.getName()) %>" selected="<%= (fileEntryTypeId == curDLFileEntryType.getPrimaryKey()) %>" value="<%= curDLFileEntryType.getPrimaryKey() %>" />
+								<aui:option label="<%= HtmlUtil.escape(curDLFileEntryType.getName()) %>" selected="<%= (fileEntryTypeId == curDLFileEntryType.getPrimaryKey()) %>" value="<%= curDLFileEntryType.getPrimaryKey() %>" />
 
 							<%
 							}
@@ -348,7 +347,13 @@ else if (dlFileEntryType != null) {
 							}
 				%>
 
-							<%= DDMXSDUtil.getHTML(pageContext, ddmStructure.getXsd(), fields, String.valueOf(ddmStructure.getPrimaryKey()), locale) %>
+							<liferay-ddm:html
+								classNameId="<%= PortalUtil.getClassNameId(DDMStructure.class) %>"
+								classPK="<%= ddmStructure.getPrimaryKey() %>"
+								fields="<%= fields %>"
+								fieldsNamespace="<%= String.valueOf(ddmStructure.getPrimaryKey()) %>"
+								requestedLocale="<%= locale %>"
+							/>
 
 				<%
 						}
@@ -507,6 +512,10 @@ else if (dlFileEntryType != null) {
 		};
 
 		Liferay.Util.selectFolder(folderData, '<liferay-portlet:renderURL portletName="<%= portletResource %>"><portlet:param name="struts_action" value='<%= "/document_library/view" %>' /></liferay-portlet:renderURL>', '<portlet:namespace />');
+	}
+
+	function <portlet:namespace />validateTitle() {
+		Liferay.Form._INSTANCES.<portlet:namespace />fm.formValidator.validateField('<portlet:namespace />title');
 	}
 
 	<c:if test="<%= windowState.equals(WindowState.MAXIMIZED) %>">

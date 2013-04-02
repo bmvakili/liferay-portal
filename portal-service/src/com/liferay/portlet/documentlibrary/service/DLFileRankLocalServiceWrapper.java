@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -188,6 +188,23 @@ public class DLFileRankLocalServiceWrapper implements DLFileRankLocalService,
 	}
 
 	/**
+	* Returns the document library file rank matching the UUID and group.
+	*
+	* @param uuid the document library file rank's UUID
+	* @param groupId the primary key of the group
+	* @return the matching document library file rank
+	* @throws PortalException if a matching document library file rank could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portlet.documentlibrary.model.DLFileRank getDLFileRankByUuidAndGroupId(
+		java.lang.String uuid, long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileRankLocalService.getDLFileRankByUuidAndGroupId(uuid,
+			groupId);
+	}
+
+	/**
 	* Returns a range of all the document library file ranks.
 	*
 	* <p>
@@ -250,7 +267,8 @@ public class DLFileRankLocalServiceWrapper implements DLFileRankLocalService,
 	public com.liferay.portlet.documentlibrary.model.DLFileRank addFileRank(
 		long groupId, long companyId, long userId, long fileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return _dlFileRankLocalService.addFileRank(groupId, companyId, userId,
 			fileEntryId, serviceContext);
 	}
@@ -313,20 +331,21 @@ public class DLFileRankLocalServiceWrapper implements DLFileRankLocalService,
 	public com.liferay.portlet.documentlibrary.model.DLFileRank updateFileRank(
 		long groupId, long companyId, long userId, long fileEntryId,
 		com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return _dlFileRankLocalService.updateFileRank(groupId, companyId,
 			userId, fileEntryId, serviceContext);
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public DLFileRankLocalService getWrappedDLFileRankLocalService() {
 		return _dlFileRankLocalService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedDLFileRankLocalService(
 		DLFileRankLocalService dlFileRankLocalService) {

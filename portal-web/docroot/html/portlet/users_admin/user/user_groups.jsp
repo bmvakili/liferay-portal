@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,8 +17,13 @@
 <%@ include file="/html/portlet/users_admin/init.jsp" %>
 
 <%
+User selUser = (User)request.getAttribute("user.selUser");
 List<UserGroup> userGroups = (List<UserGroup>)request.getAttribute("user.userGroups");
 %>
+
+<liferay-ui:error-marker key="errorSection" value="user-groups" />
+
+<liferay-ui:membership-policy-error />
 
 <liferay-util:buffer var="removeUserGroupIcon">
 	<liferay-ui:icon
@@ -49,7 +54,7 @@ List<UserGroup> userGroups = (List<UserGroup>)request.getAttribute("user.userGro
 			property="name"
 		/>
 
-		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && !UserGroupMembershipPolicyUtil.isMembershipRequired(selUser.getUserId(), userGroup.getUserGroupId()) %>">
 			<liferay-ui:search-container-column-text>
 				<a class="modify-link" data-rowId="<%= userGroup.getUserGroupId() %>" href="javascript:;"><%= removeUserGroupIcon %></a>
 			</liferay-ui:search-container-column-text>
@@ -73,7 +78,7 @@ List<UserGroup> userGroups = (List<UserGroup>)request.getAttribute("user.userGro
 
 <aui:script>
 	function <portlet:namespace />openUserGroupSelector() {
-		var userGroupWindow = window.open('<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/user_groups_admin/select_user_group" /></portlet:renderURL>', 'usergroup', 'directories=no,height=640,location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,toolbar=no,width=680');
+		var userGroupWindow = window.open('<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/user_groups_admin/select_user_group" /><portlet:param name="p_u_i_d" value='<%= String.valueOf(selUser.getUserId()) %>' /></portlet:renderURL>', 'usergroup', 'directories=no,height=640,location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,toolbar=no,width=680');
 
 		userGroupWindow.focus();
 	}

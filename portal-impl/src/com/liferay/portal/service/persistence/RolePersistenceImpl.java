@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence;
 
-import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.NoSuchRoleException;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
@@ -1024,16 +1023,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			query.append(_SQL_SELECT_ROLE_WHERE);
 
+			boolean bindName = false;
+
 			if (name == null) {
 				query.append(_FINDER_COLUMN_NAME_NAME_1);
 			}
+			else if (name.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_NAME_NAME_3);
+			}
 			else {
-				if (name.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_NAME_NAME_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_NAME_NAME_2);
-				}
+				bindName = true;
+
+				query.append(_FINDER_COLUMN_NAME_NAME_2);
 			}
 
 			if (orderByComparator != null) {
@@ -1056,7 +1057,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (name != null) {
+				if (bindName) {
 					qPos.add(name);
 				}
 
@@ -1243,16 +1244,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		query.append(_SQL_SELECT_ROLE_WHERE);
 
+		boolean bindName = false;
+
 		if (name == null) {
 			query.append(_FINDER_COLUMN_NAME_NAME_1);
 		}
+		else if (name.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_NAME_NAME_3);
+		}
 		else {
-			if (name.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_NAME_NAME_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_NAME_NAME_2);
-			}
+			bindName = true;
+
+			query.append(_FINDER_COLUMN_NAME_NAME_2);
 		}
 
 		if (orderByComparator != null) {
@@ -1323,7 +1326,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (name != null) {
+		if (bindName) {
 			qPos.add(name);
 		}
 
@@ -1411,16 +1414,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			query.append(_FILTER_SQL_SELECT_ROLE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
+		boolean bindName = false;
+
 		if (name == null) {
 			query.append(_FINDER_COLUMN_NAME_NAME_1);
 		}
+		else if (name.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_NAME_NAME_3);
+		}
 		else {
-			if (name.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_NAME_NAME_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_NAME_NAME_2);
-			}
+			bindName = true;
+
+			query.append(_FINDER_COLUMN_NAME_NAME_2);
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
@@ -1465,7 +1470,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
-			if (name != null) {
+			if (bindName) {
 				qPos.add(name);
 			}
 
@@ -1542,16 +1547,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			query.append(_FILTER_SQL_SELECT_ROLE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
+		boolean bindName = false;
+
 		if (name == null) {
 			query.append(_FINDER_COLUMN_NAME_NAME_1);
 		}
+		else if (name.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_NAME_NAME_3);
+		}
 		else {
-			if (name.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_NAME_NAME_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_NAME_NAME_2);
-			}
+			bindName = true;
+
+			query.append(_FINDER_COLUMN_NAME_NAME_2);
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
@@ -1651,7 +1658,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (name != null) {
+		if (bindName) {
 			qPos.add(name);
 		}
 
@@ -1706,16 +1713,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			query.append(_SQL_COUNT_ROLE_WHERE);
 
+			boolean bindName = false;
+
 			if (name == null) {
 				query.append(_FINDER_COLUMN_NAME_NAME_1);
 			}
+			else if (name.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_NAME_NAME_3);
+			}
 			else {
-				if (name.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_NAME_NAME_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_NAME_NAME_2);
-				}
+				bindName = true;
+
+				query.append(_FINDER_COLUMN_NAME_NAME_2);
 			}
 
 			String sql = query.toString();
@@ -1729,7 +1738,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (name != null) {
+				if (bindName) {
 					qPos.add(name);
 				}
 
@@ -1766,16 +1775,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		query.append(_FILTER_SQL_COUNT_ROLE_WHERE);
 
+		boolean bindName = false;
+
 		if (name == null) {
 			query.append(_FINDER_COLUMN_NAME_NAME_1);
 		}
+		else if (name.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_NAME_NAME_3);
+		}
 		else {
-			if (name.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_NAME_NAME_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_NAME_NAME_2);
-			}
+			bindName = true;
+
+			query.append(_FINDER_COLUMN_NAME_NAME_2);
 		}
 
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
@@ -1793,7 +1804,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
-			if (name != null) {
+			if (bindName) {
 				qPos.add(name);
 			}
 
@@ -1811,7 +1822,826 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 	private static final String _FINDER_COLUMN_NAME_NAME_1 = "role.name IS NULL";
 	private static final String _FINDER_COLUMN_NAME_NAME_2 = "role.name = ?";
-	private static final String _FINDER_COLUMN_NAME_NAME_3 = "(role.name IS NULL OR role.name = ?)";
+	private static final String _FINDER_COLUMN_NAME_NAME_3 = "(role.name IS NULL OR role.name = '')";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_TYPE = new FinderPath(RoleModelImpl.ENTITY_CACHE_ENABLED,
+			RoleModelImpl.FINDER_CACHE_ENABLED, RoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByType",
+			new String[] {
+				Integer.class.getName(),
+				
+			Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TYPE = new FinderPath(RoleModelImpl.ENTITY_CACHE_ENABLED,
+			RoleModelImpl.FINDER_CACHE_ENABLED, RoleImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByType",
+			new String[] { Integer.class.getName() },
+			RoleModelImpl.TYPE_COLUMN_BITMASK |
+			RoleModelImpl.NAME_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_TYPE = new FinderPath(RoleModelImpl.ENTITY_CACHE_ENABLED,
+			RoleModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByType",
+			new String[] { Integer.class.getName() });
+
+	/**
+	 * Returns all the roles where type = &#63;.
+	 *
+	 * @param type the type
+	 * @return the matching roles
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Role> findByType(int type) throws SystemException {
+		return findByType(type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the roles where type = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param type the type
+	 * @param start the lower bound of the range of roles
+	 * @param end the upper bound of the range of roles (not inclusive)
+	 * @return the range of matching roles
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Role> findByType(int type, int start, int end)
+		throws SystemException {
+		return findByType(type, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the roles where type = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param type the type
+	 * @param start the lower bound of the range of roles
+	 * @param end the upper bound of the range of roles (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching roles
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Role> findByType(int type, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		boolean pagination = true;
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			pagination = false;
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TYPE;
+			finderArgs = new Object[] { type };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_TYPE;
+			finderArgs = new Object[] { type, start, end, orderByComparator };
+		}
+
+		List<Role> list = (List<Role>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (Role role : list) {
+				if ((type != role.getType())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_ROLE_WHERE);
+
+			query.append(_FINDER_COLUMN_TYPE_TYPE_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+			else
+			 if (pagination) {
+				query.append(RoleModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(type);
+
+				if (!pagination) {
+					list = (List<Role>)QueryUtil.list(q, getDialect(), start,
+							end, false);
+
+					Collections.sort(list);
+
+					list = new UnmodifiableList<Role>(list);
+				}
+				else {
+					list = (List<Role>)QueryUtil.list(q, getDialect(), start,
+							end);
+				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first role in the ordered set where type = &#63;.
+	 *
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching role
+	 * @throws com.liferay.portal.NoSuchRoleException if a matching role could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Role findByType_First(int type, OrderByComparator orderByComparator)
+		throws NoSuchRoleException, SystemException {
+		Role role = fetchByType_First(type, orderByComparator);
+
+		if (role != null) {
+			return role;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("type=");
+		msg.append(type);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchRoleException(msg.toString());
+	}
+
+	/**
+	 * Returns the first role in the ordered set where type = &#63;.
+	 *
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching role, or <code>null</code> if a matching role could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Role fetchByType_First(int type, OrderByComparator orderByComparator)
+		throws SystemException {
+		List<Role> list = findByType(type, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last role in the ordered set where type = &#63;.
+	 *
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching role
+	 * @throws com.liferay.portal.NoSuchRoleException if a matching role could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Role findByType_Last(int type, OrderByComparator orderByComparator)
+		throws NoSuchRoleException, SystemException {
+		Role role = fetchByType_Last(type, orderByComparator);
+
+		if (role != null) {
+			return role;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("type=");
+		msg.append(type);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchRoleException(msg.toString());
+	}
+
+	/**
+	 * Returns the last role in the ordered set where type = &#63;.
+	 *
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching role, or <code>null</code> if a matching role could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Role fetchByType_Last(int type, OrderByComparator orderByComparator)
+		throws SystemException {
+		int count = countByType(type);
+
+		List<Role> list = findByType(type, count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the roles before and after the current role in the ordered set where type = &#63;.
+	 *
+	 * @param roleId the primary key of the current role
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next role
+	 * @throws com.liferay.portal.NoSuchRoleException if a role with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Role[] findByType_PrevAndNext(long roleId, int type,
+		OrderByComparator orderByComparator)
+		throws NoSuchRoleException, SystemException {
+		Role role = findByPrimaryKey(roleId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Role[] array = new RoleImpl[3];
+
+			array[0] = getByType_PrevAndNext(session, role, type,
+					orderByComparator, true);
+
+			array[1] = role;
+
+			array[2] = getByType_PrevAndNext(session, role, type,
+					orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected Role getByType_PrevAndNext(Session session, Role role, int type,
+		OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_ROLE_WHERE);
+
+		query.append(_FINDER_COLUMN_TYPE_TYPE_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(RoleModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(type);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(role);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<Role> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns all the roles that the user has permission to view where type = &#63;.
+	 *
+	 * @param type the type
+	 * @return the matching roles that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Role> filterFindByType(int type) throws SystemException {
+		return filterFindByType(type, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the roles that the user has permission to view where type = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param type the type
+	 * @param start the lower bound of the range of roles
+	 * @param end the upper bound of the range of roles (not inclusive)
+	 * @return the range of matching roles that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Role> filterFindByType(int type, int start, int end)
+		throws SystemException {
+		return filterFindByType(type, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the roles that the user has permissions to view where type = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portal.model.impl.RoleModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param type the type
+	 * @param start the lower bound of the range of roles
+	 * @param end the upper bound of the range of roles (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching roles that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Role> filterFindByType(int type, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled()) {
+			return findByType(type, start, end, orderByComparator);
+		}
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(3 +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_ROLE_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_ROLE_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_TYPE_TYPE_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_ROLE_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			if (getDB().isSupportsInlineDistinct()) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+			else {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator);
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(RoleModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(RoleModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				Role.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			if (getDB().isSupportsInlineDistinct()) {
+				q.addEntity(_FILTER_ENTITY_ALIAS, RoleImpl.class);
+			}
+			else {
+				q.addEntity(_FILTER_ENTITY_TABLE, RoleImpl.class);
+			}
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(type);
+
+			return (List<Role>)QueryUtil.list(q, getDialect(), start, end);
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the roles before and after the current role in the ordered set of roles that the user has permission to view where type = &#63;.
+	 *
+	 * @param roleId the primary key of the current role
+	 * @param type the type
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next role
+	 * @throws com.liferay.portal.NoSuchRoleException if a role with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Role[] filterFindByType_PrevAndNext(long roleId, int type,
+		OrderByComparator orderByComparator)
+		throws NoSuchRoleException, SystemException {
+		if (!InlineSQLHelperUtil.isEnabled()) {
+			return findByType_PrevAndNext(roleId, type, orderByComparator);
+		}
+
+		Role role = findByPrimaryKey(roleId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Role[] array = new RoleImpl[3];
+
+			array[0] = filterGetByType_PrevAndNext(session, role, type,
+					orderByComparator, true);
+
+			array[1] = role;
+
+			array[2] = filterGetByType_PrevAndNext(session, role, type,
+					orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected Role filterGetByType_PrevAndNext(Session session, Role role,
+		int type, OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_ROLE_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_ROLE_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_TYPE_TYPE_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_ROLE_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(RoleModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(RoleModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				Role.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		SQLQuery q = session.createSQLQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		if (getDB().isSupportsInlineDistinct()) {
+			q.addEntity(_FILTER_ENTITY_ALIAS, RoleImpl.class);
+		}
+		else {
+			q.addEntity(_FILTER_ENTITY_TABLE, RoleImpl.class);
+		}
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(type);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(role);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<Role> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the roles where type = &#63; from the database.
+	 *
+	 * @param type the type
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByType(int type) throws SystemException {
+		for (Role role : findByType(type, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				null)) {
+			remove(role);
+		}
+	}
+
+	/**
+	 * Returns the number of roles where type = &#63;.
+	 *
+	 * @param type the type
+	 * @return the number of matching roles
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByType(int type) throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_TYPE;
+
+		Object[] finderArgs = new Object[] { type };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_ROLE_WHERE);
+
+			query.append(_FINDER_COLUMN_TYPE_TYPE_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(type);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of roles that the user has permission to view where type = &#63;.
+	 *
+	 * @param type the type
+	 * @return the number of matching roles that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int filterCountByType(int type) throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled()) {
+			return countByType(type);
+		}
+
+		StringBundler query = new StringBundler(2);
+
+		query.append(_FILTER_SQL_COUNT_ROLE_WHERE);
+
+		query.append(_FINDER_COLUMN_TYPE_TYPE_2);
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				Role.class.getName(), _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(type);
+
+			Long count = (Long)q.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	private static final String _FINDER_COLUMN_TYPE_TYPE_2 = "role.type = ?";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_SUBTYPE = new FinderPath(RoleModelImpl.ENTITY_CACHE_ENABLED,
 			RoleModelImpl.FINDER_CACHE_ENABLED, RoleImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findBySubtype",
@@ -1919,16 +2749,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			query.append(_SQL_SELECT_ROLE_WHERE);
 
+			boolean bindSubtype = false;
+
 			if (subtype == null) {
 				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_1);
 			}
+			else if (subtype.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
+			}
 			else {
-				if (subtype.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
-				}
+				bindSubtype = true;
+
+				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
 			}
 
 			if (orderByComparator != null) {
@@ -1951,7 +2783,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (subtype != null) {
+				if (bindSubtype) {
 					qPos.add(subtype);
 				}
 
@@ -2140,16 +2972,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		query.append(_SQL_SELECT_ROLE_WHERE);
 
+		boolean bindSubtype = false;
+
 		if (subtype == null) {
 			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_1);
 		}
+		else if (subtype.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
+		}
 		else {
-			if (subtype.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
-			}
+			bindSubtype = true;
+
+			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
 		}
 
 		if (orderByComparator != null) {
@@ -2220,7 +3054,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (subtype != null) {
+		if (bindSubtype) {
 			qPos.add(subtype);
 		}
 
@@ -2310,16 +3144,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			query.append(_FILTER_SQL_SELECT_ROLE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
+		boolean bindSubtype = false;
+
 		if (subtype == null) {
 			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_1);
 		}
+		else if (subtype.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
+		}
 		else {
-			if (subtype.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
-			}
+			bindSubtype = true;
+
+			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
@@ -2364,7 +3200,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
-			if (subtype != null) {
+			if (bindSubtype) {
 				qPos.add(subtype);
 			}
 
@@ -2441,16 +3277,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			query.append(_FILTER_SQL_SELECT_ROLE_NO_INLINE_DISTINCT_WHERE_1);
 		}
 
+		boolean bindSubtype = false;
+
 		if (subtype == null) {
 			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_1);
 		}
+		else if (subtype.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
+		}
 		else {
-			if (subtype.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
-			}
+			bindSubtype = true;
+
+			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
@@ -2550,7 +3388,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (subtype != null) {
+		if (bindSubtype) {
 			qPos.add(subtype);
 		}
 
@@ -2605,16 +3443,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			query.append(_SQL_COUNT_ROLE_WHERE);
 
+			boolean bindSubtype = false;
+
 			if (subtype == null) {
 				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_1);
 			}
+			else if (subtype.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
+			}
 			else {
-				if (subtype.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
-				}
+				bindSubtype = true;
+
+				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
 			}
 
 			String sql = query.toString();
@@ -2628,7 +3468,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (subtype != null) {
+				if (bindSubtype) {
 					qPos.add(subtype);
 				}
 
@@ -2665,16 +3505,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		query.append(_FILTER_SQL_COUNT_ROLE_WHERE);
 
+		boolean bindSubtype = false;
+
 		if (subtype == null) {
 			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_1);
 		}
+		else if (subtype.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
+		}
 		else {
-			if (subtype.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
-			}
+			bindSubtype = true;
+
+			query.append(_FINDER_COLUMN_SUBTYPE_SUBTYPE_2);
 		}
 
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
@@ -2692,7 +3534,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			QueryPos qPos = QueryPos.getInstance(q);
 
-			if (subtype != null) {
+			if (bindSubtype) {
 				qPos.add(subtype);
 			}
 
@@ -2710,7 +3552,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 	private static final String _FINDER_COLUMN_SUBTYPE_SUBTYPE_1 = "role.subtype IS NULL";
 	private static final String _FINDER_COLUMN_SUBTYPE_SUBTYPE_2 = "role.subtype = ?";
-	private static final String _FINDER_COLUMN_SUBTYPE_SUBTYPE_3 = "(role.subtype IS NULL OR role.subtype = ?)";
+	private static final String _FINDER_COLUMN_SUBTYPE_SUBTYPE_3 = "(role.subtype IS NULL OR role.subtype = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_N = new FinderPath(RoleModelImpl.ENTITY_CACHE_ENABLED,
 			RoleModelImpl.FINDER_CACHE_ENABLED, RoleImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_N",
@@ -2807,16 +3649,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			query.append(_FINDER_COLUMN_C_N_COMPANYID_2);
 
+			boolean bindName = false;
+
 			if (name == null) {
 				query.append(_FINDER_COLUMN_C_N_NAME_1);
 			}
+			else if (name.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_C_N_NAME_3);
+			}
 			else {
-				if (name.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_C_N_NAME_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_C_N_NAME_2);
-				}
+				bindName = true;
+
+				query.append(_FINDER_COLUMN_C_N_NAME_2);
 			}
 
 			String sql = query.toString();
@@ -2832,8 +3676,8 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 				qPos.add(companyId);
 
-				if (name != null) {
-					qPos.add(name);
+				if (bindName) {
+					qPos.add(name.toLowerCase());
 				}
 
 				List<Role> list = q.list();
@@ -2915,16 +3759,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			query.append(_FINDER_COLUMN_C_N_COMPANYID_2);
 
+			boolean bindName = false;
+
 			if (name == null) {
 				query.append(_FINDER_COLUMN_C_N_NAME_1);
 			}
+			else if (name.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_C_N_NAME_3);
+			}
 			else {
-				if (name.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_C_N_NAME_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_C_N_NAME_2);
-				}
+				bindName = true;
+
+				query.append(_FINDER_COLUMN_C_N_NAME_2);
 			}
 
 			String sql = query.toString();
@@ -2940,8 +3786,8 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 				qPos.add(companyId);
 
-				if (name != null) {
-					qPos.add(name);
+				if (bindName) {
+					qPos.add(name.toLowerCase());
 				}
 
 				count = (Long)q.uniqueResult();
@@ -2963,8 +3809,8 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 	private static final String _FINDER_COLUMN_C_N_COMPANYID_2 = "role.companyId = ? AND ";
 	private static final String _FINDER_COLUMN_C_N_NAME_1 = "role.name IS NULL";
-	private static final String _FINDER_COLUMN_C_N_NAME_2 = "lower(role.name) = lower(CAST_TEXT(?))";
-	private static final String _FINDER_COLUMN_C_N_NAME_3 = "(role.name IS NULL OR lower(role.name) = lower(CAST_TEXT(?)))";
+	private static final String _FINDER_COLUMN_C_N_NAME_2 = "lower(role.name) = ?";
+	private static final String _FINDER_COLUMN_C_N_NAME_3 = "(role.name IS NULL OR role.name = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_T_S = new FinderPath(RoleModelImpl.ENTITY_CACHE_ENABLED,
 			RoleModelImpl.FINDER_CACHE_ENABLED, RoleImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByT_S",
@@ -3084,16 +3930,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			query.append(_FINDER_COLUMN_T_S_TYPE_2);
 
+			boolean bindSubtype = false;
+
 			if (subtype == null) {
 				query.append(_FINDER_COLUMN_T_S_SUBTYPE_1);
 			}
+			else if (subtype.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
+			}
 			else {
-				if (subtype.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
-				}
+				bindSubtype = true;
+
+				query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
 			}
 
 			if (orderByComparator != null) {
@@ -3118,7 +3966,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 				qPos.add(type);
 
-				if (subtype != null) {
+				if (bindSubtype) {
 					qPos.add(subtype);
 				}
 
@@ -3320,16 +4168,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		query.append(_FINDER_COLUMN_T_S_TYPE_2);
 
+		boolean bindSubtype = false;
+
 		if (subtype == null) {
 			query.append(_FINDER_COLUMN_T_S_SUBTYPE_1);
 		}
+		else if (subtype.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
+		}
 		else {
-			if (subtype.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
-			}
+			bindSubtype = true;
+
+			query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
 		}
 
 		if (orderByComparator != null) {
@@ -3402,7 +4252,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		qPos.add(type);
 
-		if (subtype != null) {
+		if (bindSubtype) {
 			qPos.add(subtype);
 		}
 
@@ -3497,16 +4347,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		query.append(_FINDER_COLUMN_T_S_TYPE_2);
 
+		boolean bindSubtype = false;
+
 		if (subtype == null) {
 			query.append(_FINDER_COLUMN_T_S_SUBTYPE_1);
 		}
+		else if (subtype.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
+		}
 		else {
-			if (subtype.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
-			}
+			bindSubtype = true;
+
+			query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
@@ -3553,7 +4405,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			qPos.add(type);
 
-			if (subtype != null) {
+			if (bindSubtype) {
 				qPos.add(subtype);
 			}
 
@@ -3635,16 +4487,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		query.append(_FINDER_COLUMN_T_S_TYPE_2);
 
+		boolean bindSubtype = false;
+
 		if (subtype == null) {
 			query.append(_FINDER_COLUMN_T_S_SUBTYPE_1);
 		}
+		else if (subtype.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
+		}
 		else {
-			if (subtype.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
-			}
+			bindSubtype = true;
+
+			query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
 		}
 
 		if (!getDB().isSupportsInlineDistinct()) {
@@ -3746,7 +4600,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		qPos.add(type);
 
-		if (subtype != null) {
+		if (bindSubtype) {
 			qPos.add(subtype);
 		}
 
@@ -3805,16 +4659,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			query.append(_FINDER_COLUMN_T_S_TYPE_2);
 
+			boolean bindSubtype = false;
+
 			if (subtype == null) {
 				query.append(_FINDER_COLUMN_T_S_SUBTYPE_1);
 			}
+			else if (subtype.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
+			}
 			else {
-				if (subtype.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
-				}
+				bindSubtype = true;
+
+				query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
 			}
 
 			String sql = query.toString();
@@ -3830,7 +4686,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 				qPos.add(type);
 
-				if (subtype != null) {
+				if (bindSubtype) {
 					qPos.add(subtype);
 				}
 
@@ -3871,16 +4727,18 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 		query.append(_FINDER_COLUMN_T_S_TYPE_2);
 
+		boolean bindSubtype = false;
+
 		if (subtype == null) {
 			query.append(_FINDER_COLUMN_T_S_SUBTYPE_1);
 		}
+		else if (subtype.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
+		}
 		else {
-			if (subtype.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_T_S_SUBTYPE_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
-			}
+			bindSubtype = true;
+
+			query.append(_FINDER_COLUMN_T_S_SUBTYPE_2);
 		}
 
 		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
@@ -3900,7 +4758,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			qPos.add(type);
 
-			if (subtype != null) {
+			if (bindSubtype) {
 				qPos.add(subtype);
 			}
 
@@ -3919,7 +4777,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 	private static final String _FINDER_COLUMN_T_S_TYPE_2 = "role.type = ? AND ";
 	private static final String _FINDER_COLUMN_T_S_SUBTYPE_1 = "role.subtype IS NULL";
 	private static final String _FINDER_COLUMN_T_S_SUBTYPE_2 = "role.subtype = ?";
-	private static final String _FINDER_COLUMN_T_S_SUBTYPE_3 = "(role.subtype IS NULL OR role.subtype = ?)";
+	private static final String _FINDER_COLUMN_T_S_SUBTYPE_3 = "(role.subtype IS NULL OR role.subtype = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_C_C = new FinderPath(RoleModelImpl.ENTITY_CACHE_ENABLED,
 			RoleModelImpl.FINDER_CACHE_ENABLED, RoleImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_C_C",
@@ -4182,14 +5040,11 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			RoleImpl.class, role.getPrimaryKey(), role);
 
 		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_N,
-			new Object[] { Long.valueOf(role.getCompanyId()), role.getName() },
-			role);
+			new Object[] { role.getCompanyId(), role.getName() }, role);
 
 		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_C_C,
 			new Object[] {
-				Long.valueOf(role.getCompanyId()),
-				Long.valueOf(role.getClassNameId()),
-				Long.valueOf(role.getClassPK())
+				role.getCompanyId(), role.getClassNameId(), role.getClassPK()
 			}, role);
 
 		role.resetOriginalValues();
@@ -4265,20 +5120,15 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 	protected void cacheUniqueFindersCache(Role role) {
 		if (role.isNew()) {
-			Object[] args = new Object[] {
-					Long.valueOf(role.getCompanyId()),
-					
-					role.getName()
-				};
+			Object[] args = new Object[] { role.getCompanyId(), role.getName() };
 
 			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_C_N, args,
 				Long.valueOf(1));
 			FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_C_N, args, role);
 
 			args = new Object[] {
-					Long.valueOf(role.getCompanyId()),
-					Long.valueOf(role.getClassNameId()),
-					Long.valueOf(role.getClassPK())
+					role.getCompanyId(), role.getClassNameId(),
+					role.getClassPK()
 				};
 
 			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_C_C_C, args,
@@ -4290,11 +5140,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 			if ((roleModelImpl.getColumnBitmask() &
 					FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
-				Object[] args = new Object[] {
-						Long.valueOf(role.getCompanyId()),
-						
-						role.getName()
-					};
+				Object[] args = new Object[] { role.getCompanyId(), role.getName() };
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_C_N, args,
 					Long.valueOf(1));
@@ -4304,9 +5150,8 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			if ((roleModelImpl.getColumnBitmask() &
 					FINDER_PATH_FETCH_BY_C_C_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(role.getCompanyId()),
-						Long.valueOf(role.getClassNameId()),
-						Long.valueOf(role.getClassPK())
+						role.getCompanyId(), role.getClassNameId(),
+						role.getClassPK()
 					};
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_C_C_C, args,
@@ -4319,11 +5164,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 	protected void clearUniqueFindersCache(Role role) {
 		RoleModelImpl roleModelImpl = (RoleModelImpl)role;
 
-		Object[] args = new Object[] {
-				Long.valueOf(role.getCompanyId()),
-				
-				role.getName()
-			};
+		Object[] args = new Object[] { role.getCompanyId(), role.getName() };
 
 		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_N, args);
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_C_N, args);
@@ -4331,8 +5172,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		if ((roleModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_N.getColumnBitmask()) != 0) {
 			args = new Object[] {
-					Long.valueOf(roleModelImpl.getOriginalCompanyId()),
-					
+					roleModelImpl.getOriginalCompanyId(),
 					roleModelImpl.getOriginalName()
 				};
 
@@ -4341,9 +5181,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		}
 
 		args = new Object[] {
-				Long.valueOf(role.getCompanyId()),
-				Long.valueOf(role.getClassNameId()),
-				Long.valueOf(role.getClassPK())
+				role.getCompanyId(), role.getClassNameId(), role.getClassPK()
 			};
 
 		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
@@ -4352,9 +5190,9 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		if ((roleModelImpl.getColumnBitmask() &
 				FINDER_PATH_FETCH_BY_C_C_C.getColumnBitmask()) != 0) {
 			args = new Object[] {
-					Long.valueOf(roleModelImpl.getOriginalCompanyId()),
-					Long.valueOf(roleModelImpl.getOriginalClassNameId()),
-					Long.valueOf(roleModelImpl.getOriginalClassPK())
+					roleModelImpl.getOriginalCompanyId(),
+					roleModelImpl.getOriginalClassNameId(),
+					roleModelImpl.getOriginalClassPK()
 				};
 
 			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_C, args);
@@ -4386,7 +5224,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 	 * @throws SystemException if a system exception occurred
 	 */
 	public Role remove(long roleId) throws NoSuchRoleException, SystemException {
-		return remove(Long.valueOf(roleId));
+		return remove((Serializable)roleId);
 	}
 
 	/**
@@ -4520,7 +5358,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			if ((roleModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(roleModelImpl.getOriginalCompanyId())
+						roleModelImpl.getOriginalCompanyId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
@@ -4528,7 +5366,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
 					args);
 
-				args = new Object[] { Long.valueOf(roleModelImpl.getCompanyId()) };
+				args = new Object[] { roleModelImpl.getCompanyId() };
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
 					args);
@@ -4552,6 +5390,21 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			}
 
 			if ((roleModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TYPE.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] { roleModelImpl.getOriginalType() };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_TYPE, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TYPE,
+					args);
+
+				args = new Object[] { roleModelImpl.getType() };
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_TYPE, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TYPE,
+					args);
+			}
+
+			if ((roleModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_SUBTYPE.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] { roleModelImpl.getOriginalSubtype() };
 
@@ -4569,8 +5422,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			if ((roleModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_T_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Integer.valueOf(roleModelImpl.getOriginalType()),
-						
+						roleModelImpl.getOriginalType(),
 						roleModelImpl.getOriginalSubtype()
 					};
 
@@ -4579,9 +5431,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 					args);
 
 				args = new Object[] {
-						Integer.valueOf(roleModelImpl.getType()),
-						
-						roleModelImpl.getSubtype()
+						roleModelImpl.getType(), roleModelImpl.getSubtype()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_T_S, args);
@@ -4627,13 +5477,24 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 	 *
 	 * @param primaryKey the primary key of the role
 	 * @return the role
-	 * @throws com.liferay.portal.NoSuchModelException if a role with the primary key could not be found
+	 * @throws com.liferay.portal.NoSuchRoleException if a role with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public Role findByPrimaryKey(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return findByPrimaryKey(((Long)primaryKey).longValue());
+		throws NoSuchRoleException, SystemException {
+		Role role = fetchByPrimaryKey(primaryKey);
+
+		if (role == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			}
+
+			throw new NoSuchRoleException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
+		}
+
+		return role;
 	}
 
 	/**
@@ -4646,18 +5507,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 	 */
 	public Role findByPrimaryKey(long roleId)
 		throws NoSuchRoleException, SystemException {
-		Role role = fetchByPrimaryKey(roleId);
-
-		if (role == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + roleId);
-			}
-
-			throw new NoSuchRoleException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				roleId);
-		}
-
-		return role;
+		return findByPrimaryKey((Serializable)roleId);
 	}
 
 	/**
@@ -4670,19 +5520,8 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 	@Override
 	public Role fetchByPrimaryKey(Serializable primaryKey)
 		throws SystemException {
-		return fetchByPrimaryKey(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Returns the role with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param roleId the primary key of the role
-	 * @return the role, or <code>null</code> if a role with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public Role fetchByPrimaryKey(long roleId) throws SystemException {
 		Role role = (Role)EntityCacheUtil.getResult(RoleModelImpl.ENTITY_CACHE_ENABLED,
-				RoleImpl.class, roleId);
+				RoleImpl.class, primaryKey);
 
 		if (role == _nullRole) {
 			return null;
@@ -4694,19 +5533,19 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			try {
 				session = openSession();
 
-				role = (Role)session.get(RoleImpl.class, Long.valueOf(roleId));
+				role = (Role)session.get(RoleImpl.class, primaryKey);
 
 				if (role != null) {
 					cacheResult(role);
 				}
 				else {
 					EntityCacheUtil.putResult(RoleModelImpl.ENTITY_CACHE_ENABLED,
-						RoleImpl.class, roleId, _nullRole);
+						RoleImpl.class, primaryKey, _nullRole);
 				}
 			}
 			catch (Exception e) {
 				EntityCacheUtil.removeResult(RoleModelImpl.ENTITY_CACHE_ENABLED,
-					RoleImpl.class, roleId);
+					RoleImpl.class, primaryKey);
 
 				throw processException(e);
 			}
@@ -4716,6 +5555,17 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 		}
 
 		return role;
+	}
+
+	/**
+	 * Returns the role with the primary key or returns <code>null</code> if it could not be found.
+	 *
+	 * @param roleId the primary key of the role
+	 * @return the role, or <code>null</code> if a role with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public Role fetchByPrimaryKey(long roleId) throws SystemException {
+		return fetchByPrimaryKey((Serializable)roleId);
 	}
 
 	/**
@@ -5869,7 +6719,7 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 
 				for (String listenerClassName : listenerClassNames) {
 					listenersList.add((ModelListener<Role>)InstanceFactory.newInstance(
-							listenerClassName));
+							getClassLoader(), listenerClassName));
 				}
 
 				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,6 @@ page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %><%@
 page import="com.liferay.portal.kernel.search.SearchContext" %><%@
 page import="com.liferay.portal.kernel.search.SearchContextFactory" %><%@
 page import="com.liferay.portal.plugin.PluginPackageUtil" %><%@
-page import="com.liferay.portal.service.permission.PortalPermissionUtil" %><%@
 page import="com.liferay.portlet.softwarecatalog.DuplicateProductEntryModuleIdException" %><%@
 page import="com.liferay.portlet.softwarecatalog.DuplicateProductVersionDirectDownloadURLException" %><%@
 page import="com.liferay.portlet.softwarecatalog.FrameworkVersionNameException" %><%@

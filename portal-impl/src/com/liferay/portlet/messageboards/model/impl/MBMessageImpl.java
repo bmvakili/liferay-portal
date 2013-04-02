@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortletKeys;
@@ -83,7 +84,7 @@ public class MBMessageImpl extends MBMessageBaseImpl {
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
 
-		long repositoryId = PortletFileRepositoryUtil.getPortletRepository(
+		long repositoryId = PortletFileRepositoryUtil.getPortletRepositoryId(
 			getGroupId(), PortletKeys.MESSAGE_BOARDS, serviceContext);
 
 		Folder folder = PortletFileRepositoryUtil.getPortletFolder(
@@ -145,6 +146,18 @@ public class MBMessageImpl extends MBMessageBaseImpl {
 		return getThread().getAttachmentsFolderId();
 	}
 
+	public ContainerModel getTrashContainer()
+		throws PortalException, SystemException {
+
+		MBThread thread = getThread();
+
+		if (thread.isInTrash()) {
+			return thread;
+		}
+
+		return thread.getTrashContainer();
+	}
+
 	public String getWorkflowClassName() {
 		if (isDiscussion()) {
 			return MBDiscussion.class.getName();
@@ -177,7 +190,12 @@ public class MBMessageImpl extends MBMessageBaseImpl {
 	public boolean isInTrashThread() throws PortalException, SystemException {
 		MBThread thread = getThread();
 
-		return thread.isInTrash();
+		if (thread.isInTrash() || thread.isInTrashContainer()) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	public boolean isReply() {

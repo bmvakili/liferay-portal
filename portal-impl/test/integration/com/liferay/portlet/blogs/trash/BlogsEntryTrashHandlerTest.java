@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,9 +20,10 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
-import com.liferay.portal.test.TransactionalExecutionTestListener;
+import com.liferay.portal.test.MainServletExecutionTestListener;
+import com.liferay.portal.test.Sync;
+import com.liferay.portal.test.SynchronousDestinationExecutionTestListener;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
@@ -39,14 +40,25 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		EnvironmentExecutionTestListener.class,
-		TransactionalExecutionTestListener.class
+		MainServletExecutionTestListener.class,
+		SynchronousDestinationExecutionTestListener.class
 	})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
+@Sync
 public class BlogsEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 
 	@Override
 	public void testTrashDuplicate() throws Exception {
+		Assert.assertTrue("This test does not apply", true);
+	}
+
+	@Override
+	public void testTrashMoveBaseModel() throws Exception {
+		Assert.assertTrue("This test does not apply", true);
+	}
+
+	@Override
+	public void testTrashMyBaseModel() throws Exception {
 		Assert.assertTrue("This test does not apply", true);
 	}
 
@@ -56,22 +68,37 @@ public class BlogsEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 	}
 
 	@Override
+	public void testTrashParentAndDeleteTrashEntries() throws Exception {
+		Assert.assertTrue("This test does not apply", true);
+	}
+
+	@Override
 	public void testTrashParentAndRestoreModel() throws Exception {
 		Assert.assertTrue("This test does not apply", true);
 	}
 
 	@Override
-	public void testTrashVersionAndDelete() throws Exception {
+	public void testTrashRecentBaseModel() throws Exception {
 		Assert.assertTrue("This test does not apply", true);
 	}
 
 	@Override
-	public void testTrashVersionAndRestore() throws Exception {
+	public void testTrashVersionBaseModelAndDelete() throws Exception {
 		Assert.assertTrue("This test does not apply", true);
 	}
 
 	@Override
-	protected BaseModel<?> addBaseModel(
+	public void testTrashVersionBaseModelAndRestore() throws Exception {
+		Assert.assertTrue("This test does not apply", true);
+	}
+
+	@Override
+	public void testTrashVersionParentBaseModel() throws Exception {
+		Assert.assertTrue("This test does not apply", true);
+	}
+
+	@Override
+	protected BaseModel<?> addBaseModelWithWorkflow(
 			BaseModel<?> parentBaseModel, boolean approved,
 			ServiceContext serviceContext)
 		throws Exception {
@@ -104,7 +131,7 @@ public class BlogsEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 			smallImageInputStream, serviceContext);
 
 		if (approved) {
-			BlogsEntryLocalServiceUtil.updateStatus(
+			entry = BlogsEntryLocalServiceUtil.updateStatus(
 				TestPropsValues.getUserId(), entry.getEntryId(),
 				WorkflowConstants.STATUS_APPROVED, serviceContext);
 		}
@@ -123,7 +150,7 @@ public class BlogsEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 	}
 
 	@Override
-	protected int getBaseModelsNotInTrashCount(BaseModel<?> parentBaseModel)
+	protected int getNotInTrashBaseModelsCount(BaseModel<?> parentBaseModel)
 		throws Exception {
 
 		QueryDefinition queryDefinition = new QueryDefinition(
@@ -136,6 +163,11 @@ public class BlogsEntryTrashHandlerTest extends BaseTrashHandlerTestCase {
 	@Override
 	protected String getSearchKeywords() {
 		return "Title";
+	}
+
+	@Override
+	protected String getUniqueTitle(BaseModel<?> baseModel) {
+		return null;
 	}
 
 	@Override

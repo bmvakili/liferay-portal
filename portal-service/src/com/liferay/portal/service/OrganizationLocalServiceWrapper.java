@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -230,6 +230,292 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addGroupOrganization(long groupId, long organizationId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.addGroupOrganization(groupId, organizationId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addGroupOrganization(long groupId,
+		com.liferay.portal.model.Organization organization)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.addGroupOrganization(groupId, organization);
+	}
+
+	/**
+	* @throws PortalException
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addGroupOrganizations(long groupId, long[] organizationIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.addGroupOrganizations(groupId, organizationIds);
+	}
+
+	/**
+	* @throws PortalException
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addGroupOrganizations(long groupId,
+		java.util.List<com.liferay.portal.model.Organization> Organizations)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.addGroupOrganizations(groupId, Organizations);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void clearGroupOrganizations(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.clearGroupOrganizations(groupId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteGroupOrganization(long groupId, long organizationId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.deleteGroupOrganization(groupId,
+			organizationId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteGroupOrganization(long groupId,
+		com.liferay.portal.model.Organization organization)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.deleteGroupOrganization(groupId, organization);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteGroupOrganizations(long groupId, long[] organizationIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.deleteGroupOrganizations(groupId,
+			organizationIds);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteGroupOrganizations(long groupId,
+		java.util.List<com.liferay.portal.model.Organization> Organizations)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.deleteGroupOrganizations(groupId,
+			Organizations);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.Organization> getGroupOrganizations(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getGroupOrganizations(groupId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.Organization> getGroupOrganizations(
+		long groupId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getGroupOrganizations(groupId, start,
+			end);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.Organization> getGroupOrganizations(
+		long groupId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getGroupOrganizations(groupId, start,
+			end, orderByComparator);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public int getGroupOrganizationsCount(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getGroupOrganizationsCount(groupId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public boolean hasGroupOrganization(long groupId, long organizationId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.hasGroupOrganization(groupId,
+			organizationId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public boolean hasGroupOrganizations(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.hasGroupOrganizations(groupId);
+	}
+
+	/**
+	* @throws PortalException
+	* @throws SystemException if a system exception occurred
+	*/
+	public void setGroupOrganizations(long groupId, long[] organizationIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.setGroupOrganizations(groupId, organizationIds);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addUserOrganization(long userId, long organizationId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.addUserOrganization(userId, organizationId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addUserOrganization(long userId,
+		com.liferay.portal.model.Organization organization)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.addUserOrganization(userId, organization);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addUserOrganizations(long userId, long[] organizationIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.addUserOrganizations(userId, organizationIds);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addUserOrganizations(long userId,
+		java.util.List<com.liferay.portal.model.Organization> Organizations)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.addUserOrganizations(userId, Organizations);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void clearUserOrganizations(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.clearUserOrganizations(userId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteUserOrganization(long userId, long organizationId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.deleteUserOrganization(userId, organizationId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteUserOrganization(long userId,
+		com.liferay.portal.model.Organization organization)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.deleteUserOrganization(userId, organization);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteUserOrganizations(long userId, long[] organizationIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.deleteUserOrganizations(userId,
+			organizationIds);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteUserOrganizations(long userId,
+		java.util.List<com.liferay.portal.model.Organization> Organizations)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.deleteUserOrganizations(userId, Organizations);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
+		long userId) throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getUserOrganizations(userId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
+		long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getUserOrganizations(userId, start, end);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
+		long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getUserOrganizations(userId, start,
+			end, orderByComparator);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public int getUserOrganizationsCount(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getUserOrganizationsCount(userId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public boolean hasUserOrganization(long userId, long organizationId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.hasUserOrganization(userId,
+			organizationId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public boolean hasUserOrganizations(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.hasUserOrganizations(userId);
+	}
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void setUserOrganizations(long userId, long[] organizationIds)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		_organizationLocalService.setUserOrganizations(userId, organizationIds);
+	}
+
+	/**
 	* Returns the Spring bean ID for this bean.
 	*
 	* @return the Spring bean ID for this bean
@@ -248,18 +534,81 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
-	* Adds the organizations to the group.
+	* Adds an organization.
 	*
-	* @param groupId the primary key of the group
-	* @param organizationIds the primary keys of the organizations
-	* @throws PortalException if a group or organization with the primary key
-	could not be found
+	* <p>
+	* This method handles the creation and bookkeeping of the organization
+	* including its resources, metadata, and internal data structures. It is
+	* not necessary to make a subsequent call to {@link
+	* #addOrganizationResources(long, Organization)}.
+	* </p>
+	*
+	* @param userId the primary key of the creator/owner of the organization
+	* @param parentOrganizationId the primary key of the organization's parent
+	organization
+	* @param name the organization's name
+	* @param site whether the organization is to be associated with a main
+	site
+	* @return the organization
+	* @throws PortalException if a creator or parent organization with the
+	primary key could not be found or if the organization's
+	information was invalid
 	* @throws SystemException if a system exception occurred
 	*/
-	public void addGroupOrganizations(long groupId, long[] organizationIds)
+	public com.liferay.portal.model.Organization addOrganization(long userId,
+		long parentOrganizationId, java.lang.String name, boolean site)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_organizationLocalService.addGroupOrganizations(groupId, organizationIds);
+		return _organizationLocalService.addOrganization(userId,
+			parentOrganizationId, name, site);
+	}
+
+	/**
+	* Adds an organization.
+	*
+	* <p>
+	* This method handles the creation and bookkeeping of the organization
+	* including its resources, metadata, and internal data structures. It is
+	* not necessary to make a subsequent call to {@link
+	* #addOrganizationResources(long, Organization)}.
+	* </p>
+	*
+	* @param userId the primary key of the creator/owner of the
+	organization
+	* @param parentOrganizationId the primary key of the organization's
+	parent organization
+	* @param name the organization's name
+	* @param type the organization's type
+	* @param recursable whether the permissions of the organization are to
+	be inherited by its suborganizations
+	* @param regionId the primary key of the organization's region
+	* @param countryId the primary key of the organization's country
+	* @param statusId the organization's workflow status
+	* @param comments the comments about the organization
+	* @param site whether the organization is to be associated with a main
+	site
+	* @param serviceContext the service context to be applied (optionally
+	<code>null</code>). Can set asset category IDs, asset tag
+	names, and expando bridge attributes for the organization.
+	* @return the organization
+	* @throws PortalException if a creator or parent organization with the
+	primary key could not be found or if the organization's
+	information was invalid
+	* @throws SystemException if a system exception occurred
+	* @deprecated As of 6.2.0, replaced by {@link #addOrganization(long, long,
+	String, String, long, long, int, String, boolean,
+	ServiceContext)}
+	*/
+	public com.liferay.portal.model.Organization addOrganization(long userId,
+		long parentOrganizationId, java.lang.String name,
+		java.lang.String type, boolean recursable, long regionId,
+		long countryId, int statusId, java.lang.String comments, boolean site,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.addOrganization(userId,
+			parentOrganizationId, name, type, recursable, regionId, countryId,
+			statusId, comments, site, serviceContext);
 	}
 
 	/**
@@ -277,15 +626,13 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	organization
 	* @param name the organization's name
 	* @param type the organization's type
-	* @param recursable whether the permissions of the organization are to be
-	inherited by its sub-organizations
 	* @param regionId the primary key of the organization's region
 	* @param countryId the primary key of the organization's country
 	* @param statusId the organization's workflow status
 	* @param comments the comments about the organization
 	* @param site whether the organization is to be associated with a main
 	site
-	* @param serviceContext the organization's service context (optionally
+	* @param serviceContext the service context to be applied (optionally
 	<code>null</code>). Can set asset category IDs, asset tag names,
 	and expando bridge attributes for the organization.
 	* @return the organization
@@ -296,14 +643,14 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	*/
 	public com.liferay.portal.model.Organization addOrganization(long userId,
 		long parentOrganizationId, java.lang.String name,
-		java.lang.String type, boolean recursable, long regionId,
-		long countryId, int statusId, java.lang.String comments, boolean site,
+		java.lang.String type, long regionId, long countryId, int statusId,
+		java.lang.String comments, boolean site,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _organizationLocalService.addOrganization(userId,
-			parentOrganizationId, name, type, recursable, regionId, countryId,
-			statusId, comments, site, serviceContext);
+			parentOrganizationId, name, type, regionId, countryId, statusId,
+			comments, site, serviceContext);
 	}
 
 	/**
@@ -353,19 +700,6 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
-	* Returns all the organizations belonging to the group.
-	*
-	* @param groupId the primary key of the group
-	* @return the organizations belonging to the group
-	* @throws SystemException if a system exception occurred
-	*/
-	public java.util.List<com.liferay.portal.model.Organization> getGroupOrganizations(
-		long groupId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _organizationLocalService.getGroupOrganizations(groupId);
-	}
-
-	/**
 	* Returns the organization with the name.
 	*
 	* @param companyId the primary key of the organization's company
@@ -394,6 +728,15 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	public long getOrganizationId(long companyId, java.lang.String name)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _organizationLocalService.getOrganizationId(companyId, name);
+	}
+
+	public java.util.List<com.liferay.portal.model.Organization> getOrganizations(
+		long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator obc)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getOrganizations(userId, start, end,
+			obc);
 	}
 
 	/**
@@ -493,17 +836,46 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
-	* Returns the sub-organizations of the organizations.
+	* Returns the suborganizations of the organizations.
 	*
 	* @param organizations the organizations from which to get
-	sub-organizations
-	* @return the sub-organizations of the organizations
+	suborganizations
+	* @return the suborganizations of the organizations
 	* @throws SystemException if a system exception occurred
 	*/
 	public java.util.List<com.liferay.portal.model.Organization> getSuborganizations(
 		java.util.List<com.liferay.portal.model.Organization> organizations)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _organizationLocalService.getSuborganizations(organizations);
+	}
+
+	/**
+	* Returns the suborganizations of the organization.
+	*
+	* @param companyId the primary key of the organization's company
+	* @param organizationId the primary key of the organization
+	* @return the suborganizations of the organization
+	* @throws SystemException if a system exception occurred
+	*/
+	public java.util.List<com.liferay.portal.model.Organization> getSuborganizations(
+		long companyId, long organizationId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getSuborganizations(companyId,
+			organizationId);
+	}
+
+	/**
+	* Returns the count of suborganizations of the organization.
+	*
+	* @param companyId the primary key of the organization's company
+	* @param organizationId the primary key of the organization
+	* @return the count of suborganizations of the organization
+	* @throws SystemException if a system exception occurred
+	*/
+	public int getSuborganizationsCount(long companyId, long organizationId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.getSuborganizationsCount(companyId,
+			organizationId);
 	}
 
 	/**
@@ -520,21 +892,6 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 		java.util.List<com.liferay.portal.model.Organization> availableOrganizations) {
 		return _organizationLocalService.getSubsetOrganizations(allOrganizations,
 			availableOrganizations);
-	}
-
-	/**
-	* Returns all the organizations associated with the user.
-	*
-	* @param userId the primary key of the user
-	* @return the organizations associated with the user
-	* @throws PortalException if a user with the primary key could not be found
-	* @throws SystemException if a system exception occurred
-	*/
-	public java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
-		long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _organizationLocalService.getUserOrganizations(userId);
 	}
 
 	/**
@@ -560,61 +917,6 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
-	* Returns a range of all the organizations associated with the user.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end -
-	* start</code> instances. <code>start</code> and <code>end</code> are not
-	* primary keys, they are indexes in the result set. Thus, <code>0</code>
-	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	* result set.
-	* </p>
-	*
-	* @param userId the primary key of the user
-	* @param start the lower bound of the range of organizations to return
-	* @param end the upper bound of the range of organizations to return (not
-	inclusive)
-	* @return the range organizations associated with the user
-	* @throws PortalException if a user with the primary key could not be found
-	* @throws SystemException if a system exception occurred
-	*/
-	public java.util.List<com.liferay.portal.model.Organization> getUserOrganizations(
-		long userId, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _organizationLocalService.getUserOrganizations(userId, start, end);
-	}
-
-	/**
-	* Returns the number of organizations associated with the user.
-	*
-	* @param userId the primary key of the user
-	* @return the number of organizations associated with the user
-	* @throws SystemException if a system exception occurred
-	*/
-	public int getUserOrganizationsCount(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _organizationLocalService.getUserOrganizationsCount(userId);
-	}
-
-	/**
-	* Returns <code>true</code> if the organization belongs to the group.
-	*
-	* @param groupId the primary key of the group
-	* @param organizationId the primary key of the organization
-	* @return <code>true</code> if the organization belongs to the group;
-	<code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
-	*/
-	public boolean hasGroupOrganization(long groupId, long organizationId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _organizationLocalService.hasGroupOrganization(groupId,
-			organizationId);
-	}
-
-	/**
 	* Returns <code>true</code> if the password policy has been assigned to the
 	* organization.
 	*
@@ -632,29 +934,10 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
-	* Returns <code>true</code> if the user is a member of the organization.
-	* This method is usually called to determine if the user has view access to
-	* a resource belonging to the organization.
-	*
-	* @param userId the primary key of the user
-	* @param organizationId the primary key of the organization
-	* @return <code>true</code> if the user has access to the organization;
-	<code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
-	*/
-	public boolean hasUserOrganization(long userId, long organizationId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _organizationLocalService.hasUserOrganization(userId,
-			organizationId);
-	}
-
-	/**
 	* Returns <code>true</code> if the user is a member of the organization,
-	* optionally focusing on sub-organizations or the specified organization.
+	* optionally focusing on suborganizations or the specified organization.
 	* This method is usually called to determine if the user has view access to
 	* a resource belonging to the organization.
-	*
-	* <p>
 	*
 	* <ol>
 	* <li>
@@ -685,12 +968,10 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	* </li>
 	* </ol>
 	*
-	* <p>
-	*
 	* @param userId the primary key of the organization's user
 	* @param organizationId the primary key of the organization
-	* @param inheritSuborganizations if <code>true</code> sub-organizations
-	are considered in the determination
+	* @param inheritSuborganizations if <code>true</code> suborganizations are
+	considered in the determination
 	* @param includeSpecifiedOrganization if <code>true</code> the
 	organization specified by <code>organizationId</code> is
 	considered in the determination
@@ -1150,21 +1431,6 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
-	* Sets the organizations in the group, removing and adding organizations to
-	* the group as necessary.
-	*
-	* @param groupId the primary key of the group
-	* @param organizationIds the primary keys of the organizations
-	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
-	public void setGroupOrganizations(long groupId, long[] organizationIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		_organizationLocalService.setGroupOrganizations(groupId, organizationIds);
-	}
-
-	/**
 	* Removes the organizations from the group.
 	*
 	* @param groupId the primary key of the group
@@ -1223,22 +1489,25 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	* @param name the organization's name
 	* @param type the organization's type
 	* @param recursable whether permissions of the organization are to be
-	inherited by its sub-organizations
+	inherited by its suborganizations
 	* @param regionId the primary key of the organization's region
 	* @param countryId the primary key of the organization's country
 	* @param statusId the organization's workflow status
 	* @param comments the comments about the organization
 	* @param site whether the organization is to be associated with a main
 	site
-	* @param serviceContext the organization's service context (optionally
+	* @param serviceContext the service context to be applied (optionally
 	<code>null</code>). Can set asset category IDs and asset tag
-	names for the organization, and merge expando bridge attributes
-	for the organization.
+	names for the organization, and merge expando bridge
+	attributes for the organization.
 	* @return the organization
-	* @throws PortalException if an organization or parent organization with
-	the primary key could not be found or if the new information was
-	invalid
+	* @throws PortalException if an organization or parent organization
+	with the primary key could not be found or if the new
+	information was invalid
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 6.2.0, replaced by {@link #updateOrganization(long,
+	long, long, String, String, long, long, int, String, boolean,
+	ServiceContext)}
 	*/
 	public com.liferay.portal.model.Organization updateOrganization(
 		long companyId, long organizationId, long parentOrganizationId,
@@ -1253,14 +1522,51 @@ public class OrganizationLocalServiceWrapper implements OrganizationLocalService
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	* Updates the organization.
+	*
+	* @param companyId the primary key of the organization's company
+	* @param organizationId the primary key of the organization
+	* @param parentOrganizationId the primary key of organization's parent
+	organization
+	* @param name the organization's name
+	* @param type the organization's type
+	* @param regionId the primary key of the organization's region
+	* @param countryId the primary key of the organization's country
+	* @param statusId the organization's workflow status
+	* @param comments the comments about the organization
+	* @param site whether the organization is to be associated with a main
+	site
+	* @param serviceContext the service context to be applied (optionally
+	<code>null</code>). Can set asset category IDs and asset tag
+	names for the organization, and merge expando bridge attributes
+	for the organization.
+	* @return the organization
+	* @throws PortalException if an organization or parent organization with
+	the primary key could not be found or if the new information was
+	invalid
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.liferay.portal.model.Organization updateOrganization(
+		long companyId, long organizationId, long parentOrganizationId,
+		java.lang.String name, java.lang.String type, long regionId,
+		long countryId, int statusId, java.lang.String comments, boolean site,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _organizationLocalService.updateOrganization(companyId,
+			organizationId, parentOrganizationId, name, type, regionId,
+			countryId, statusId, comments, site, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public OrganizationLocalService getWrappedOrganizationLocalService() {
 		return _organizationLocalService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedOrganizationLocalService(
 		OrganizationLocalService organizationLocalService) {

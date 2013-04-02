@@ -62,6 +62,7 @@
 			'history-manager': ['liferay-history'],
 			'hudcrumbs': ['aui-base', 'plugin'],
 			'icon': ['aui-base'],
+			'inline-editor-base': ['aui-base', 'aui-overlay-base'],
 			'input-move-boxes': ['aui-base', 'aui-toolbar'],
 			'layout': [],
 			'layout-column': ['aui-portal-layout', 'dd'],
@@ -97,7 +98,8 @@
 			'undo-manager': ['aui-data-set', 'base'],
 			'upload': ['aui-io-request', 'aui-template', 'collection', 'liferay-portlet-base', 'uploader'],
 			'util-list-fields': ['aui-base'],
-			'util-window': ['aui-dialog', 'aui-dialog-iframe']
+			'util-window': ['aui-dialog', 'aui-dialog-iframe'],
+			'xml-formatter': ['aui-base']
 		};
 
 		for (var i in moduleList) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,8 +30,10 @@ import com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -43,6 +45,24 @@ import java.util.Map;
 public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 
 	public ExpandoValueImpl() {
+	}
+
+	public List<Locale> getAvailableLocales()
+		throws PortalException, SystemException {
+
+		if (!isColumnLocalized()) {
+			return null;
+		}
+
+		List<Locale> locales = new ArrayList<Locale>();
+
+		for (String languageId :
+				LocalizationUtil.getAvailableLocales(getData())) {
+
+			locales.add(LocaleUtil.fromLanguageId(languageId));
+		}
+
+		return locales;
 	}
 
 	public boolean getBoolean() throws PortalException, SystemException {
@@ -89,6 +109,16 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 		}
 
 		return dateArray;
+	}
+
+	public Locale getDefaultLocale() throws PortalException, SystemException {
+		if (!isColumnLocalized()) {
+			return null;
+		}
+
+		String defaultLanguageId = LocalizationUtil.getDefaultLocale(getData());
+
+		return LocaleUtil.fromLanguageId(defaultLanguageId);
 	}
 
 	public double getDouble() throws PortalException, SystemException {
@@ -416,12 +446,12 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 		setData(data);
 	}
 
-	public void setString(String data, Locale locale)
+	public void setString(String data, Locale locale, Locale defaultLocale)
 		throws PortalException, SystemException {
 
 		validate(ExpandoColumnConstants.STRING_LOCALIZED);
 
-		setString(data, locale, LocaleUtil.getDefault());
+		doSetString(data, locale, defaultLocale);
 	}
 
 	public void setStringArray(String[] data)
@@ -432,15 +462,17 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 		setData(merge(data));
 	}
 
-	public void setStringArray(String[] data, Locale locale)
+	public void setStringArray(
+			String[] data, Locale locale, Locale defaultLocale)
 		throws PortalException, SystemException {
 
 		validate(ExpandoColumnConstants.STRING_ARRAY_LOCALIZED);
 
-		setString(merge(data), locale, LocaleUtil.getDefault());
+		doSetString(merge(data), locale, defaultLocale);
 	}
 
-	public void setStringArrayMap(Map<Locale, String[]> dataMap)
+	public void setStringArrayMap(
+			Map<Locale, String[]> dataMap, Locale defaultLocale)
 		throws PortalException, SystemException {
 
 		validate(ExpandoColumnConstants.STRING_ARRAY_LOCALIZED);
@@ -451,33 +483,20 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 			stringMap.put(entry.getKey(), merge(entry.getValue()));
 		}
 
-		setStringMap(stringMap, LocaleUtil.getDefault());
+		doSetStringMap(stringMap, defaultLocale);
 	}
 
-	public void setStringMap(Map<Locale, String> dataMap)
+	public void setStringMap(Map<Locale, String> dataMap, Locale defaultLocale)
 		throws PortalException, SystemException {
 
 		validate(ExpandoColumnConstants.STRING_LOCALIZED);
 
-		setStringMap(dataMap, LocaleUtil.getDefault());
+		doSetStringMap(dataMap, defaultLocale);
 	}
 
-	protected String getData(String languageId) {
-		return LocalizationUtil.getLocalization(getData(), languageId);
-	}
+	protected void doSetString(
+		String data, Locale locale, Locale defaultLocale) {
 
-	protected String merge(String[] data) {
-		if (data != null) {
-			for (int i = 0; i < data.length; i++) {
-				data[i] = StringUtil.replace(
-					data[i], StringPool.COMMA, _EXPANDO_COMMA);
-			}
-		}
-
-		return StringUtil.merge(data);
-	}
-
-	protected void setString(String data, Locale locale, Locale defaultLocale) {
 		String languageId = LocaleUtil.toLanguageId(locale);
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 
@@ -493,7 +512,7 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 		setData(data);
 	}
 
-	protected void setStringMap(
+	protected void doSetStringMap(
 		Map<Locale, String> dataMap, Locale defaultLocale) {
 
 		if (dataMap == null) {
@@ -504,6 +523,40 @@ public class ExpandoValueImpl extends ExpandoValueBaseImpl {
 			dataMap, getData(), "Data", LocaleUtil.toLanguageId(defaultLocale));
 
 		setData(data);
+	}
+
+	protected String getData(String languageId) {
+		return LocalizationUtil.getLocalization(getData(), languageId);
+	}
+
+	protected boolean isColumnLocalized()
+		throws PortalException, SystemException {
+
+		ExpandoColumn column = getColumn();
+
+		if (column == null) {
+			return false;
+		}
+
+		if ((column.getType() ==
+				ExpandoColumnConstants.STRING_ARRAY_LOCALIZED) ||
+			(column.getType() == ExpandoColumnConstants.STRING_LOCALIZED)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	protected String merge(String[] data) {
+		if (data != null) {
+			for (int i = 0; i < data.length; i++) {
+				data[i] = StringUtil.replace(
+					data[i], StringPool.COMMA, _EXPANDO_COMMA);
+			}
+		}
+
+		return StringUtil.merge(data);
 	}
 
 	protected String[] split(String data) {

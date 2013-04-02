@@ -1,53 +1,25 @@
-<#setting number_format = "0">
+<#include "macro.ftl">
 
-<#assign createDate = dataFactory.getDateString(dlFileEntry.createDate)>
+insert into DLFileEntry values ('${dlFileEntry.uuid}', ${dlFileEntry.fileEntryId}, ${dlFileEntry.groupId}, ${dlFileEntry.companyId}, ${dlFileEntry.userId}, '${dlFileEntry.userName}', ${dlFileEntry.versionUserId}, '${dlFileEntry.versionUserName}', '${dataFactory.getDateString(dlFileEntry.createDate)}', '${dataFactory.getDateString(dlFileEntry.modifiedDate)}', ${dlFileEntry.classNameId}, ${dlFileEntry.classPK}, ${dlFileEntry.repositoryId}, ${dlFileEntry.folderId}, '${dlFileEntry.name}', '${dlFileEntry.extension}', '${dlFileEntry.mimeType}', '${dlFileEntry.title}','${dlFileEntry.description}', '${dlFileEntry.extraSettings}', ${dlFileEntry.fileEntryTypeId}, '${dlFileEntry.version}', ${dlFileEntry.size}, ${dlFileEntry.readCount}, ${dlFileEntry.smallImageId}, ${dlFileEntry.largeImageId}, ${dlFileEntry.custom1ImageId}, ${dlFileEntry.custom2ImageId}, ${dlFileEntry.manualCheckInRequired?string});
 
-insert into DLFileEntry values ('${portalUUIDUtil.generate()}', ${dlFileEntry.fileEntryId}, ${dlFileEntry.groupId}, ${dlFileEntry.companyId}, ${dlFileEntry.userId}, '', ${dlFileEntry.userId}, '', '${createDate}', '${createDate}', ${dlFileEntry.repositoryId}, ${dlFileEntry.folderId}, '${dlFileEntry.name}', '${dlFileEntry.extension}', '${dlFileEntry.mimeType}', '${dlFileEntry.title}','${dlFileEntry.description}', '', 0, '1.0', '${maxDLFileEntrySize}', 1,'${dlFileEntry.smallImageId}','${dlFileEntry.largeImageId}', 0, 0, FALSE);
+<#assign dlFileVersion = dataFactory.newDLFileVersion(dlFileEntry)>
 
-<#assign dlFileRank = dataFactory.addDLFileRank(dlFileEntry.groupId, dlFileEntry.companyId, dlFileEntry.userId, dlFileEntry.fileEntryId)>
+insert into DLFileVersion values ('${dlFileVersion.uuid}', ${dlFileVersion.fileVersionId}, ${dlFileVersion.groupId}, ${dlFileVersion.companyId}, ${dlFileVersion.userId}, '${dlFileVersion.userName}', '${dataFactory.getDateString(dlFileVersion.createDate)}', '${dataFactory.getDateString(dlFileVersion.modifiedDate)}', ${dlFileVersion.repositoryId}, ${dlFileVersion.folderId}, ${dlFileVersion.fileEntryId}, '${dlFileVersion.extension}', '${dlFileVersion.mimeType}', '${dlFileVersion.title}','${dlFileVersion.description}', '${dlFileVersion.changeLog}', '${dlFileVersion.extraSettings}', ${dlFileVersion.fileEntryTypeId}, '${dlFileVersion.version}', ${dlFileVersion.size}, '${dlFileVersion.checksum}', ${dlFileVersion.status}, ${dlFileVersion.statusByUserId}, '${dlFileVersion.statusByUserName}', ${dlFileVersion.statusDate!'null'});
 
-insert into DLFileRank values (${dlFileRank.fileRankId}, ${dlFileRank.groupId}, ${dlFileRank.companyId}, ${dlFileRank.userId}, '${createDate}', ${dlFileRank.fileEntryId}, TRUE);
+<@insertDLSync _entry = dlFileEntry />
 
-<#assign dlFileVersion = dataFactory.addDLFileVersion(dlFileEntry)>
+<@insertAssetEntry _entry = dlFileEntry />
 
-insert into DLFileVersion values ('${portalUUIDUtil.generate()}', ${dlFileVersion.fileVersionId}, ${dlFileVersion.groupId}, ${dlFileVersion.companyId}, ${dlFileVersion.userId}, '', '${createDate}', '${createDate}', ${dlFileVersion.repositoryId}, ${dlFileEntry.folderId}, ${dlFileVersion.fileEntryId}, '${dlFileVersion.extension}', '${dlFileVersion.mimeType}', '${dlFileVersion.title}','${dlFileEntry.description}', '', '', 0, '1.0', '${maxDLFileEntrySize}', '', 0, ${dlFileVersion.userId}, '', '${createDate}');
+<#assign ddmStorageLinkId = counter.get()>
 
-<#assign dlSync = dataFactory.addDLSync(dlFileEntry.companyId, dlFileEntry.fileEntryId, dlFileEntry.groupId, dlFileEntry.folderId, false)>
+<@insertDDMContent _ddmStorageLinkId = ddmStorageLinkId _ddmStructureId = ddmStructureId _entry = dlFileEntry />
 
-insert into DLSync values (${dlSync.syncId}, ${dlSync.companyId}, '${createDate}', '${createDate}', ${dlSync.fileId}, '${dlSync.fileUuid}', ${dlSync.repositoryId}, ${dlSync.parentFolderId}, '${dlSync.name}', '${dlSync.description}', '${dlSync.event}', '${dlSync.type}', '${dlSync.version}');
+${sampleSQLBuilder.insertMBDiscussion(dlFileEntry.groupId, dataFactory.DLFileEntryClassNameId, dlFileEntry.fileEntryId, counter.get(), counter.get(), 0)}
 
-<#assign assetEntry = dataFactory.addAssetEntry(dlFileEntry.groupId, dlFileEntry.userId, dataFactory.DLFileEntryClassName.classNameId, dlFileEntry.fileEntryId, true, "text/html", dlFileEntry.title)>
+<@insertSocialActivity _entry = dlFileEntry />
 
-insert into AssetEntry (entryId, groupId, companyId, userId, createDate, modifiedDate, classNameId, classPK, visible, mimeType, title) values (${counter.get()}, ${assetEntry.groupId}, ${companyId}, ${assetEntry.userId}, '${createDate}', '${createDate}', ${assetEntry.classNameId}, ${assetEntry.classPK}, <#if assetEntry.visible>TRUE<#else>FALSE</#if>, '${assetEntry.mimeType}', '${assetEntry.title}');
+<#assign dlFileEntryMetadata = dataFactory.newDLFileEntryMetadata(ddmStorageLinkId, ddmStructureId, dlFileVersion)>
 
-<#assign ddmContent = dataFactory.addDDMContent(dlFileEntry.groupId, dlFileEntry.companyId, dlFileEntry.userId)>
+insert into DLFileEntryMetadata values ('${dlFileEntryMetadata.uuid}', ${dlFileEntryMetadata.fileEntryMetadataId}, ${dlFileEntryMetadata.DDMStorageId}, ${dlFileEntryMetadata.DDMStructureId}, ${dlFileEntryMetadata.fileEntryTypeId}, ${dlFileEntryMetadata.fileEntryId}, ${dlFileEntryMetadata.fileVersionId});
 
-insert into DDMContent values ('${portalUUIDUtil.generate()}', ${ddmContent.contentId}, ${ddmContent.groupId}, ${ddmContent.companyId}, ${ddmContent.userId}, '', '${createDate}', '${createDate}',  'com.liferay.portlet.dynamicdatamapping.model.DDMStorageLink', '', '<?xml version="1.0"?>\n\n<root>\n <dynamic-element name="CONTENT_TYPE">\n <dynamic-content><![CDATA[text/plain]]></dynamic-content>\n </dynamic-element>\n <dynamic-element name="CONTENT_ENCODING">\n <dynamic-content><![CDATA[ISO-8859-1]]></dynamic-content>\n </dynamic-element>\n</root>');
-
-<#assign ddmStorageLink = dataFactory.addDDMStorageLink(dataFactory.DDMContentClassName.classNameId, ddmContent.contentId, ddmStructure.structureId)>
-
-insert into DDMStorageLink values ('${portalUUIDUtil.generate()}', ${ddmStorageLink.storageLinkId}, ${dataFactory.DDMContentClassName.classNameId}, ${ddmContent.contentId}, ${ddmStructure.structureId});
-
-<#assign mbDiscussion = dataFactory.addMBDiscussion(dataFactory.DLFileEntryClassName.classNameId, dlFileEntry.fileEntryId, counter.get())>
-
-insert into MBDiscussion values (${mbDiscussion.discussionId}, ${mbDiscussion.classNameId}, ${mbDiscussion.classPK}, ${mbDiscussion.threadId});
-
-<#assign mbMessage = dataFactory.addMBMessage(counter.get(), 0, dlFileEntry.userId, dataFactory.DLFileEntryClassName.classNameId, dlFileEntry.fileEntryId, 0, mbDiscussion.threadId, 0, 0, stringUtil.valueOf(dlFileEntry.fileEntryId), stringUtil.valueOf(dlFileEntry.fileEntryId))>
-
-${sampleSQLBuilder.insertMBMessage(mbMessage)}
-
-<#assign mbThread = dataFactory.addMBThread(mbDiscussion.threadId, mbMessage.groupId, companyId, mbMessage.categoryId, mbMessage.messageId, 1, mbMessage.userId)>
-
-insert into MBThread values (${mbThread.threadId}, ${mbThread.groupId}, ${mbThread.companyId}, ${mbThread.categoryId}, ${mbThread.rootMessageId}, ${mbThread.rootMessageUserId}, ${mbThread.messageCount}, 0, ${mbThread.lastPostByUserId}, '${createDate}', 0, FALSE, 0, ${mbThread.lastPostByUserId}, '', '${createDate}');
-
-<#assign socialActivity = dataFactory.addSocialActivity(dlFileEntry.groupId, dlFileEntry.companyId, dlFileEntry.userId, dataFactory.DLFileEntryClassName.classNameId, dlFileEntry.fileEntryId)>
-
-insert into SocialActivity values (${socialActivity.activityId}, ${socialActivity.groupId}, ${socialActivity.companyId}, ${socialActivity.userId}, ${stringUtil.valueOf(dateUtil.newTime())}, 0, ${socialActivity.classNameId}, ${socialActivity.classPK}, 1, '', 0);
-
-<#assign dlFileEntryMetadata = dataFactory.addDLFileEntryMetadata(ddmContent.contentId, ddmStructure.structureId, dlFileEntry.fileEntryId, dlFileVersion.fileVersionId)>
-
-insert into DLFileEntryMetadata values ('${portalUUIDUtil.generate()}', ${dlFileEntryMetadata.fileEntryMetadataId}, ${ddmContent.contentId}, ${ddmStructure.structureId}, 0, ${dlFileEntryMetadata.fileEntryId}, ${dlFileEntryMetadata.fileVersionId});
-
-<#assign ddmStructureLink = dataFactory.addDDMStructureLink(dlFileEntryMetadata.fileEntryMetadataId, ddmContent.contentId)>
-
-insert into DDMStructureLink values (${ddmStructureLink.structureLinkId},${ ddmStructureLink.classNameId}, ${ddmStructureLink.classPK}, ${ddmStructureLink.structureId});
+<@insertDDMStructureLink _entry = dlFileEntryMetadata />

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -213,6 +213,336 @@ public interface UserGroupLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addGroupUserGroup(long groupId, long userGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addGroupUserGroup(long groupId,
+		com.liferay.portal.model.UserGroup userGroup)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addGroupUserGroups(long groupId, long[] userGroupIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addGroupUserGroups(long groupId,
+		java.util.List<com.liferay.portal.model.UserGroup> UserGroups)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void clearGroupUserGroups(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteGroupUserGroup(long groupId, long userGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteGroupUserGroup(long groupId,
+		com.liferay.portal.model.UserGroup userGroup)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteGroupUserGroups(long groupId, long[] userGroupIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteGroupUserGroups(long groupId,
+		java.util.List<com.liferay.portal.model.UserGroup> UserGroups)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getGroupUserGroups(
+		long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getGroupUserGroups(
+		long groupId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getGroupUserGroups(
+		long groupId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getGroupUserGroupsCount(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasGroupUserGroup(long groupId, long userGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasGroupUserGroups(long groupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void setGroupUserGroups(long groupId, long[] userGroupIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addTeamUserGroup(long teamId, long userGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addTeamUserGroup(long teamId,
+		com.liferay.portal.model.UserGroup userGroup)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addTeamUserGroups(long teamId, long[] userGroupIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addTeamUserGroups(long teamId,
+		java.util.List<com.liferay.portal.model.UserGroup> UserGroups)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void clearTeamUserGroups(long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteTeamUserGroup(long teamId, long userGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteTeamUserGroup(long teamId,
+		com.liferay.portal.model.UserGroup userGroup)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteTeamUserGroups(long teamId, long[] userGroupIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteTeamUserGroups(long teamId,
+		java.util.List<com.liferay.portal.model.UserGroup> UserGroups)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getTeamUserGroups(
+		long teamId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getTeamUserGroups(
+		long teamId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getTeamUserGroups(
+		long teamId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getTeamUserGroupsCount(long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasTeamUserGroup(long teamId, long userGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasTeamUserGroups(long teamId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void setTeamUserGroups(long teamId, long[] userGroupIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addUserUserGroup(long userId, long userGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addUserUserGroup(long userId,
+		com.liferay.portal.model.UserGroup userGroup)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addUserUserGroups(long userId, long[] userGroupIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addUserUserGroups(long userId,
+		java.util.List<com.liferay.portal.model.UserGroup> UserGroups)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void clearUserUserGroups(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteUserUserGroup(long userId, long userGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteUserUserGroup(long userId,
+		com.liferay.portal.model.UserGroup userGroup)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteUserUserGroups(long userId, long[] userGroupIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteUserUserGroups(long userId,
+		java.util.List<com.liferay.portal.model.UserGroup> UserGroups)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getUserUserGroups(
+		long userId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getUserUserGroups(
+		long userId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.UserGroup> getUserUserGroups(
+		long userId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getUserUserGroupsCount(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasUserUserGroup(long userId, long userGroupId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasUserUserGroups(long userId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws PortalException
+	* @throws SystemException if a system exception occurred
+	*/
+	public void setUserUserGroups(long userId, long[] userGroupIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns the Spring bean ID for this bean.
 	*
 	* @return the Spring bean ID for this bean
@@ -225,26 +555,6 @@ public interface UserGroupLocalService extends BaseLocalService,
 	* @param beanIdentifier the Spring bean ID for this bean
 	*/
 	public void setBeanIdentifier(java.lang.String beanIdentifier);
-
-	/**
-	* Adds the user groups to the group.
-	*
-	* @param groupId the primary key of the group
-	* @param userGroupIds the primary keys of the user groups
-	* @throws SystemException if a system exception occurred
-	*/
-	public void addGroupUserGroups(long groupId, long[] userGroupIds)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Adds the user groups to the team.
-	*
-	* @param teamId the primary key of the team
-	* @param userGroupIds the primary keys of the user groups
-	* @throws SystemException if a system exception occurred
-	*/
-	public void addTeamUserGroups(long teamId, long[] userGroupIds)
-		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Adds a user group.
@@ -263,8 +573,8 @@ public interface UserGroupLocalService extends BaseLocalService,
 	* @return the user group
 	* @throws PortalException if the user group's information was invalid
 	* @throws SystemException if a system exception occurred
-	* @deprecated {@link #addUserGroup(long, long, String, String,
-	ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #addUserGroup(long, long,
+	String, String, ServiceContext)}
 	*/
 	public com.liferay.portal.model.UserGroup addUserGroup(long userId,
 		long companyId, java.lang.String name, java.lang.String description)
@@ -285,7 +595,7 @@ public interface UserGroupLocalService extends BaseLocalService,
 	* @param companyId the primary key of the user group's company
 	* @param name the user group's name
 	* @param description the user group's description
-	* @param serviceContext the user group's service context (optionally
+	* @param serviceContext the service context to be applied (optionally
 	<code>null</code>). Can set expando bridge attributes for the
 	user group.
 	* @return the user group
@@ -299,18 +609,18 @@ public interface UserGroupLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Clears all associations between the user and its user groups and clears
-	* the permissions cache.
+	* Copies the user group's layout to the user.
 	*
-	* <p>
-	* This method is called from {@link #deleteUserGroup(UserGroup)}.
-	* </p>
-	*
+	* @param userGroupId the primary key of the user group
 	* @param userId the primary key of the user
+	* @throws PortalException if a user with the primary key could not be
+	found or if a portal exception occurred
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 6.2.0
 	*/
-	public void clearUserUserGroups(long userId)
-		throws com.liferay.portal.kernel.exception.SystemException;
+	public void copyUserGroupLayouts(long userGroupId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Copies the user group's layouts to the users who are not already members
@@ -321,7 +631,7 @@ public interface UserGroupLocalService extends BaseLocalService,
 	* @throws PortalException if any one of the users could not be found or
 	if a portal exception occurred
 	* @throws SystemException if a system exception occurred
-	* @deprecated
+	* @deprecated As of 6.1.0
 	*/
 	public void copyUserGroupLayouts(long userGroupId, long[] userIds)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -335,23 +645,9 @@ public interface UserGroupLocalService extends BaseLocalService,
 	* @throws PortalException if a user with the primary key could not be
 	found or if a portal exception occurred
 	* @throws SystemException if a system exception occurred
-	* @deprecated
+	* @deprecated As of 6.1.0
 	*/
 	public void copyUserGroupLayouts(long[] userGroupIds, long userId)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Copies the user group's layout to the user.
-	*
-	* @param userGroupId the primary key of the user group
-	* @param userId the primary key of the user
-	* @throws PortalException if a user with the primary key could not be
-	found or if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	* @deprecated
-	*/
-	public void copyUserGroupLayouts(long userGroupId, long userId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -395,43 +691,6 @@ public interface UserGroupLocalService extends BaseLocalService,
 		long[] userGroupIds)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns all the user groups to which the user belongs.
-	*
-	* @param userId the primary key of the user
-	* @return the user groups to which the user belongs
-	* @throws SystemException if a system exception occurred
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.UserGroup> getUserUserGroups(
-		long userId) throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns <code>true</code> if the user group is associated with the group.
-	*
-	* @param groupId the primary key of the group
-	* @param userGroupId the primary key of the user group
-	* @return <code>true</code> if the user group belongs to the group;
-	<code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean hasGroupUserGroup(long groupId, long userGroupId)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns <code>true</code> if the user group belongs to the team.
-	*
-	* @param teamId the primary key of the team
-	* @param userGroupId the primary key of the user group
-	* @return <code>true</code> if the user group belongs to the team;
-	<code>false</code> otherwise
-	* @throws SystemException if a system exception occurred
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean hasTeamUserGroup(long teamId, long userGroupId)
-		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Returns an ordered range of all the user groups that match the keywords.
@@ -547,43 +806,6 @@ public interface UserGroupLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Returns an ordered range of all the user groups that match the name and
-	* description.
-	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end -
-	* start</code> instances. <code>start</code> and <code>end</code> are not
-	* primary keys, they are indexes in the result set. Thus, <code>0</code>
-	* refers to the first result in the set. Setting both <code>start</code>
-	* and <code>end</code> to {@link
-	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	* result set.
-	* </p>
-	*
-	* @param companyId the primary key of the user group's company
-	* @param name the user group's name (optionally <code>null</code>)
-	* @param description the user group's description (optionally
-	<code>null</code>)
-	* @param params the finder params (optionally <code>null</code>). For more
-	information see {@link
-	com.liferay.portal.service.persistence.UserGroupFinder}
-	* @param start the lower bound of the range of user groups to return
-	* @param end the upper bound of the range of user groups to return (not
-	inclusive)
-	* @param obc the comparator to order the user groups (optionally
-	<code>null</code>)
-	* @return the matching user groups ordered by comparator <code>obc</code>
-	* @throws SystemException if a system exception occurred
-	* @see com.liferay.portal.service.persistence.UserGroupFinder
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public java.util.List<com.liferay.portal.model.UserGroup> search(
-		long companyId, java.lang.String name, java.lang.String description,
-		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
-		int start, int end, com.liferay.portal.kernel.util.OrderByComparator obc)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
 	* Returns the number of user groups that match the keywords
 	*
 	* @param companyId the primary key of the user group's company
@@ -600,40 +822,6 @@ public interface UserGroupLocalService extends BaseLocalService,
 	public int searchCount(long companyId, java.lang.String keywords,
 		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params)
 		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Returns the number of user groups that match the name and description.
-	*
-	* @param companyId the primary key of the user group's company
-	* @param name the user group's name (optionally <code>null</code>)
-	* @param description the user group's description (optionally
-	<code>null</code>)
-	* @param params the finder params (optionally <code>null</code>). For more
-	information see {@link
-	com.liferay.portal.service.persistence.UserGroupFinder}
-	* @return the number of matching user groups
-	* @throws SystemException if a system exception occurred
-	* @see com.liferay.portal.service.persistence.UserGroupFinder
-	*/
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(long companyId, java.lang.String name,
-		java.lang.String description,
-		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params)
-		throws com.liferay.portal.kernel.exception.SystemException;
-
-	/**
-	* Sets the user groups associated with the user copying the user group
-	* layouts and removing and adding user group associations for the user as
-	* necessary.
-	*
-	* @param userId the primary key of the user
-	* @param userGroupIds the primary keys of the user groups
-	* @throws PortalException if a portal exception occurred
-	* @throws SystemException if a system exception occurred
-	*/
-	public void setUserUserGroups(long userId, long[] userGroupIds)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
 	* Removes the user groups from the group.
@@ -666,8 +854,8 @@ public interface UserGroupLocalService extends BaseLocalService,
 	* @throws PortalException if a user group with the primary key could
 	not be found or if the new information was invalid
 	* @throws SystemException if a system exception occurred
-	* @deprecated {@link #updateUserGroup(long, long, String, String,
-	ServiceContext)}
+	* @deprecated As of 6.2.0, replaced by {@link #updateUserGroup(long, long,
+	String, String, ServiceContext)}
 	*/
 	public com.liferay.portal.model.UserGroup updateUserGroup(long companyId,
 		long userGroupId, java.lang.String name, java.lang.String description)
@@ -681,7 +869,7 @@ public interface UserGroupLocalService extends BaseLocalService,
 	* @param userGroupId the primary key of the user group
 	* @param name the user group's name
 	* @param description the user group's description
-	* @param serviceContext the user group's service context (optionally
+	* @param serviceContext the service context to be applied (optionally
 	<code>null</code>). Can set expando bridge attributes for the
 	user group.
 	* @return the user group

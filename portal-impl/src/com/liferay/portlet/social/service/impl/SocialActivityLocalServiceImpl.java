@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,12 +17,13 @@ package com.liferay.portlet.social.service.impl;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.lar.ImportExportThreadLocal;
+import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.messaging.async.Async;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.social.NoSuchActivityException;
 import com.liferay.portlet.social.model.SocialActivity;
@@ -97,7 +98,7 @@ public class SocialActivityLocalServiceImpl
 			long classPK, int type, String extraData, long receiverUserId)
 		throws PortalException, SystemException {
 
-		if (ImportExportThreadLocal.isImportInProcess()) {
+		if (ExportImportThreadLocal.isImportInProcess()) {
 			return;
 		}
 
@@ -172,7 +173,7 @@ public class SocialActivityLocalServiceImpl
 			String extraData, long receiverUserId)
 		throws PortalException, SystemException {
 
-		if (ImportExportThreadLocal.isImportInProcess()) {
+		if (ExportImportThreadLocal.isImportInProcess()) {
 			return;
 		}
 
@@ -204,7 +205,7 @@ public class SocialActivityLocalServiceImpl
 			SocialActivity activity, SocialActivity mirrorActivity)
 		throws PortalException, SystemException {
 
-		if (ImportExportThreadLocal.isImportInProcess()) {
+		if (ExportImportThreadLocal.isImportInProcess()) {
 			return;
 		}
 
@@ -240,6 +241,15 @@ public class SocialActivityLocalServiceImpl
 				mirrorActivity.setMirrorActivityId(activity.getPrimaryKey());
 
 				socialActivityPersistence.update(mirrorActivity);
+			}
+
+			if (PropsValues.SOCIAL_ACTIVITY_SETS_ENABLED) {
+				long activitySetId =
+					socialActivityInterpreterLocalService.getActivitySetId(
+						activity.getActivityId());
+
+				socialActivitySetLocalService.incrementActivityCount(
+					activitySetId, activityId);
 			}
 		}
 
@@ -339,6 +349,11 @@ public class SocialActivityLocalServiceImpl
 			assetEntry.getClassNameId(), assetEntry.getClassPK());
 
 		socialActivityCounterLocalService.deleteActivityCounters(assetEntry);
+
+		if (PropsValues.SOCIAL_ACTIVITY_SETS_ENABLED) {
+			socialActivitySetLocalService.decrementActivityCount(
+				assetEntry.getClassNameId(), assetEntry.getClassPK());
+		}
 	}
 
 	/**
@@ -350,11 +365,16 @@ public class SocialActivityLocalServiceImpl
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void deleteActivities(String className, long classPK)
-		throws SystemException {
+		throws PortalException, SystemException {
 
 		long classNameId = PortalUtil.getClassNameId(className);
 
 		socialActivityPersistence.removeByC_C(classNameId, classPK);
+
+		if (PropsValues.SOCIAL_ACTIVITY_SETS_ENABLED) {
+			socialActivitySetLocalService.decrementActivityCount(
+				classNameId, classPK);
+		}
 	}
 
 	/**
@@ -379,7 +399,9 @@ public class SocialActivityLocalServiceImpl
 	 * @param  activity the activity to be removed
 	 * @throws SystemException if a system exception occurred
 	 */
-	public void deleteActivity(SocialActivity activity) throws SystemException {
+	public void deleteActivity(SocialActivity activity)
+		throws PortalException, SystemException {
+
 		socialActivityPersistence.remove(activity);
 
 		try {
@@ -387,6 +409,11 @@ public class SocialActivityLocalServiceImpl
 				activity.getActivityId());
 		}
 		catch (NoSuchActivityException nsae) {
+		}
+
+		if (PropsValues.SOCIAL_ACTIVITY_SETS_ENABLED) {
+			socialActivitySetLocalService.decrementActivityCount(
+				activity.getActivitySetId());
 		}
 	}
 
@@ -412,6 +439,11 @@ public class SocialActivityLocalServiceImpl
 
 		for (SocialActivity activity : activities) {
 			socialActivityPersistence.remove(activity);
+
+			if (PropsValues.SOCIAL_ACTIVITY_SETS_ENABLED) {
+				socialActivitySetLocalService.decrementActivityCount(
+					activity.getActivitySetId());
+			}
 		}
 
 		activities = socialActivityPersistence.findByReceiverUserId(
@@ -419,10 +451,25 @@ public class SocialActivityLocalServiceImpl
 
 		for (SocialActivity activity : activities) {
 			socialActivityPersistence.remove(activity);
+
+			if (PropsValues.SOCIAL_ACTIVITY_SETS_ENABLED) {
+				socialActivitySetLocalService.decrementActivityCount(
+					activity.getActivitySetId());
+			}
 		}
 
 		socialActivityCounterLocalService.deleteActivityCounters(
 			User.class.getName(), userId);
+	}
+
+	public SocialActivity fetchFirstActivity(
+			String className, long classPK, int type)
+		throws SystemException {
+
+		long classNameId = PortalUtil.getClassNameId(className);
+
+		return socialActivityPersistence.fetchByC_C_T_First(
+			classNameId, classPK, type, null);
 	}
 
 	/**
@@ -624,6 +671,14 @@ public class SocialActivityLocalServiceImpl
 		throws PortalException, SystemException {
 
 		return socialActivityPersistence.findByPrimaryKey(activityId);
+	}
+
+	public List<SocialActivity> getActivitySetActivities(
+			long activitySetId, int start, int end)
+		throws SystemException {
+
+		return socialActivityPersistence.findByActivitySetId(
+			activitySetId, start, end);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -188,12 +188,12 @@ public class MBCategoryLocalServiceWrapper implements MBCategoryLocalService,
 	}
 
 	/**
-	* Returns the message boards category with the UUID in the group.
+	* Returns the message boards category matching the UUID and group.
 	*
-	* @param uuid the UUID of message boards category
-	* @param groupId the group id of the message boards category
-	* @return the message boards category
-	* @throws PortalException if a message boards category with the UUID in the group could not be found
+	* @param uuid the message boards category's UUID
+	* @param groupId the primary key of the group
+	* @return the matching message boards category
+	* @throws PortalException if a matching message boards category could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.messageboards.model.MBCategory getMBCategoryByUuidAndGroupId(
@@ -262,6 +262,16 @@ public class MBCategoryLocalServiceWrapper implements MBCategoryLocalService,
 	*/
 	public void setBeanIdentifier(java.lang.String beanIdentifier) {
 		_mbCategoryLocalService.setBeanIdentifier(beanIdentifier);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBCategory addCategory(
+		long userId, long parentCategoryId, java.lang.String name,
+		java.lang.String description,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.addCategory(userId, parentCategoryId,
+			name, description, serviceContext);
 	}
 
 	public com.liferay.portlet.messageboards.model.MBCategory addCategory(
@@ -339,10 +349,24 @@ public class MBCategoryLocalServiceWrapper implements MBCategoryLocalService,
 		_mbCategoryLocalService.deleteCategory(category);
 	}
 
+	public void deleteCategory(
+		com.liferay.portlet.messageboards.model.MBCategory category,
+		boolean includeTrashedEntries)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_mbCategoryLocalService.deleteCategory(category, includeTrashedEntries);
+	}
+
 	public java.util.List<com.liferay.portlet.messageboards.model.MBCategory> getCategories(
 		long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _mbCategoryLocalService.getCategories(groupId);
+	}
+
+	public java.util.List<com.liferay.portlet.messageboards.model.MBCategory> getCategories(
+		long groupId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.getCategories(groupId, status);
 	}
 
 	public java.util.List<com.liferay.portlet.messageboards.model.MBCategory> getCategories(
@@ -353,15 +377,41 @@ public class MBCategoryLocalServiceWrapper implements MBCategoryLocalService,
 	}
 
 	public java.util.List<com.liferay.portlet.messageboards.model.MBCategory> getCategories(
+		long groupId, long parentCategoryId, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.getCategories(groupId, parentCategoryId,
+			status, start, end);
+	}
+
+	public java.util.List<com.liferay.portlet.messageboards.model.MBCategory> getCategories(
 		long groupId, long[] parentCategoryIds, int start, int end)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _mbCategoryLocalService.getCategories(groupId,
 			parentCategoryIds, start, end);
 	}
 
+	public java.util.List<com.liferay.portlet.messageboards.model.MBCategory> getCategories(
+		long groupId, long[] parentCategoryIds, int status, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.getCategories(groupId,
+			parentCategoryIds, status, start, end);
+	}
+
+	public java.util.List<java.lang.Object> getCategoriesAndThreads(
+		long groupId, long categoryId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.getCategoriesAndThreads(groupId,
+			categoryId);
+	}
+
 	public int getCategoriesCount(long groupId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _mbCategoryLocalService.getCategoriesCount(groupId);
+	}
+
+	public int getCategoriesCount(long groupId, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.getCategoriesCount(groupId, status);
 	}
 
 	public int getCategoriesCount(long groupId, long parentCategoryId)
@@ -370,10 +420,22 @@ public class MBCategoryLocalServiceWrapper implements MBCategoryLocalService,
 			parentCategoryId);
 	}
 
+	public int getCategoriesCount(long groupId, long parentCategoryId,
+		int status) throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.getCategoriesCount(groupId,
+			parentCategoryId, status);
+	}
+
 	public int getCategoriesCount(long groupId, long[] parentCategoryIds)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _mbCategoryLocalService.getCategoriesCount(groupId,
 			parentCategoryIds);
+	}
+
+	public int getCategoriesCount(long groupId, long[] parentCategoryIds,
+		int status) throws com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.getCategoriesCount(groupId,
+			parentCategoryIds, status);
 	}
 
 	public com.liferay.portlet.messageboards.model.MBCategory getCategory(
@@ -416,12 +478,39 @@ public class MBCategoryLocalServiceWrapper implements MBCategoryLocalService,
 			userId);
 	}
 
+	public void moveCategoriesToTrash(long groupId, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_mbCategoryLocalService.moveCategoriesToTrash(groupId, userId);
+	}
+
 	public com.liferay.portlet.messageboards.model.MBCategory moveCategory(
 		long categoryId, long parentCategoryId, boolean mergeWithParentCategory)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _mbCategoryLocalService.moveCategory(categoryId,
 			parentCategoryId, mergeWithParentCategory);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBCategory moveCategoryFromTrash(
+		long userId, long categoryId, long newCategoryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.moveCategoryFromTrash(userId,
+			categoryId, newCategoryId);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBCategory moveCategoryToTrash(
+		long userId, long categoryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.moveCategoryToTrash(userId, categoryId);
+	}
+
+	public void restoreCategoryFromTrash(long userId, long categoryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_mbCategoryLocalService.restoreCategoryFromTrash(userId, categoryId);
 	}
 
 	public void subscribeCategory(long userId, long groupId, long categoryId)
@@ -459,15 +548,30 @@ public class MBCategoryLocalServiceWrapper implements MBCategoryLocalService,
 			serviceContext);
 	}
 
+	public void updateDependentStatus(com.liferay.portal.model.User user,
+		java.util.List<java.lang.Object> categoriesAndThreads, int status)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_mbCategoryLocalService.updateDependentStatus(user,
+			categoriesAndThreads, status);
+	}
+
+	public com.liferay.portlet.messageboards.model.MBCategory updateStatus(
+		long userId, long categoryId, int status)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _mbCategoryLocalService.updateStatus(userId, categoryId, status);
+	}
+
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public MBCategoryLocalService getWrappedMBCategoryLocalService() {
 		return _mbCategoryLocalService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedMBCategoryLocalService(
 		MBCategoryLocalService mbCategoryLocalService) {

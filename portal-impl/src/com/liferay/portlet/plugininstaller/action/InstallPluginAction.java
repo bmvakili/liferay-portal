@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.plugin.PluginPackageUtil;
 import com.liferay.portal.plugin.RepositoryReport;
 import com.liferay.portal.security.auth.PrincipalException;
+import com.liferay.portal.security.lang.DoPrivilegedBean;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -137,8 +138,6 @@ public class InstallPluginAction extends PortletAction {
 		String deployDir = ParamUtil.getString(actionRequest, "deployDir");
 		String destDir = ParamUtil.getString(actionRequest, "destDir");
 		long interval = ParamUtil.getLong(actionRequest, "interval");
-		int blacklistThreshold = ParamUtil.getInteger(
-			actionRequest, "blacklistThreshold");
 		boolean unpackWar = ParamUtil.getBoolean(actionRequest, "unpackWar");
 		boolean customPortletXml = ParamUtil.getBoolean(
 			actionRequest, "customPortletXml");
@@ -164,9 +163,6 @@ public class InstallPluginAction extends PortletAction {
 		preferences.setValue(PropsKeys.AUTO_DEPLOY_DEST_DIR, destDir);
 		preferences.setValue(
 			PropsKeys.AUTO_DEPLOY_INTERVAL, String.valueOf(interval));
-		preferences.setValue(
-			PropsKeys.AUTO_DEPLOY_BLACKLIST_THRESHOLD,
-			String.valueOf(blacklistThreshold));
 		preferences.setValue(
 			PropsKeys.AUTO_DEPLOY_UNPACK_WAR, String.valueOf(unpackWar));
 		preferences.setValue(
@@ -209,7 +205,7 @@ public class InstallPluginAction extends PortletAction {
 
 			AutoDeployDir autoDeployDir = new AutoDeployDir(
 				"defaultAutoDeployDir", new File(deployDir), new File(destDir),
-				interval, blacklistThreshold, autoDeployListeners);
+				interval, autoDeployListeners);
 
 			AutoDeployUtil.registerDir(autoDeployDir);
 		}
@@ -350,7 +346,19 @@ public class InstallPluginAction extends PortletAction {
 			actionRequest, "deploymentContext");
 
 		try {
-			HttpImpl httpImpl = (HttpImpl)HttpUtil.getHttp();
+			HttpImpl httpImpl = null;
+
+			Object httpObject = HttpUtil.getHttp();
+
+			if (httpObject instanceof DoPrivilegedBean) {
+				DoPrivilegedBean doPrivilegedBean =
+					(DoPrivilegedBean)httpObject;
+
+				httpImpl = (HttpImpl)doPrivilegedBean.getActualBean();
+			}
+			else {
+				httpImpl = (HttpImpl)httpObject;
+			}
 
 			HostConfiguration hostConfiguration = httpImpl.getHostConfiguration(
 				url);

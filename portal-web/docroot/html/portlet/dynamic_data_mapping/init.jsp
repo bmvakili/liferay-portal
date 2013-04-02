@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,13 +17,21 @@
 <%@ include file="/html/portlet/init.jsp" %>
 
 <%@ page import="com.liferay.portal.LocaleException" %><%@
-page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandler" %><%@
-page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandlerRegistryUtil" %><%@
+page import="com.liferay.portal.kernel.editor.EditorUtil" %><%@
+page import="com.liferay.portal.kernel.portletdisplaytemplate.BasePortletDisplayTemplateHandler" %><%@
+page import="com.liferay.portal.kernel.template.TemplateConstants" %><%@
+page import="com.liferay.portal.kernel.template.TemplateHandler" %><%@
+page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><%@
+page import="com.liferay.portal.kernel.template.TemplateManagerUtil" %><%@
+page import="com.liferay.portal.kernel.template.TemplateVariableDefinition" %><%@
+page import="com.liferay.portal.kernel.template.TemplateVariableGroup" %><%@
+page import="com.liferay.portal.template.TemplateContextHelper" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFolderConstants" %><%@
 page import="com.liferay.portlet.dynamicdatalists.model.DDLRecordSet" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.NoSuchStructureException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.RequiredStructureException" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.RequiredTemplateException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.StructureDuplicateElementException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.StructureFieldException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.StructureNameException" %><%@
@@ -42,7 +50,6 @@ page import="com.liferay.portlet.dynamicdatamapping.search.StructureSearchTerms"
 page import="com.liferay.portlet.dynamicdatamapping.search.TemplateDisplayTerms" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.search.TemplateSearch" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.search.TemplateSearchTerms" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.DDMStorageLinkLocalServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.DDMTemplateServiceUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMPermission" %><%@
@@ -51,7 +58,8 @@ page import="com.liferay.portlet.dynamicdatamapping.service.permission.DDMTempla
 page import="com.liferay.portlet.dynamicdatamapping.storage.StorageType" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMTemplateHelperUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMUtil" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" %>
+page import="com.liferay.portlet.dynamicdatamapping.util.DDMXSDUtil" %><%@
+page import="com.liferay.portlet.journal.model.JournalArticle" %>
 
 <%
 PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(request);
@@ -59,6 +67,8 @@ PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPre
 String chooseCallback = ParamUtil.getString(request, "chooseCallback");
 String ddmResource = ParamUtil.getString(request, "ddmResource");
 String ddmResourceActionId = ParamUtil.getString(request, "ddmResourceActionId");
+String refererPortletName = ParamUtil.getString(request, "refererPortletName");
+String refererWebDAVToken = ParamUtil.getString(request, "refererWebDAVToken", portletConfig.getInitParameter("refererWebDAVToken"));
 String saveCallback = ParamUtil.getString(request, "saveCallback");
 String scopeAvailableFields = ParamUtil.getString(request, "scopeAvailableFields");
 String scopeStorageType = ParamUtil.getString(request, "scopeStorageType");
@@ -66,6 +76,7 @@ String scopeStructureName = ParamUtil.getString(request, "scopeStructureName");
 String scopeStructureType = ParamUtil.getString(request, "scopeStructureType");
 String scopeTemplateMode = ParamUtil.getString(request, "scopeTemplateMode");
 String scopeTemplateType = ParamUtil.getString(request, "scopeTemplateType");
+String scopeTitle = ParamUtil.getString(request, "scopeTitle");
 boolean showGlobalScope = ParamUtil.getBoolean(request, "showGlobalScope");
 boolean showManageTemplates = ParamUtil.getBoolean(request, "showManageTemplates", true);
 boolean showToolbar = ParamUtil.getBoolean(request, "showToolbar", true);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -48,6 +48,9 @@ public class PasswordPolicyServiceWrapper implements PasswordPolicyService,
 		_passwordPolicyService.setBeanIdentifier(beanIdentifier);
 	}
 
+	/**
+	* @deprecated As of 6.2.0
+	*/
 	public com.liferay.portal.model.PasswordPolicy addPasswordPolicy(
 		java.lang.String name, java.lang.String description,
 		boolean changeable, boolean changeRequired, long minAge,
@@ -67,12 +70,34 @@ public class PasswordPolicyServiceWrapper implements PasswordPolicyService,
 			lockoutDuration, resetFailureCount, resetTicketMaxAge);
 	}
 
+	public com.liferay.portal.model.PasswordPolicy addPasswordPolicy(
+		java.lang.String name, java.lang.String description,
+		boolean changeable, boolean changeRequired, long minAge,
+		boolean checkSyntax, boolean allowDictionaryWords, int minAlphanumeric,
+		int minLength, int minLowerCase, int minNumbers, int minSymbols,
+		int minUpperCase, java.lang.String regex, boolean history,
+		int historyCount, boolean expireable, long maxAge, long warningTime,
+		int graceLimit, boolean lockout, int maxFailure, long lockoutDuration,
+		long resetFailureCount, long resetTicketMaxAge)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _passwordPolicyService.addPasswordPolicy(name, description,
+			changeable, changeRequired, minAge, checkSyntax,
+			allowDictionaryWords, minAlphanumeric, minLength, minLowerCase,
+			minNumbers, minSymbols, minUpperCase, regex, history, historyCount,
+			expireable, maxAge, warningTime, graceLimit, lockout, maxFailure,
+			lockoutDuration, resetFailureCount, resetTicketMaxAge);
+	}
+
 	public void deletePasswordPolicy(long passwordPolicyId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_passwordPolicyService.deletePasswordPolicy(passwordPolicyId);
 	}
 
+	/**
+	* @deprecated As of 6.2.0
+	*/
 	public com.liferay.portal.model.PasswordPolicy updatePasswordPolicy(
 		long passwordPolicyId, java.lang.String name,
 		java.lang.String description, boolean changeable,
@@ -92,15 +117,35 @@ public class PasswordPolicyServiceWrapper implements PasswordPolicyService,
 			lockoutDuration, resetFailureCount, resetTicketMaxAge);
 	}
 
+	public com.liferay.portal.model.PasswordPolicy updatePasswordPolicy(
+		long passwordPolicyId, java.lang.String name,
+		java.lang.String description, boolean changeable,
+		boolean changeRequired, long minAge, boolean checkSyntax,
+		boolean allowDictionaryWords, int minAlphanumeric, int minLength,
+		int minLowerCase, int minNumbers, int minSymbols, int minUpperCase,
+		java.lang.String regex, boolean history, int historyCount,
+		boolean expireable, long maxAge, long warningTime, int graceLimit,
+		boolean lockout, int maxFailure, long lockoutDuration,
+		long resetFailureCount, long resetTicketMaxAge)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _passwordPolicyService.updatePasswordPolicy(passwordPolicyId,
+			name, description, changeable, changeRequired, minAge, checkSyntax,
+			allowDictionaryWords, minAlphanumeric, minLength, minLowerCase,
+			minNumbers, minSymbols, minUpperCase, regex, history, historyCount,
+			expireable, maxAge, warningTime, graceLimit, lockout, maxFailure,
+			lockoutDuration, resetFailureCount, resetTicketMaxAge);
+	}
+
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public PasswordPolicyService getWrappedPasswordPolicyService() {
 		return _passwordPolicyService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedPasswordPolicyService(
 		PasswordPolicyService passwordPolicyService) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,9 +31,11 @@ import com.liferay.portal.kernel.search.facet.ScopeFacet;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.trash.TrashRenderer;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -63,15 +65,24 @@ import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextThreadLocal;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
+import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
 import com.liferay.portlet.expando.util.ExpandoBridgeIndexerUtil;
+import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.ratings.model.RatingsStats;
+import com.liferay.portlet.ratings.service.RatingsStatsLocalServiceUtil;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.service.TrashEntryLocalServiceUtil;
 
@@ -98,6 +109,14 @@ public abstract class BaseIndexer implements Indexer {
 
 	public static final int INDEX_FILTER_SEARCH_LIMIT = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.INDEX_FILTER_SEARCH_LIMIT));
+
+	public BaseIndexer() {
+		_document = new DocumentImpl();
+	}
+
+	public void addRelatedEntryFields(Document document, Object obj)
+		throws Exception {
+	}
 
 	public void delete(long companyId, String uid) throws SearchException {
 		try {
@@ -186,8 +205,28 @@ public abstract class BaseIndexer implements Indexer {
 		try {
 			searchContext.setSearchEngineId(getSearchEngineId());
 
-			searchContext.setEntryClassNames(
-				new String[] {getClassName(searchContext)});
+			String[] entryClassNames = getClassNames();
+
+			if (searchContext.isIncludeAttachments()) {
+				entryClassNames = ArrayUtil.append(
+					entryClassNames, DLFileEntry.class.getName());
+			}
+
+			if (searchContext.isIncludeDiscussions()) {
+				entryClassNames = ArrayUtil.append(
+					entryClassNames, MBMessage.class.getName());
+
+				searchContext.setAttribute("discussion", true);
+			}
+
+			searchContext.setEntryClassNames(entryClassNames);
+
+			if (searchContext.isIncludeAttachments() ||
+				searchContext.isIncludeDiscussions()) {
+
+				searchContext.setAttribute(
+					"relatedEntryClassNames", getClassNames());
+			}
 
 			BooleanQuery contextQuery = BooleanQueryFactoryUtil.create(
 				searchContext);
@@ -195,7 +234,9 @@ public abstract class BaseIndexer implements Indexer {
 			addSearchAssetCategoryIds(contextQuery, searchContext);
 			addSearchAssetTagNames(contextQuery, searchContext);
 			addSearchEntryClassNames(contextQuery, searchContext);
+			addSearchFolderId(contextQuery, searchContext);
 			addSearchGroupId(contextQuery, searchContext);
+			addSearchUserId(contextQuery, searchContext);
 
 			BooleanQuery fullQuery = createFullQuery(
 				contextQuery, searchContext);
@@ -252,7 +293,7 @@ public abstract class BaseIndexer implements Indexer {
 	public String getSortField(String orderByCol) {
 		String sortField = doGetSortField(orderByCol);
 
-		if (DocumentImpl.isSortableTextField(sortField)) {
+		if (_document.isDocumentSortableTextField(sortField)) {
 			return DocumentImpl.getSortableFieldName(sortField);
 		}
 
@@ -420,6 +461,8 @@ public abstract class BaseIndexer implements Indexer {
 				hits = filterSearch(hits, permissionChecker, searchContext);
 			}
 
+			processHits(searchContext, hits);
+
 			return hits;
 		}
 		catch (SearchException se) {
@@ -442,9 +485,69 @@ public abstract class BaseIndexer implements Indexer {
 			new IndexerPostProcessor[indexerPostProcessorsList.size()]);
 	}
 
+	protected void addAssetFields(
+			Document document, String className, long classPK)
+		throws SystemException {
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+				className);
+
+		if ((assetRendererFactory == null) ||
+			!assetRendererFactory.isSelectable()) {
+
+			return;
+		}
+
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+			className, classPK);
+
+		if (assetEntry == null) {
+			return;
+		}
+
+		if (!document.hasField(Field.CREATE_DATE)) {
+			document.addDate(Field.CREATE_DATE, assetEntry.getCreateDate());
+		}
+
+		if (assetEntry.getExpirationDate() != null) {
+			document.addDate(
+				Field.EXPIRATION_DATE, assetEntry.getExpirationDate());
+		}
+		else {
+			document.addDate(Field.EXPIRATION_DATE, new Date(Long.MAX_VALUE));
+		}
+
+		if (!document.hasField(Field.MODIFIED_DATE)) {
+			document.addDate(Field.MODIFIED_DATE, assetEntry.getModifiedDate());
+		}
+
+		document.addNumber(Field.PRIORITY, assetEntry.getPriority());
+
+		if (assetEntry.getPublishDate() != null) {
+			document.addDate(Field.PUBLISH_DATE, assetEntry.getPublishDate());
+		}
+		else {
+			document.addDate(Field.PUBLISH_DATE, new Date(0));
+		}
+
+		RatingsStats ratingsStats = RatingsStatsLocalServiceUtil.getStats(
+			className, classPK);
+
+		document.addNumber(Field.RATINGS, ratingsStats.getAverageScore());
+
+		document.addNumber(Field.VIEW_COUNT, assetEntry.getViewCount());
+
+		Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
+			assetEntry.getTitle(), true);
+
+		document.addLocalizedKeyword("localized_title", titleMap, true);
+	}
+
 	/**
-	 * @deprecated {@link #addSearchLocalizedTerm(BooleanQuery, SearchContext,
-	 *             String, boolean)}
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             #addSearchLocalizedTerm(BooleanQuery, SearchContext, String,
+	 *             boolean)}
 	 */
 	protected void addLocalizedSearchTerm(
 			BooleanQuery searchQuery, SearchContext searchContext, String field,
@@ -452,6 +555,45 @@ public abstract class BaseIndexer implements Indexer {
 		throws Exception {
 
 		addSearchLocalizedTerm(searchQuery, searchContext, field, like);
+	}
+
+	protected void addRelatedClassNames(
+			BooleanQuery contextQuery, SearchContext searchContext)
+		throws Exception {
+
+		String[] relatedEntryClassNames = (String[])searchContext.getAttribute(
+			"relatedEntryClassNames");
+
+		if ((relatedEntryClassNames == null) ||
+			(relatedEntryClassNames.length == 0)) {
+
+			return;
+		}
+
+		BooleanQuery relatedQueries = BooleanQueryFactoryUtil.create(
+			searchContext);
+
+		for (String relatedEntryClassName : relatedEntryClassNames) {
+			Indexer indexer = IndexerRegistryUtil.getIndexer(
+				relatedEntryClassName);
+
+			if (indexer == null) {
+				continue;
+			}
+
+			BooleanQuery relatedQuery = BooleanQueryFactoryUtil.create(
+				searchContext);
+
+			indexer.postProcessContextQuery(relatedQuery, searchContext);
+
+			relatedQuery.addRequiredTerm(
+				Field.CLASS_NAME_ID,
+				PortalUtil.getClassNameId(relatedEntryClassName));
+
+			relatedQueries.add(relatedQuery, BooleanClauseOccur.SHOULD);
+		}
+
+		contextQuery.add(relatedQueries, BooleanClauseOccur.MUST);
 	}
 
 	protected void addSearchArrayQuery(
@@ -632,6 +774,26 @@ public abstract class BaseIndexer implements Indexer {
 		searchContext.addFacet(multiValueFacet);
 	}
 
+	protected void addSearchClassTypeIds(
+			BooleanQuery contextQuery, SearchContext searchContext)
+		throws Exception {
+
+		long[] classTypeIds = searchContext.getClassTypeIds();
+
+		if ((classTypeIds == null) || (classTypeIds.length <= 0)) {
+			return;
+		}
+
+		BooleanQuery classTypeIdsQuery = BooleanQueryFactoryUtil.create(
+			searchContext);
+
+		for (long classTypeId : classTypeIds) {
+			classTypeIdsQuery.addTerm(Field.CLASS_TYPE_ID, classTypeId);
+		}
+
+		contextQuery.add(classTypeIdsQuery, BooleanClauseOccur.MUST);
+	}
+
 	protected void addSearchDDMStruture(
 			BooleanQuery searchQuery, SearchContext searchContext,
 			DDMStructure ddmStructure)
@@ -692,6 +854,18 @@ public abstract class BaseIndexer implements Indexer {
 		}
 	}
 
+	protected void addSearchFolderId(
+			BooleanQuery contextQuery, SearchContext searchContext)
+		throws Exception {
+
+		MultiValueFacet multiValueFacet = new MultiValueFacet(searchContext);
+
+		multiValueFacet.setFieldName(Field.FOLDER_ID);
+		multiValueFacet.setStatic(true);
+
+		searchContext.addFacet(multiValueFacet);
+	}
+
 	protected void addSearchGroupId(
 			BooleanQuery contextQuery, SearchContext searchContext)
 		throws Exception {
@@ -716,6 +890,21 @@ public abstract class BaseIndexer implements Indexer {
 		searchQuery.addTerms(Field.KEYWORDS, keywords);
 
 		addSearchExpando(searchQuery, searchContext, keywords);
+	}
+
+	protected void addSearchLocalizedDDMStructure(
+			BooleanQuery searchQuery, SearchContext searchContext,
+			DDMStructure ddmStructure)
+		throws Exception {
+
+		Set<String> fieldNames = ddmStructure.getFieldNames();
+
+		for (String fieldName : fieldNames) {
+			String name = DDMIndexerUtil.encodeName(
+				ddmStructure.getStructureId(), fieldName);
+
+			addSearchLocalizedTerm(searchQuery, searchContext, name, false);
+		}
 	}
 
 	protected void addSearchLocalizedTerm(
@@ -777,6 +966,18 @@ public abstract class BaseIndexer implements Indexer {
 		else {
 			searchQuery.addTerm(field, value, like);
 		}
+	}
+
+	protected void addSearchUserId(
+			BooleanQuery contextQuery, SearchContext searchContext)
+		throws Exception {
+
+		MultiValueFacet multiValueFacet = new MultiValueFacet(searchContext);
+
+		multiValueFacet.setFieldName(Field.USER_ID);
+		multiValueFacet.setStatic(true);
+
+		searchContext.addFacet(multiValueFacet);
 	}
 
 	protected void addStagingGroupKeyword(Document document, long groupId)
@@ -1059,7 +1260,9 @@ public abstract class BaseIndexer implements Indexer {
 			catch (Exception e) {
 			}
 
-			if (paginationType.equals("more") && (docs.size() > end)) {
+			if (paginationType.equals("more") && (end > 0) &&
+				(docs.size() > end)) {
+
 				hasMore = true;
 
 				break;
@@ -1104,7 +1307,7 @@ public abstract class BaseIndexer implements Indexer {
 			BaseModel<?> workflowedBaseModel)
 		throws SystemException {
 
-		Document document = new DocumentImpl();
+		Document document = newDocument();
 
 		String className = baseModel.getModelClassName();
 
@@ -1140,6 +1343,14 @@ public abstract class BaseIndexer implements Indexer {
 			className, classPK);
 
 		document.addText(Field.ASSET_TAG_NAMES, assetTagNames);
+
+		List<AssetTag> assetTags = AssetTagLocalServiceUtil.getTags(
+			className, classPK);
+
+		long[] assetTagsIds = StringUtil.split(
+			ListUtil.toString(assetTags, AssetTag.TAG_ID_ACCESSOR), 0L);
+
+		document.addKeyword(Field.ASSET_TAG_IDS, assetTagsIds);
 
 		document.addKeyword(Field.ENTRY_CLASS_NAME, className);
 		document.addKeyword(Field.ENTRY_CLASS_PK, classPK);
@@ -1178,7 +1389,7 @@ public abstract class BaseIndexer implements Indexer {
 			groupedModel = (GroupedModel)baseModel;
 
 			document.addKeyword(
-				Field.GROUP_ID, getParentGroupId(groupedModel.getGroupId()));
+				Field.GROUP_ID, getSiteGroupId(groupedModel.getGroupId()));
 			document.addKeyword(
 				Field.SCOPE_GROUP_ID, groupedModel.getGroupId());
 		}
@@ -1194,6 +1405,8 @@ public abstract class BaseIndexer implements Indexer {
 			}
 		}
 
+		addAssetFields(document, className, classPK);
+
 		ExpandoBridgeIndexerUtil.addAttributes(
 			document, baseModel.getExpandoBridge());
 
@@ -1202,12 +1415,6 @@ public abstract class BaseIndexer implements Indexer {
 
 	protected String getClassName(SearchContext searchContext) {
 		String[] classNames = getClassNames();
-
-		if (classNames.length != 1) {
-			throw new UnsupportedOperationException(
-				"Search method needs to be manually implemented for " +
-					"indexers with more than one class name");
-		}
 
 		return classNames[0];
 	}
@@ -1228,23 +1435,30 @@ public abstract class BaseIndexer implements Indexer {
 		return countryNames;
 	}
 
+	/**
+	 * @deprecated As of 6.2 renamed to {@link #getSiteGroupId(long)}
+	 */
 	protected long getParentGroupId(long groupId) {
-		long parentGroupId = groupId;
+		return getSiteGroupId(groupId);
+	}
+
+	protected abstract String getPortletId(SearchContext searchContext);
+
+	protected long getSiteGroupId(long groupId) {
+		long siteGroupId = groupId;
 
 		try {
 			Group group = GroupLocalServiceUtil.getGroup(groupId);
 
 			if (group.isLayout()) {
-				parentGroupId = group.getParentGroupId();
+				siteGroupId = group.getParentGroupId();
 			}
 		}
 		catch (Exception e) {
 		}
 
-		return parentGroupId;
+		return siteGroupId;
 	}
-
-	protected abstract String getPortletId(SearchContext searchContext);
 
 	protected Locale getSnippetLocale(Document document, Locale locale) {
 		String prefix = Field.SNIPPET + StringPool.UNDERLINE;
@@ -1264,6 +1478,10 @@ public abstract class BaseIndexer implements Indexer {
 		}
 
 		return null;
+	}
+
+	protected Document newDocument() {
+		return (Document)_document.clone();
 	}
 
 	protected void populateAddresses(
@@ -1329,6 +1547,17 @@ public abstract class BaseIndexer implements Indexer {
 		throws Exception {
 	}
 
+	protected void processHits(SearchContext searchContext, Hits hits)
+		throws SearchException {
+
+		HitsProcessor hitsProcessor =
+			HitsProcessorRegistryUtil.getDefaultHitsProcessor();
+
+		if (hitsProcessor != null) {
+			hitsProcessor.process(searchContext, hits);
+		}
+	}
+
 	protected void setFilterSearch(boolean filterSearch) {
 		_filterSearch = filterSearch;
 	}
@@ -1341,12 +1570,17 @@ public abstract class BaseIndexer implements Indexer {
 		_permissionAware = permissionAware;
 	}
 
+	protected void setSortableTextFields(String[] sortableTextFields) {
+		_document.setSortableTextFields(sortableTextFields);
+	}
+
 	protected void setStagingAware(boolean stagingAware) {
 		_stagingAware = stagingAware;
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(BaseIndexer.class);
 
+	private Document _document;
 	private boolean _filterSearch;
 	private boolean _indexerEnabled = true;
 	private IndexerPostProcessor[] _indexerPostProcessors =

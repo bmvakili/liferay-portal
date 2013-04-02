@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.portlet.documentlibrary.service.persistence;
 
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -22,7 +23,9 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.Time;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.service.ServiceTestUtil;
 import com.liferay.portal.service.persistence.BasePersistence;
 import com.liferay.portal.service.persistence.PersistenceExecutionTestListener;
@@ -109,13 +112,19 @@ public class DLFileRankPersistenceTest {
 
 		DLFileRank newDLFileRank = _persistence.create(pk);
 
+		newDLFileRank.setUuid(ServiceTestUtil.randomString());
+
 		newDLFileRank.setGroupId(ServiceTestUtil.nextLong());
 
 		newDLFileRank.setCompanyId(ServiceTestUtil.nextLong());
 
 		newDLFileRank.setUserId(ServiceTestUtil.nextLong());
 
+		newDLFileRank.setUserName(ServiceTestUtil.randomString());
+
 		newDLFileRank.setCreateDate(ServiceTestUtil.nextDate());
+
+		newDLFileRank.setModifiedDate(ServiceTestUtil.nextDate());
 
 		newDLFileRank.setFileEntryId(ServiceTestUtil.nextLong());
 
@@ -125,6 +134,8 @@ public class DLFileRankPersistenceTest {
 
 		DLFileRank existingDLFileRank = _persistence.findByPrimaryKey(newDLFileRank.getPrimaryKey());
 
+		Assert.assertEquals(existingDLFileRank.getUuid(),
+			newDLFileRank.getUuid());
 		Assert.assertEquals(existingDLFileRank.getFileRankId(),
 			newDLFileRank.getFileRankId());
 		Assert.assertEquals(existingDLFileRank.getGroupId(),
@@ -133,9 +144,14 @@ public class DLFileRankPersistenceTest {
 			newDLFileRank.getCompanyId());
 		Assert.assertEquals(existingDLFileRank.getUserId(),
 			newDLFileRank.getUserId());
+		Assert.assertEquals(existingDLFileRank.getUserName(),
+			newDLFileRank.getUserName());
 		Assert.assertEquals(Time.getShortTimestamp(
 				existingDLFileRank.getCreateDate()),
 			Time.getShortTimestamp(newDLFileRank.getCreateDate()));
+		Assert.assertEquals(Time.getShortTimestamp(
+				existingDLFileRank.getModifiedDate()),
+			Time.getShortTimestamp(newDLFileRank.getModifiedDate()));
 		Assert.assertEquals(existingDLFileRank.getFileEntryId(),
 			newDLFileRank.getFileEntryId());
 		Assert.assertEquals(existingDLFileRank.getActive(),
@@ -180,6 +196,26 @@ public class DLFileRankPersistenceTest {
 		DLFileRank missingDLFileRank = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingDLFileRank);
+	}
+
+	@Test
+	public void testActionableDynamicQuery() throws Exception {
+		final IntegerWrapper count = new IntegerWrapper();
+
+		ActionableDynamicQuery actionableDynamicQuery = new DLFileRankActionableDynamicQuery() {
+				@Override
+				protected void performAction(Object object) {
+					DLFileRank dlFileRank = (DLFileRank)object;
+
+					Assert.assertNotNull(dlFileRank);
+
+					count.increment();
+				}
+			};
+
+		actionableDynamicQuery.performActions();
+
+		Assert.assertEquals(count.getValue(), _persistence.countAll());
 	}
 
 	@Test
@@ -266,6 +302,12 @@ public class DLFileRankPersistenceTest {
 
 		DLFileRankModelImpl existingDLFileRankModelImpl = (DLFileRankModelImpl)_persistence.findByPrimaryKey(newDLFileRank.getPrimaryKey());
 
+		Assert.assertTrue(Validator.equals(
+				existingDLFileRankModelImpl.getUuid(),
+				existingDLFileRankModelImpl.getOriginalUuid()));
+		Assert.assertEquals(existingDLFileRankModelImpl.getGroupId(),
+			existingDLFileRankModelImpl.getOriginalGroupId());
+
 		Assert.assertEquals(existingDLFileRankModelImpl.getCompanyId(),
 			existingDLFileRankModelImpl.getOriginalCompanyId());
 		Assert.assertEquals(existingDLFileRankModelImpl.getUserId(),
@@ -279,13 +321,19 @@ public class DLFileRankPersistenceTest {
 
 		DLFileRank dlFileRank = _persistence.create(pk);
 
+		dlFileRank.setUuid(ServiceTestUtil.randomString());
+
 		dlFileRank.setGroupId(ServiceTestUtil.nextLong());
 
 		dlFileRank.setCompanyId(ServiceTestUtil.nextLong());
 
 		dlFileRank.setUserId(ServiceTestUtil.nextLong());
 
+		dlFileRank.setUserName(ServiceTestUtil.randomString());
+
 		dlFileRank.setCreateDate(ServiceTestUtil.nextDate());
+
+		dlFileRank.setModifiedDate(ServiceTestUtil.nextDate());
 
 		dlFileRank.setFileEntryId(ServiceTestUtil.nextLong());
 

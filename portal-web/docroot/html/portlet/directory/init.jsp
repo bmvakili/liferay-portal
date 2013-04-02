@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,6 +18,7 @@
 
 <%@ page import="com.liferay.portal.NoSuchOrganizationException" %><%@
 page import="com.liferay.portal.NoSuchUserGroupException" %><%@
+page import="com.liferay.portlet.social.model.SocialRelationConstants" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupDisplayTerms" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupSearch" %><%@
 page import="com.liferay.portlet.usergroupsadmin.search.UserGroupSearchTerms" %><%@

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,7 @@ public class FileUploadFieldRenderer extends BaseFieldRenderer {
 	protected String doRender(Field field, Locale locale) throws Exception {
 		List<String> values = new ArrayList<String>();
 
-		for (Serializable value : field.getValues()) {
+		for (Serializable value : field.getValues(locale)) {
 			String valueString = String.valueOf(value);
 
 			if (Validator.isNull(valueString)) {
@@ -53,13 +53,13 @@ public class FileUploadFieldRenderer extends BaseFieldRenderer {
 
 	@Override
 	protected String doRender(Field field, Locale locale, int valueIndex) {
-		String value = String.valueOf(field.getValue(valueIndex));
+		Serializable value = field.getValue(locale, valueIndex);
 
 		if (Validator.isNull(value)) {
 			return StringPool.BLANK;
 		}
 
-		return handleJSON(value);
+		return handleJSON(String.valueOf(value));
 	}
 
 	protected String handleJSON(String json) {

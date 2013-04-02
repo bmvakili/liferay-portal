@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,8 @@
 String viewOrganizationsRedirect = ParamUtil.getString(request, "viewOrganizationsRedirect", themeDisplay.getURLControlPanel());
 String redirect = ParamUtil.getString(request, "redirect", viewOrganizationsRedirect);
 String closeRedirect = ParamUtil.getString(request, "closeRedirect");
-String backURL = ParamUtil.getString(request, "backURL");
+String backURL = ParamUtil.getString(request, "backURL", redirect);
+boolean showBackURL = ParamUtil.getBoolean(request, "showBackURL", true);
 
 Group group = (Group)request.getAttribute(WebKeys.GROUP);
 
@@ -90,9 +91,15 @@ if ((analyticsTypes.length == 0) && ArrayUtil.contains(advancedSections, "analyt
 	advancedSections = ArrayUtil.remove(advancedSections, "analytics");
 }
 
-int trashEnabled = PrefsPropsUtil.getInteger(company.getCompanyId(), PropsKeys.TRASH_ENABLED);
+int contentSharingWithChildrenEnabledEnabled = PrefsPropsUtil.getInteger(company.getCompanyId(), PropsKeys.SITES_CONTENT_SHARING_WITH_CHILDREN_ENABLED);
 
-if ((trashEnabled == 0) && ArrayUtil.contains(advancedSections, "recycle-bin")) {
+if ((contentSharingWithChildrenEnabledEnabled == 0) && ArrayUtil.contains(advancedSections, "content-sharing")) {
+	advancedSections = ArrayUtil.remove(advancedSections, "content-sharing");
+}
+
+boolean trashEnabled = PrefsPropsUtil.getBoolean(company.getCompanyId(), PropsKeys.TRASH_ENABLED);
+
+if (!trashEnabled && ArrayUtil.contains(advancedSections, "recycle-bin")) {
 	advancedSections = ArrayUtil.remove(advancedSections, "recycle-bin");
 }
 
@@ -122,6 +129,7 @@ else if (layoutSetPrototype != null) {
 <liferay-ui:header
 	backURL="<%= backURL %>"
 	localizeTitle="<%= localizeTitle %>"
+	showBackURL="<%= showBackURL %>"
 	title="<%= title %>"
 />
 

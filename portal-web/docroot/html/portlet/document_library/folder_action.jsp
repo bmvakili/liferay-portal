@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -104,9 +104,11 @@ if ((row == null) || portletId.equals(PortletKeys.DOCUMENT_LIBRARY)) {
 
 boolean view = false;
 
-if ((row == null) && (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) || portletName.equals(PortletKeys.MEDIA_GALLERY_DISPLAY))) {
+if ((row == null) && ((portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) && !showMinimalActionButtons) || portletName.equals(PortletKeys.MEDIA_GALLERY_DISPLAY))) {
 	view = true;
 }
+
+String iconMenuId = null;
 %>
 
 <liferay-util:buffer var="iconMenu">
@@ -392,6 +394,11 @@ if ((row == null) && (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) |
 		</c:choose>
 
 		<c:if test="<%= hasViewPermission && portletDisplay.isWebDAVEnabled() && ((folder == null) || (folder.getRepositoryId() == scopeGroupId)) %>">
+
+			<%
+			iconMenuId = GetterUtil.getString((String)request.getAttribute("liferay-ui:icon-menu:id"));
+			%>
+
 			<liferay-ui:icon
 				cssClass='<%= randomNamespace + "-webdav-action" %>'
 				image="desktop"
@@ -403,7 +410,7 @@ if ((row == null) && (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) |
 </liferay-util:buffer>
 
 <c:choose>
-	<c:when test="<%= portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) %>">
+	<c:when test="<%= portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) && !showMinimalActionButtons %>">
 
 		<%= iconMenu %>
 
@@ -439,6 +446,7 @@ if ((row == null) && (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) |
 			<label><liferay-ui:message key="webdav-url" /></label>
 
 			<liferay-ui:input-resource
+				cssClass="webdav-url-resource"
 				url="<%= DLUtil.getWebDavURL(themeDisplay, folder, null) %>"
 			/>
 		</div>
@@ -451,8 +459,6 @@ if ((row == null) && (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) |
 </portlet:renderURL>
 
 <aui:script use="aui-dialog,uploader">
-	var swfDetect = A.SWFDetect || A.SWF;
-
 	if (!A.UA.ios && (A.Uploader.TYPE != 'none')) {
 		var uploadMultipleDocumentsIcon = A.all('.upload-multiple-documents:hidden');
 
@@ -480,7 +486,7 @@ if ((row == null) && (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) |
 			function(event) {
 				event.preventDefault();
 
-				new A.Dialog(
+				var webdavDialog = new A.Dialog(
 					{
 						align: Liferay.Util.Window.ALIGN_CENTER,
 						bodyContent: A.one('#<%= randomNamespace %>webDav').html(),
@@ -489,7 +495,29 @@ if ((row == null) && (portletName.equals(PortletKeys.DOCUMENT_LIBRARY_DISPLAY) |
 						title: '<%= UnicodeLanguageUtil.get(pageContext, "access-from-desktop") %>',
 						width: 500
 					}
-				).render();
+				);
+
+				webdavDialog.after(
+					'render',
+					function(event) {
+						var webdavURLInput = webdavDialog.get('boundingBox').one('.webdav-url-resource');
+
+						webdavURLInput.focus();
+					}
+				);
+
+				webdavDialog.on(
+					'close',
+					function(event) {
+						var trigger = A.one('#<portlet:namespace /><%= iconMenuId %>Button');
+
+						if (trigger) {
+							trigger.focus();
+						}
+					}
+				);
+
+				webdavDialog.render();
 			}
 		);
 	}

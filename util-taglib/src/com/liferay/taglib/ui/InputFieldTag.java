@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -25,6 +25,10 @@ import javax.servlet.http.HttpServletRequest;
  * @author Brian Wing Shun Chan
  */
 public class InputFieldTag extends IncludeTag {
+
+	public void setAutoSize(boolean autoSize) {
+		_autoSize = autoSize;
+	}
 
 	public void setBean(Object bean) {
 		_bean = bean;
@@ -84,6 +88,7 @@ public class InputFieldTag extends IncludeTag {
 
 	@Override
 	protected void cleanUp() {
+		_autoSize = false;
 		_bean = null;
 		_cssClass = null;
 		_defaultLanguageId = null;
@@ -119,6 +124,8 @@ public class InputFieldTag extends IncludeTag {
 			id = fieldParam;
 		}
 
+		request.setAttribute(
+			"liferay-ui:input-field:autoSize", String.valueOf(_autoSize));
 		request.setAttribute("liferay-ui:input-field:bean", _bean);
 		request.setAttribute("liferay-ui:input-field:cssClass", _cssClass);
 		request.setAttribute(
@@ -143,6 +150,7 @@ public class InputFieldTag extends IncludeTag {
 
 	private static final String _PAGE = "/html/taglib/ui/input_field/page.jsp";
 
+	private boolean _autoSize;
 	private Object _bean;
 	private String _cssClass;
 	private String _defaultLanguageId;

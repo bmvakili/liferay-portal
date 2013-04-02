@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -174,11 +174,11 @@ else {
 				</c:if>
 
 				<%
-				List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getStructures(scopeGroupId, PortalUtil.getClassNameId(JournalArticle.class));
+				List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getStructures(PortalUtil.getSiteAndCompanyGroupIds(themeDisplay), PortalUtil.getClassNameId(JournalArticle.class));
 				%>
 
 				<c:if test="<%= !ddmStructures.isEmpty() %>">
-					<liferay-portlet:renderURL varImpl="viewBasicJournalStructureArticlesURL">
+					<liferay-portlet:renderURL varImpl="viewBasicDDMStructureArticlesURL">
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
 						<portlet:param name="structureId" value="0" />
@@ -195,12 +195,12 @@ else {
 					%>
 
 					<liferay-ui:app-view-navigation-entry
-						cssClassName="folder structure"
+						cssClass="folder structure"
 						dataView="<%= dataView %>"
 						entryTitle='<%= LanguageUtil.get(pageContext, "basic-web-content") %>'
 						iconImage="copy"
 						selected='<%= (structureId == "0") %>'
-						viewURL="<%= viewBasicJournalStructureArticlesURL.toString() %>"
+						viewURL="<%= viewBasicDDMStructureArticlesURL.toString() %>"
 					/>
 				</c:if>
 
@@ -208,7 +208,7 @@ else {
 				for (DDMStructure ddmStructure : ddmStructures) {
 				%>
 
-					<liferay-portlet:renderURL varImpl="viewJournalStructureArticlesURL">
+					<liferay-portlet:renderURL varImpl="viewDDMStructureArticlesURL">
 						<portlet:param name="struts_action" value="/journal/view" />
 						<portlet:param name="folderId" value="<%= String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>" />
 						<portlet:param name="structureId" value="<%= ddmStructure.getStructureKey() %>" />
@@ -225,12 +225,12 @@ else {
 					%>
 
 					<liferay-ui:app-view-navigation-entry
-						cssClassName="folder structure"
+						cssClass="folder structure"
 						dataView="<%= dataView %>"
 						entryTitle="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>"
 						iconImage="copy"
 						selected="<%= structureId.equals(ddmStructure.getStructureKey()) %>"
-						viewURL="<%= viewJournalStructureArticlesURL.toString() %>"
+						viewURL="<%= viewDDMStructureArticlesURL.toString() %>"
 					/>
 
 				<%
@@ -275,9 +275,6 @@ else {
 
 				<%
 				for (JournalFolder curFolder : folders) {
-					int foldersCount = JournalFolderServiceUtil.getFoldersCount(scopeGroupId, curFolder.getFolderId());
-					int articlesCount = JournalArticleServiceUtil.getArticlesCount(scopeGroupId, curFolder.getFolderId());
-
 					request.setAttribute("view_entries.jsp-folder", curFolder);
 					request.setAttribute("view_entries.jsp-folderId", String.valueOf(curFolder.getFolderId()));
 					request.setAttribute("view_entries.jsp-folderSelected", String.valueOf(folderId == curFolder.getFolderId()));
@@ -313,9 +310,9 @@ else {
 						dataView="<%= dataView %>"
 						entryTitle="<%= curFolder.getName() %>"
 						expandURL="<%= expandViewURL.toString() %>"
-						iconImage='<%= (foldersCount + articlesCount) > 0 ? "folder_full_document" : "folder_empty" %>'
+						iconImage='<%= (JournalFolderServiceUtil.getFoldersAndArticlesCount(scopeGroupId, curFolder.getFolderId()) > 0) ? "folder_full_document" : "folder_empty" %>'
 						selected="<%= (curFolder.getFolderId() == folderId) %>"
-						showExpand="<%= foldersCount > 0 %>"
+						showExpand="<%= JournalFolderServiceUtil.getFoldersCount(scopeGroupId, curFolder.getFolderId()) > 0 %>"
 						viewURL="<%= viewURL.toString() %>"
 					/>
 

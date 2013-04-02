@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -299,7 +299,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	}
 
 	/**
-	 * @deprecated {@link #update(BaseModel)}}
+	 * @deprecated As of 6.2.0, replaced by {@link #update(BaseModel)}}
 	 */
 	public T update(T model, boolean merge) throws SystemException {
 		if (model instanceof ModelWrapper) {
@@ -334,7 +334,8 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	}
 
 	/**
-	 * @deprecated {@link #update(BaseModel, ServiceContext)}}
+	 * @deprecated As of 6.2.0, replaced by {@link #update(BaseModel,
+	 *             ServiceContext)}}
 	 */
 	public T update(T model, boolean merge, ServiceContext serviceContext)
 		throws SystemException {
@@ -355,6 +356,16 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 		finally {
 			ServiceContextThreadLocal.popServiceContext();
 		}
+	}
+
+	protected static String removeConjunction(String sql) {
+		int pos = sql.indexOf(" AND ");
+
+		if (pos != -1) {
+			sql = sql.substring(0, pos);
+		}
+
+		return sql;
 	}
 
 	protected void appendOrderByComparator(
@@ -388,6 +399,12 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 		}
 	}
 
+	protected ClassLoader getClassLoader() {
+		Class<?> clazz = getClass();
+
+		return clazz.getClassLoader();
+	}
+
 	/**
 	 * Removes the model instance from the database. {@link #update(BaseModel,
 	 * boolean)} depends on this method to implement the remove operation; it
@@ -415,7 +432,7 @@ public class BasePersistenceImpl<T extends BaseModel<T>>
 	}
 
 	/**
-	 * @deprecated {@link #updateImpl(BaseModel)}
+	 * @deprecated As of 6.2.0, replaced by {@link #updateImpl(BaseModel)}
 	 */
 	protected T updateImpl(T model, boolean merge) throws SystemException {
 		return updateImpl(model);

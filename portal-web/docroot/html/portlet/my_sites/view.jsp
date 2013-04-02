@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,7 +29,7 @@ pageContext.setAttribute("portletURL", portletURL);
 request.setAttribute("view.jsp-tabs1", tabs1);
 %>
 
-<liferay-ui:success key="membership_request_sent" message="your-request-was-sent-you-will-receive-a-reply-by-email" />
+<liferay-ui:success key="membershipRequestSent" message="your-request-was-sent-you-will-receive-a-reply-by-email" />
 
 <aui:form action="<%= portletURL.toString() %>" method="get" name="fm">
 	<liferay-portlet:renderURLParams varImpl="portletURL" />
@@ -173,7 +173,7 @@ request.setAttribute("view.jsp-tabs1", tabs1);
 			<%
 			LinkedHashMap<String, Object> userParams = new LinkedHashMap<String, Object>();
 
-			userParams.put("inherit", true);
+			userParams.put("inherit", Boolean.TRUE);
 			userParams.put("usersGroups", new Long(group.getGroupId()));
 			%>
 

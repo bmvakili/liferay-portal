@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,13 +20,16 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.portlet.PortletPreferences;
@@ -41,14 +44,6 @@ import javax.servlet.http.HttpServletRequest;
  * @author Julio Camarero
  */
 public class DLUtil {
-
-	public static final String MANUAL_CHECK_IN_REQUIRED =
-		"manualCheckInRequired";
-
-	public static final String MANUAL_CHECK_IN_REQUIRED_PATH =
-		StringPool.SLASH + MANUAL_CHECK_IN_REQUIRED;
-
-	public static final String WEBDAV_CHECK_IN_MODE = "webDAVCheckInMode";
 
 	public static void addPortletBreadcrumbEntries(
 			DLFileShortcut dlFileShortcut, HttpServletRequest request,
@@ -149,10 +144,70 @@ public class DLUtil {
 		return getDL().getDLControlPanelLink(portletRequest, folderId);
 	}
 
+	public static Map<Locale, String> getEmailFileEntryAddedBodyMap(
+		PortletPreferences preferences) {
+
+		return getDL().getEmailFileEntryAddedBodyMap(preferences);
+	}
+
+	public static boolean getEmailFileEntryAddedEnabled(
+		PortletPreferences preferences) {
+
+		return getDL().getEmailFileEntryAddedEnabled(preferences);
+	}
+
+	public static Map<Locale, String> getEmailFileEntryAddedSubjectMap(
+		PortletPreferences preferences) {
+
+		return getDL().getEmailFileEntryAddedSubjectMap(preferences);
+	}
+
+	public static Map<Locale, String> getEmailFileEntryUpdatedBodyMap(
+		PortletPreferences preferences) {
+
+		return getDL().getEmailFileEntryUpdatedBodyMap(preferences);
+	}
+
+	public static boolean getEmailFileEntryUpdatedEnabled(
+		PortletPreferences preferences) {
+
+		return getDL().getEmailFileEntryUpdatedEnabled(preferences);
+	}
+
+	public static Map<Locale, String> getEmailFileEntryUpdatedSubjectMap(
+		PortletPreferences preferences) {
+
+		return getDL().getEmailFileEntryUpdatedSubjectMap(preferences);
+	}
+
+	public static String getEmailFromAddress(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
+
+		return getDL().getEmailFromAddress(preferences, companyId);
+	}
+
+	public static String getEmailFromName(
+			PortletPreferences preferences, long companyId)
+		throws SystemException {
+
+		return getDL().getEmailFromName(preferences, companyId);
+	}
+
+	public static List<Object> getEntries(Hits hits) {
+		return getDL().getEntries(hits);
+	}
+
 	public static String getFileEntryImage(
 		FileEntry fileEntry, ThemeDisplay themeDisplay) {
 
 		return getDL().getFileEntryImage(fileEntry, themeDisplay);
+	}
+
+	public static Set<Long> getFileEntryTypeSubscriptionClassPKs(long userId)
+		throws SystemException {
+
+		return getDL().getFileEntryTypeSubscriptionClassPKs(userId);
 	}
 
 	public static String getFileIcon(String extension) {
@@ -161,6 +216,21 @@ public class DLUtil {
 
 	public static String getGenericName(String extension) {
 		return getDL().getGenericName(extension);
+	}
+
+	public static String getImagePreviewURL(
+			FileEntry fileEntry, FileVersion fileVersion,
+			ThemeDisplay themeDisplay)
+		throws Exception {
+
+		return getDL().getImagePreviewURL(fileEntry, fileVersion, themeDisplay);
+	}
+
+	public static String getImagePreviewURL(
+			FileEntry fileEntry, ThemeDisplay themeDisplay)
+		throws Exception {
+
+		return getDL().getImagePreviewURL(fileEntry, themeDisplay);
 	}
 
 	public static String[] getMediaGalleryMimeTypes(
@@ -179,8 +249,8 @@ public class DLUtil {
 	}
 
 	/**
-	 * @deprecated {@link #getPreviewURL(FileEntry, FileVersion, ThemeDisplay,
-	 *             String, boolean, boolean)}
+	 * @deprecated As of 6.2.0, replaced by {@link #getPreviewURL(FileEntry,
+	 *             FileVersion, ThemeDisplay, String, boolean, boolean)}
 	 */
 	public static String getPreviewURL(
 		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
@@ -267,6 +337,16 @@ public class DLUtil {
 			themeDisplay, folder, fileEntry, manualCheckInRequired);
 	}
 
+	public static String getWebDavURL(
+			ThemeDisplay themeDisplay, Folder folder, FileEntry fileEntry,
+			boolean manualCheckInRequired, boolean officeExtensionRequired)
+		throws PortalException, SystemException {
+
+		return getDL().getWebDavURL(
+			themeDisplay, folder, fileEntry, manualCheckInRequired,
+			officeExtensionRequired);
+	}
+
 	public static boolean hasWorkflowDefinitionLink(
 			long companyId, long groupId, long folderId, long fileEntryTypeId)
 		throws Exception {
@@ -280,6 +360,35 @@ public class DLUtil {
 
 		return getDL().isAutoGeneratedDLFileEntryTypeDDMStructureKey(
 			ddmStructureKey);
+	}
+
+	public static boolean isOfficeExtension(String extension) {
+		return getDL().isOfficeExtension(extension);
+	}
+
+	public static boolean isSubscribedToFileEntryType(
+			long companyId, long groupId, long userId, long fileEntryTypeId)
+		throws SystemException {
+
+		return getDL().isSubscribedToFileEntryType(
+			companyId, groupId, userId, fileEntryTypeId);
+	}
+
+	public static boolean isSubscribedToFolder(
+			long companyId, long groupId, long userId, long folderId)
+		throws PortalException, SystemException {
+
+		return getDL().isSubscribedToFolder(
+			companyId, groupId, userId, folderId);
+	}
+
+	public static boolean isSubscribedToFolder(
+			long companyId, long groupId, long userId, long folderId,
+			boolean recursive)
+		throws PortalException, SystemException {
+
+		return getDL().isSubscribedToFolder(
+			companyId, groupId, userId, folderId, recursive);
 	}
 
 	public void setDL(DL dl) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,24 +14,21 @@
 
 package com.liferay.portal.velocity;
 
+import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.template.Template;
+import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateContextType;
 import com.liferay.portal.kernel.template.TemplateException;
-import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
-import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
-import com.liferay.portal.security.pacl.PACLPolicy;
-import com.liferay.portal.security.pacl.PACLPolicyManager;
+import com.liferay.portal.template.BaseTemplateManager;
 import com.liferay.portal.template.RestrictedTemplate;
 import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.velocity.VelocityContext;
@@ -42,110 +39,27 @@ import org.apache.velocity.util.introspection.SecureUberspector;
 /**
  * @author Raymond Augé
  */
-public class VelocityManager implements TemplateManager {
+@DoPrivileged
+public class VelocityManager extends BaseTemplateManager {
 
 	public void destroy() {
 		if (_velocityEngine == null) {
 			return;
 		}
 
-		_classLoaderVelocityContexts.clear();
-
-		_classLoaderVelocityContexts = null;
-		_restrictedVelocityContext = null;
-		_standardVelocityContext = null;
 		_velocityEngine = null;
+
+		_templateContextHelper.removeAllHelperUtilities();
+
 		_templateContextHelper = null;
 	}
 
 	public void destroy(ClassLoader classLoader) {
-		_classLoaderVelocityContexts.remove(classLoader);
+		_templateContextHelper.removeHelperUtilities(classLoader);
 	}
 
 	public String getName() {
-		return VELOCITY;
-	}
-
-	public Template getTemplate(
-		TemplateResource templateResource,
-		TemplateContextType templateContextType) {
-
-		return getTemplate(templateResource, null, templateContextType);
-	}
-
-	public Template getTemplate(
-		TemplateResource templateResource,
-		TemplateResource errorTemplateResource,
-		TemplateContextType templateContextType) {
-
-		if (templateContextType.equals(TemplateContextType.CLASS_LOADER)) {
-
-			// This template will have all of its utilities initialized within
-			// the class loader of the current thread
-
-			ClassLoader contextClassLoader =
-				PACLClassLoaderUtil.getContextClassLoader();
-
-			PACLPolicy threadLocalPACLPolicy =
-				PortalSecurityManagerThreadLocal.getPACLPolicy();
-
-			PACLPolicy contextClassLoaderPACLPolicy =
-				PACLPolicyManager.getPACLPolicy(contextClassLoader);
-
-			try {
-				PortalSecurityManagerThreadLocal.setPACLPolicy(
-					contextClassLoaderPACLPolicy);
-
-				VelocityContext velocityContext =
-					_classLoaderVelocityContexts.get(contextClassLoader);
-
-				if (velocityContext == null) {
-					velocityContext = new VelocityContext();
-
-					Map<String, Object> helperUtilities =
-						_templateContextHelper.getHelperUtilities();
-
-					for (Map.Entry<String, Object> entry :
-							helperUtilities.entrySet()) {
-
-						velocityContext.put(entry.getKey(), entry.getValue());
-					}
-
-					_classLoaderVelocityContexts.put(
-						contextClassLoader, velocityContext);
-				}
-
-				return new PACLVelocityTemplate(
-					templateResource, errorTemplateResource, velocityContext,
-					_velocityEngine, _templateContextHelper,
-					contextClassLoaderPACLPolicy);
-			}
-			finally {
-				PortalSecurityManagerThreadLocal.setPACLPolicy(
-					threadLocalPACLPolicy);
-			}
-		}
-		else if (templateContextType.equals(TemplateContextType.EMPTY)) {
-			return new VelocityTemplate(
-				templateResource, errorTemplateResource, null, _velocityEngine,
-				_templateContextHelper);
-		}
-		else if (templateContextType.equals(TemplateContextType.RESTRICTED)) {
-			return new RestrictedTemplate(
-				new VelocityTemplate(
-					templateResource, errorTemplateResource,
-					_restrictedVelocityContext, _velocityEngine,
-					_templateContextHelper),
-				_templateContextHelper.getRestrictedVariables());
-		}
-		else if (templateContextType.equals(TemplateContextType.STANDARD)) {
-			return new VelocityTemplate(
-				templateResource, errorTemplateResource,
-				_standardVelocityContext, _velocityEngine,
-				_templateContextHelper);
-		}
-
-		return null;
+		return TemplateConstants.LANG_TYPE_VM;
 	}
 
 	public void init() throws TemplateException {
@@ -223,23 +137,6 @@ public class VelocityManager implements TemplateManager {
 		catch (Exception e) {
 			throw new TemplateException(e);
 		}
-
-		_restrictedVelocityContext = new VelocityContext();
-
-		Map<String, Object> helperUtilities =
-			_templateContextHelper.getRestrictedHelperUtilities();
-
-		for (Map.Entry<String, Object> entry : helperUtilities.entrySet()) {
-			_restrictedVelocityContext.put(entry.getKey(), entry.getValue());
-		}
-
-		_standardVelocityContext = new VelocityContext();
-
-		helperUtilities = _templateContextHelper.getHelperUtilities();
-
-		for (Map.Entry<String, Object> entry : helperUtilities.entrySet()) {
-			_standardVelocityContext.put(entry.getKey(), entry.getValue());
-		}
 	}
 
 	public void setTemplateContextHelper(
@@ -248,10 +145,55 @@ public class VelocityManager implements TemplateManager {
 		_templateContextHelper = templateContextHelper;
 	}
 
-	private Map<ClassLoader, VelocityContext> _classLoaderVelocityContexts =
-		new ConcurrentHashMap<ClassLoader, VelocityContext>();
-	private VelocityContext _restrictedVelocityContext;
-	private VelocityContext _standardVelocityContext;
+	@Override
+	protected Template doGetTemplate(
+		TemplateResource templateResource,
+		TemplateResource errorTemplateResource,
+		TemplateContextType templateContextType,
+		Map<String, Object> helperUtilities) {
+
+		Template template = null;
+
+		VelocityContext velocityContext = getVelocityContext(helperUtilities);
+
+		if (templateContextType.equals(TemplateContextType.EMPTY)) {
+			template = new VelocityTemplate(
+				templateResource, errorTemplateResource, null, _velocityEngine,
+				_templateContextHelper);
+		}
+		else if (templateContextType.equals(TemplateContextType.RESTRICTED)) {
+			template = new RestrictedTemplate(
+				new VelocityTemplate(
+					templateResource, errorTemplateResource, velocityContext,
+					_velocityEngine, _templateContextHelper),
+				_templateContextHelper.getRestrictedVariables());
+		}
+		else if (templateContextType.equals(TemplateContextType.STANDARD)) {
+			template = new VelocityTemplate(
+				templateResource, errorTemplateResource, velocityContext,
+				_velocityEngine, _templateContextHelper);
+		}
+
+		return template;
+	}
+
+	@Override
+	protected TemplateContextHelper getTemplateContextHelper() {
+		return _templateContextHelper;
+	}
+
+	protected VelocityContext getVelocityContext(
+		Map<String, Object> helperUtilities) {
+
+		VelocityContext velocityContext = new VelocityContext();
+
+		for (Map.Entry<String, Object> entry : helperUtilities.entrySet()) {
+			velocityContext.put(entry.getKey(), entry.getValue());
+		}
+
+		return velocityContext;
+	}
+
 	private TemplateContextHelper _templateContextHelper;
 	private VelocityEngine _velocityEngine;
 

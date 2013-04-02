@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -32,7 +32,10 @@ import com.liferay.portal.model.LayoutSet;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.ResourcePermission;
 import com.liferay.portal.model.User;
+import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.InvokerPortlet;
+import com.liferay.portlet.PortletInstanceFactoryUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 
 import java.io.IOException;
@@ -51,10 +54,12 @@ import java.util.TimeZone;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
+import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import javax.portlet.PortletURL;
 import javax.portlet.PreferencesValidator;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -263,7 +268,7 @@ public class PortalUtil {
 	}
 
 	/**
-	 * @deprecated {@link #getCDNHost(boolean)}
+	 * @deprecated As of 6.1.0, replaced by {@link #getCDNHost(boolean)}
 	 */
 	public static String getCDNHost() {
 		return getPortal().getCDNHost();
@@ -375,6 +380,22 @@ public class PortalUtil {
 		return getPortal().getControlPanelPortlets(category, themeDisplay);
 	}
 
+	public static PortletURL getControlPanelPortletURL(
+		HttpServletRequest request, String portletId, long referrerPlid,
+		String lifecycle) {
+
+		return getPortal().getControlPanelPortletURL(
+			request, portletId, referrerPlid, lifecycle);
+	}
+
+	public static PortletURL getControlPanelPortletURL(
+		PortletRequest portletRequest, String portletId, long referrerPlid,
+		String lifecycle) {
+
+		return getPortal().getControlPanelPortletURL(
+			portletRequest, portletId, referrerPlid, lifecycle);
+	}
+
 	public static String getCreateAccountURL(
 			HttpServletRequest request, ThemeDisplay themeDisplay)
 		throws Exception {
@@ -440,7 +461,7 @@ public class PortalUtil {
 	}
 
 	/**
-	 * @deprecated {@link DBFactoryUtil#getDB()}
+	 * @deprecated As of 6.1.0, replaced by {@link DBFactoryUtil#getDB()}
 	 */
 	public static DB getDB() {
 		return DBFactoryUtil.getDB();
@@ -518,6 +539,12 @@ public class PortalUtil {
 
 	public static String getFirstPageLayoutTypes(PageContext pageContext) {
 		return getPortal().getFirstPageLayoutTypes(pageContext);
+	}
+
+	public static String getFullName(
+		String firstName, String middleName, String lastName) {
+
+		return getPortal().getFullName(firstName, middleName, lastName);
 	}
 
 	public static String getGlobalLibDir() {
@@ -615,12 +642,14 @@ public class PortalUtil {
 	}
 
 	public static String getJournalArticleActualURL(
-			long groupId, String mainPath, String friendlyURL,
-			Map<String, String[]> params, Map<String, Object> requestContext)
+			long groupId, boolean privateLayout, String mainPath,
+			String friendlyURL, Map<String, String[]> params,
+			Map<String, Object> requestContext)
 		throws PortalException, SystemException {
 
 		return getPortal().getJournalArticleActualURL(
-			groupId, mainPath, friendlyURL, params, requestContext);
+			groupId, privateLayout, mainPath, friendlyURL, params,
+			requestContext);
 	}
 
 	public static String getJsSafePortletId(String portletId) {
@@ -775,7 +804,8 @@ public class PortalUtil {
 	}
 
 	/**
-	 * @deprecated {@link #getBaseModel(ResourcePermission)}
+	 * @deprecated As of 6.1.0, replaced by {@link
+	 *             #getBaseModel(ResourcePermission)}
 	 */
 	public static BaseModel<?> getModel(ResourcePermission resourcePermission)
 		throws PortalException, SystemException {
@@ -784,7 +814,8 @@ public class PortalUtil {
 	}
 
 	/**
-	 * @deprecated {@link #getBaseModel(String, String)}
+	 * @deprecated As of 6.1.0, replaced by {@link #getBaseModel(String,
+	 *             String)}
 	 */
 	public static BaseModel<?> getModel(String modelName, String primKey)
 		throws PortalException, SystemException {
@@ -812,6 +843,9 @@ public class PortalUtil {
 		return getPortal().getOriginalServletRequest(request);
 	}
 
+	/**
+	 * @deprecated As of 6.2 renamed to {@link #getSiteGroupId(long)}
+	 */
 	public static long getParentGroupId(long scopeGroupId)
 		throws PortalException, SystemException {
 
@@ -840,6 +874,10 @@ public class PortalUtil {
 
 	public static String getPathMain() {
 		return getPortal().getPathMain();
+	}
+
+	public static String getPathModule() {
+		return getPortal().getPathModule();
 	}
 
 	public static String getPathProxy() {
@@ -877,7 +915,7 @@ public class PortalUtil {
 	}
 
 	/**
-	 * @deprecated {@link #getPortalPort(boolean)}
+	 * @deprecated As of 6.1.0, replaced by {@link #getPortalPort(boolean)}
 	 */
 	public static int getPortalPort() {
 		return getPortal().getPortalPort();
@@ -944,7 +982,8 @@ public class PortalUtil {
 	}
 
 	/**
-	 * @deprecated {@link #getPortletBreadcrumbs(HttpServletRequest)}
+	 * @deprecated As of 6.1.0, replaced by {@link
+	 *             #getPortletBreadcrumbs(HttpServletRequest)}
 	 */
 	public static List<BreadcrumbEntry> getPortletBreadcrumbList(
 		HttpServletRequest request) {
@@ -956,6 +995,19 @@ public class PortalUtil {
 		HttpServletRequest request) {
 
 		return getPortal().getPortletBreadcrumbs(request);
+	}
+
+	public static PortletConfig getPortletConfig(
+			long companyId, String portletId, ServletContext servletContext)
+		throws PortletException, SystemException {
+
+		Portlet portlet = PortletLocalServiceUtil.getPortletById(
+			companyId, portletId);
+
+		InvokerPortlet invokerPortlet = PortletInstanceFactoryUtil.create(
+			portlet, servletContext);
+
+		return invokerPortlet.getPortletConfig();
 	}
 
 	public static String getPortletDescription(
@@ -1167,6 +1219,12 @@ public class PortalUtil {
 		throws PortalException, SystemException {
 
 		return getPortal().getSiteAndCompanyGroupIds(themeDisplay);
+	}
+
+	public static long getSiteGroupId(long scopeGroupId)
+		throws PortalException, SystemException {
+
+		return getPortal().getSiteGroupId(scopeGroupId);
 	}
 
 	public static String getSiteLoginURL(ThemeDisplay themeDisplay)
@@ -1554,7 +1612,7 @@ public class PortalUtil {
 	}
 
 	/**
-	 * @deprecated {@link DB#runSQL(String)}
+	 * @deprecated As of 6.1.0, replaced by {@link DB#runSQL(String)}
 	 */
 	public static void runSQL(String sql) throws IOException, SQLException {
 		DBFactoryUtil.getDB().runSQL(sql);
@@ -1661,6 +1719,10 @@ public class PortalUtil {
 
 	public static String transformCustomSQL(String sql) {
 		return getPortal().transformCustomSQL(sql);
+	}
+
+	public static String transformSQL(String sql) {
+		return getPortal().transformSQL(sql);
 	}
 
 	public static PortletMode updatePortletMode(

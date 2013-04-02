@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.NoSuchImageException;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.model.Image;
 import com.liferay.portal.service.ServiceTestUtil;
@@ -108,8 +110,6 @@ public class ImagePersistenceTest {
 
 		newImage.setModifiedDate(ServiceTestUtil.nextDate());
 
-		newImage.setText(ServiceTestUtil.randomString());
-
 		newImage.setType(ServiceTestUtil.randomString());
 
 		newImage.setHeight(ServiceTestUtil.nextInt());
@@ -126,7 +126,6 @@ public class ImagePersistenceTest {
 		Assert.assertEquals(Time.getShortTimestamp(
 				existingImage.getModifiedDate()),
 			Time.getShortTimestamp(newImage.getModifiedDate()));
-		Assert.assertEquals(existingImage.getText(), newImage.getText());
 		Assert.assertEquals(existingImage.getType(), newImage.getType());
 		Assert.assertEquals(existingImage.getHeight(), newImage.getHeight());
 		Assert.assertEquals(existingImage.getWidth(), newImage.getWidth());
@@ -171,6 +170,26 @@ public class ImagePersistenceTest {
 		Image missingImage = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingImage);
+	}
+
+	@Test
+	public void testActionableDynamicQuery() throws Exception {
+		final IntegerWrapper count = new IntegerWrapper();
+
+		ActionableDynamicQuery actionableDynamicQuery = new ImageActionableDynamicQuery() {
+				@Override
+				protected void performAction(Object object) {
+					Image image = (Image)object;
+
+					Assert.assertNotNull(image);
+
+					count.increment();
+				}
+			};
+
+		actionableDynamicQuery.performActions();
+
+		Assert.assertEquals(count.getValue(), _persistence.countAll());
 	}
 
 	@Test
@@ -251,8 +270,6 @@ public class ImagePersistenceTest {
 		Image image = _persistence.create(pk);
 
 		image.setModifiedDate(ServiceTestUtil.nextDate());
-
-		image.setText(ServiceTestUtil.randomString());
 
 		image.setType(ServiceTestUtil.randomString());
 

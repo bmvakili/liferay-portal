@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -43,6 +43,16 @@ try {
 	}
 }
 catch (NoSuchMailingListException nsmle) {
+}
+
+if ((category == null) && (mailingList == null)) {
+	try {
+		if (parentCategoryId > 0) {
+			mailingList = MBMailingListLocalServiceUtil.getCategoryMailingList(scopeGroupId, parentCategoryId);
+		}
+	}
+	catch (NoSuchMailingListException nsmle) {
+	}
 }
 %>
 
@@ -96,7 +106,7 @@ catch (NoSuchMailingListException nsmle) {
 						<portlet:param name="mbCategoryId" value="<%= String.valueOf(parentCategoryId) %>" />
 					</portlet:renderURL>
 
-					<aui:a href="<%= viewCategoryURL %>" id="parentCategoryName"><%= parentCategoryName %></aui:a>
+					<aui:a href="<%= viewCategoryURL %>" id="parentCategoryName"><%= HtmlUtil.escape(parentCategoryName) %></aui:a>
 				</aui:field-wrapper>
 			</c:if>
 		</c:if>

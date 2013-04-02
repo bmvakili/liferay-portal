@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,7 +28,6 @@ import com.liferay.portlet.documentlibrary.model.DLSyncConstants;
 import com.liferay.portlet.documentlibrary.model.impl.DLSyncImpl;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,7 +40,7 @@ public class DLSyncFinderImpl
 		DLSyncFinder.class.getName() + ".findByC_M_R_T";
 
 	public List<DLSync> filterFindByC_M_R(
-			long companyId, Date modifiedDate, long repositoryId)
+			long companyId, long modifiedDate, long repositoryId)
 		throws SystemException {
 
 		Session session = null;

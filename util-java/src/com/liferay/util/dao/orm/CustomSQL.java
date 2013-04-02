@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,6 +15,7 @@
 package com.liferay.util.dao.orm;
 
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.log.Log;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -112,6 +114,40 @@ public class CustomSQL {
 		return _sqlPool.get(id);
 	}
 
+	public String get(String id, QueryDefinition queryDefinition) {
+		return get(id, queryDefinition, StringPool.BLANK);
+	}
+
+	public String get(
+		String id, QueryDefinition queryDefinition, String tableName) {
+
+		String sql = get(id);
+
+		if (!Validator.isBlank(tableName) &&
+			!tableName.endsWith(StringPool.PERIOD)) {
+
+			tableName = tableName.concat(StringPool.PERIOD);
+		}
+
+		if (queryDefinition.getStatus() == WorkflowConstants.STATUS_ANY) {
+			sql = sql.replace(_STATUS_KEYWORD, _STATUS_CONDITION_EMPTY);
+		}
+		else {
+			if (queryDefinition.isExcludeStatus()) {
+				sql = sql.replace(
+					_STATUS_KEYWORD,
+					tableName.concat(_STATUS_CONDITION_INVERSE));
+			}
+			else {
+				sql = sql.replace(
+					_STATUS_KEYWORD,
+					tableName.concat(_STATUS_CONDITION_DEFAULT));
+			}
+		}
+
+		return sql;
+	}
+
 	/**
 	 * Returns <code>true</code> if Hibernate is connecting to a DB2 database.
 	 *
@@ -119,6 +155,17 @@ public class CustomSQL {
 	 */
 	public boolean isVendorDB2() {
 		return _vendorDB2;
+	}
+
+	/**
+	 * Returns <code>true</code> if Hibernate is connecting to a Hypersonic
+	 * database.
+	 *
+	 * @return <code>true</code> if Hibernate is connecting to a Hypersonic
+	 *         database
+	 */
+	public boolean isVendorHSQL() {
+		return _vendorHSQL;
 	}
 
 	/**
@@ -274,9 +321,9 @@ public class CustomSQL {
 				_functionIsNotNull = functionIsNotNull;
 
 				if (_log.isDebugEnabled()) {
-					_log.info(
+					_log.debug(
 						"functionIsNull is manually set to " + functionIsNull);
-					_log.info(
+					_log.debug(
 						"functionIsNotNull is manually set to " +
 							functionIsNotNull);
 				}
@@ -298,6 +345,13 @@ public class CustomSQL {
 
 					if (_log.isInfoEnabled()) {
 						_log.info("Detected DB2 with database name " + dbName);
+					}
+				}
+				else if (dbName.startsWith("HSQL")) {
+					_vendorHSQL = true;
+
+					if (_log.isInfoEnabled()) {
+						_log.info("Detected HSQL with database name " + dbName);
 					}
 				}
 				else if (dbName.startsWith("Informix")) {
@@ -514,7 +568,7 @@ public class CustomSQL {
 
 		StringBundler oldSql = new StringBundler(4);
 
-		oldSql.append("(");
+		oldSql.append(StringPool.OPEN_PARENTHESIS);
 		oldSql.append(field);
 		oldSql.append(" = ?)");
 
@@ -528,19 +582,19 @@ public class CustomSQL {
 
 		StringBundler newSql = new StringBundler(values.length * 4 + 3);
 
-		newSql.append("(");
+		newSql.append(StringPool.OPEN_PARENTHESIS);
 
 		for (int i = 0; i < values.length; i++) {
 			if (i > 0) {
 				newSql.append(" OR ");
 			}
 
-			newSql.append("(");
+			newSql.append(StringPool.OPEN_PARENTHESIS);
 			newSql.append(field);
 			newSql.append(" = ?)");
 		}
 
-		newSql.append(")");
+		newSql.append(StringPool.CLOSE_PARENTHESIS);
 
 		if (!last) {
 			newSql.append(" [$AND_OR_CONNECTOR$]");
@@ -558,7 +612,7 @@ public class CustomSQL {
 
 		StringBundler oldSql = new StringBundler(4);
 
-		oldSql.append("(");
+		oldSql.append(StringPool.OPEN_PARENTHESIS);
 		oldSql.append(field);
 		oldSql.append(" = ?)");
 
@@ -572,19 +626,19 @@ public class CustomSQL {
 
 		StringBundler newSql = new StringBundler(values.length * 4 + 3);
 
-		newSql.append("(");
+		newSql.append(StringPool.OPEN_PARENTHESIS);
 
 		for (int i = 0; i < values.length; i++) {
 			if (i > 0) {
 				newSql.append(" OR ");
 			}
 
-			newSql.append("(");
+			newSql.append(StringPool.OPEN_PARENTHESIS);
 			newSql.append(field);
 			newSql.append(" = ?)");
 		}
 
-		newSql.append(")");
+		newSql.append(StringPool.CLOSE_PARENTHESIS);
 
 		if (!last) {
 			newSql.append(" [$AND_OR_CONNECTOR$]");
@@ -603,7 +657,7 @@ public class CustomSQL {
 
 		StringBundler oldSql = new StringBundler(6);
 
-		oldSql.append("(");
+		oldSql.append(StringPool.OPEN_PARENTHESIS);
 		oldSql.append(field);
 		oldSql.append(" ");
 		oldSql.append(operator);
@@ -615,21 +669,21 @@ public class CustomSQL {
 
 		StringBundler newSql = new StringBundler(values.length * 6 + 3);
 
-		newSql.append("(");
+		newSql.append(StringPool.OPEN_PARENTHESIS);
 
 		for (int i = 0; i < values.length; i++) {
 			if (i > 0) {
 				newSql.append(" OR ");
 			}
 
-			newSql.append("(");
+			newSql.append(StringPool.OPEN_PARENTHESIS);
 			newSql.append(field);
 			newSql.append(" ");
 			newSql.append(operator);
 			newSql.append(" ? [$AND_OR_NULL_CHECK$])");
 		}
 
-		newSql.append(")");
+		newSql.append(StringPool.CLOSE_PARENTHESIS);
 
 		if (!last) {
 			newSql.append(" [$AND_OR_CONNECTOR$]");
@@ -735,12 +789,22 @@ public class CustomSQL {
 
 	private static final String _ORDER_BY_CLAUSE = " ORDER BY ";
 
+	private static final String _STATUS_CONDITION_DEFAULT = "status = ?";
+
+	private static final String _STATUS_CONDITION_EMPTY =
+		WorkflowConstants.STATUS_ANY + " = ?";
+
+	private static final String _STATUS_CONDITION_INVERSE = "status != ?";
+
+	private static final String _STATUS_KEYWORD = "[$STATUS$]";
+
 	private static Log _log = LogFactoryUtil.getLog(CustomSQL.class);
 
 	private String _functionIsNotNull;
 	private String _functionIsNull;
 	private Map<String, String> _sqlPool;
 	private boolean _vendorDB2;
+	private boolean _vendorHSQL;
 	private boolean _vendorInformix;
 	private boolean _vendorMySQL;
 	private boolean _vendorOracle;

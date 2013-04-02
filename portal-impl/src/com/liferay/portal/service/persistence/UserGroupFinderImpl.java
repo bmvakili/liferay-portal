@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -347,21 +347,48 @@ public class UserGroupFinderImpl
 			Object value = entry.getValue();
 
 			if (Validator.isNotNull(value)) {
-				sb.append(getWhere(key));
+				sb.append(getWhere(key, value));
 			}
 		}
 
 		return sb.toString();
 	}
 
-	protected String getWhere(String key) {
+	protected String getWhere(String key, Object value) {
 		String join = StringPool.BLANK;
 
 		if (key.equals("userGroupGroupRole")) {
 			join = CustomSQLUtil.get(JOIN_BY_USER_GROUP_GROUP_ROLE);
 		}
 		else if (key.equals("userGroupsGroups")) {
-			join = CustomSQLUtil.get(JOIN_BY_USER_GROUPS_GROUPS);
+			if (value instanceof Long) {
+				join = CustomSQLUtil.get(JOIN_BY_USER_GROUPS_GROUPS);
+			}
+			else if (value instanceof Long[]) {
+				Long[] userGroupIds = (Long[])value;
+
+				if (userGroupIds.length == 0) {
+					join = "WHERE (Groups_UserGroups.groupId = -1)";
+				}
+				else {
+					StringBundler sb = new StringBundler(
+						userGroupIds.length * 2 + 1);
+
+					sb.append("WHERE (");
+
+					for (int i = 0; i < userGroupIds.length; i++) {
+						sb.append("(Groups_UserGroups.groupId = ?) ");
+
+						if ((i + 1) < userGroupIds.length) {
+							sb.append("OR ");
+						}
+					}
+
+					sb.append(StringPool.CLOSE_PARENTHESIS);
+
+					join = sb.toString();
+				}
+			}
 		}
 		else if (key.equals("userGroupsRoles")) {
 			join = CustomSQLUtil.get(JOIN_BY_USER_GROUPS_ROLES);

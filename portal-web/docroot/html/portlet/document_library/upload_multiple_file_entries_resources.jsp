@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -67,17 +67,16 @@ long assetClassPK = 0;
 
 <portlet:actionURL var="editMultipleFileEntriesURL">
 	<portlet:param name="struts_action" value="document_library/edit_file_entry" />
-	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD_MULTIPLE %>" />
 </portlet:actionURL>
 
 <aui:form action="<%= editMultipleFileEntriesURL %>" method="post" name="fm2" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "updateMultipleFiles();" %>'>
+	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.ADD_MULTIPLE %>" />
+	<aui:input name="repositoryId" type="hidden" value="<%= String.valueOf(repositoryId) %>" />
+	<aui:input name="folderId" type="hidden" value="<%= String.valueOf(folderId) %>" />
+
 	<div class="no-files-selected-info portlet-msg-info aui-helper-hidden" id="<portlet:namespace />metadataExplanationContainer">
 		<liferay-ui:message key="select-documents-from-the-left-to-add-them-to-the-documents-and-media" />
 	</div>
-
-	<aui:input name="repositoryId" type="hidden" value="<%= String.valueOf(repositoryId) %>" />
-
-	<aui:input name="folderId" type="hidden" value="<%= String.valueOf(folderId) %>" />
 
 	<aui:model-context bean="<%= fileVersion %>" model="<%= DLFileVersion.class %>" />
 
@@ -156,7 +155,13 @@ long assetClassPK = 0;
 					%>
 
 									<div class="document-type-fields">
-										<%= DDMXSDUtil.getHTML(pageContext, ddmStructure.getXsd(), fields, String.valueOf(ddmStructure.getPrimaryKey()), locale) %>
+										<liferay-ddm:html
+											classNameId="<%= PortalUtil.getClassNameId(DDMStructure.class) %>"
+											classPK="<%= ddmStructure.getPrimaryKey() %>"
+											fields="<%= fields %>"
+											fieldsNamespace="<%= String.valueOf(ddmStructure.getPrimaryKey()) %>"
+											requestedLocale="<%= locale %>"
+										/>
 									</div>
 
 					<%

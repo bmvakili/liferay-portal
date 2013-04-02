@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -104,13 +104,15 @@ public class JournalContentSearchLocalServiceImpl
 	public void deleteArticleContentSearch(
 			long groupId, boolean privateLayout, long layoutId,
 			String portletId, String articleId)
-		throws PortalException, SystemException {
+		throws SystemException {
 
 		JournalContentSearch contentSearch =
-			journalContentSearchPersistence.findByG_P_L_P_A(
+			journalContentSearchPersistence.fetchByG_P_L_P_A(
 				groupId, privateLayout, layoutId, portletId, articleId);
 
-		deleteJournalContentSearch(contentSearch);
+		if (contentSearch != null) {
+			deleteJournalContentSearch(contentSearch);
+		}
 	}
 
 	public void deleteArticleContentSearches(long groupId, String articleId)

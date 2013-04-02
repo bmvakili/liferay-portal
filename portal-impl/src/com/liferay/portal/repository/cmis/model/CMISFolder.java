@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -84,6 +84,22 @@ public class CMISFolder extends CMISModel implements Folder {
 		else {
 			return containsPermission(_cmisFolder, actionId);
 		}
+	}
+
+	public List<Long> getAncestorFolderIds()
+		throws PortalException, SystemException {
+
+		List<Long> folderIds = new ArrayList<Long>();
+
+		Folder folder = this;
+
+		while (!folder.isRoot()) {
+			folder = folder.getParentFolder();
+
+			folderIds.add(folder.getFolderId());
+		}
+
+		return folderIds;
 	}
 
 	public List<Folder> getAncestors() throws PortalException, SystemException {
@@ -332,6 +348,10 @@ public class CMISFolder extends CMISModel implements Folder {
 	}
 
 	public boolean isSupportsSocial() {
+		return false;
+	}
+
+	public boolean isSupportsSubscribing() {
 		return false;
 	}
 

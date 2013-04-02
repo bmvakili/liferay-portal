@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,11 +17,14 @@ package com.liferay.portal.kernel.lar;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+
+import java.io.IOException;
 
 import javax.portlet.PortletPreferences;
 
@@ -89,23 +92,23 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	}
 
 	public String[] getDataPortletPreferences() {
-		return new String[0];
+		return _dataPortletPreferences;
 	}
 
 	public PortletDataHandlerControl[] getExportControls() {
-		return new PortletDataHandlerControl[0];
+		return _exportControls;
 	}
 
 	public PortletDataHandlerControl[] getExportMetadataControls() {
-		return new PortletDataHandlerControl[0];
+		return _exportMetadataControls;
 	}
 
 	public PortletDataHandlerControl[] getImportControls() {
-		return new PortletDataHandlerControl[0];
+		return _importControls;
 	}
 
 	public PortletDataHandlerControl[] getImportMetadataControls() {
-		return new PortletDataHandlerControl[0];
+		return _importMetadataControls;
 	}
 
 	public PortletPreferences importData(
@@ -128,6 +131,8 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 				Document document = SAXReaderUtil.read(data);
 
 				Element rootElement = document.getRootElement();
+
+				portletDataContext.setImportDataRootElement(rootElement);
 
 				long portletSourceGroupId = GetterUtil.getLong(
 					rootElement.attributeValue("group-id"));
@@ -155,19 +160,33 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 	}
 
 	public boolean isAlwaysExportable() {
-		return _ALWAYS_EXPORTABLE;
+		return _alwaysExportable;
 	}
 
 	public boolean isAlwaysStaged() {
-		return _ALWAYS_STAGED;
+		return _alwaysStaged;
 	}
 
 	public boolean isDataLocalized() {
-		return _DATA_LOCALIZED;
+		return _dataLocalized;
 	}
 
 	public boolean isPublishToLiveByDefault() {
-		return _PUBLISH_TO_LIVE_BY_DEFAULT;
+		return _publishToLiveByDefault;
+	}
+
+	protected Element addExportDataRootElement(
+		PortletDataContext portletDataContext) {
+
+		Document document = SAXReaderUtil.createDocument();
+
+		Class<?> clazz = getClass();
+
+		Element rootElement = document.addElement(clazz.getSimpleName());
+
+		portletDataContext.setExportDataRootElement(rootElement);
+
+		return rootElement;
 	}
 
 	protected PortletPreferences doDeleteData(
@@ -175,7 +194,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		return null;
+		return portletPreferences;
 	}
 
 	protected String doExportData(
@@ -194,15 +213,84 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		return null;
 	}
 
-	private static final boolean _ALWAYS_EXPORTABLE = false;
+	protected String getExportDataRootElementString(Element rootElement) {
+		if (rootElement == null) {
+			return StringPool.BLANK;
+		}
 
-	private static final boolean _ALWAYS_STAGED = false;
+		try {
+			Document document = rootElement.getDocument();
 
-	private static final boolean _DATA_LOCALIZED = false;
+			return document.formattedString();
+		}
+		catch (IOException ioe) {
+			return StringPool.BLANK;
+		}
+	}
 
-	private static final boolean _PUBLISH_TO_LIVE_BY_DEFAULT = false;
+	protected void setAlwaysExportable(boolean alwaysExportable) {
+		_alwaysExportable = alwaysExportable;
+	}
+
+	protected void setAlwaysStaged(boolean alwaysStaged) {
+		_alwaysStaged = alwaysStaged;
+	}
+
+	protected void setDataLocalized(boolean dataLocalized) {
+		_dataLocalized = dataLocalized;
+	}
+
+	protected void setDataPortletPreferences(String... dataPortletPreferences) {
+		_dataPortletPreferences = dataPortletPreferences;
+	}
+
+	protected void setExportControls(
+		PortletDataHandlerControl... exportControls) {
+
+		_exportControls = exportControls;
+
+		setImportControls(exportControls);
+	}
+
+	protected void setExportMetadataControls(
+		PortletDataHandlerControl... exportMetadataControls) {
+
+		_exportMetadataControls = exportMetadataControls;
+
+		setImportMetadataControls(exportMetadataControls);
+	}
+
+	protected void setImportControls(
+		PortletDataHandlerControl... importControls) {
+
+		_importControls = importControls;
+	}
+
+	protected void setImportMetadataControls(
+		PortletDataHandlerControl... importMetadataControls) {
+
+		_importMetadataControls = importMetadataControls;
+	}
+
+	protected void setPublishToLiveByDefault(boolean publishToLiveByDefault) {
+		_publishToLiveByDefault = publishToLiveByDefault;
+	}
 
 	private static Log _log = LogFactoryUtil.getLog(
 		BasePortletDataHandler.class);
+
+	private boolean _alwaysExportable;
+	private boolean _alwaysStaged;
+	private boolean _dataLocalized;
+	private String[] _dataPortletPreferences = new String[0];
+	private PortletDataHandlerControl[] _exportControls =
+		new PortletDataHandlerControl[0];
+	private PortletDataHandlerControl[] _exportMetadataControls =
+		new PortletDataHandlerControl[0];
+	private PortletDataHandlerControl[] _importControls =
+		new PortletDataHandlerControl[0];
+	private PortletDataHandlerControl[] _importMetadataControls =
+		new PortletDataHandlerControl[0];
+	private boolean _publishToLiveByDefault;
 
 }

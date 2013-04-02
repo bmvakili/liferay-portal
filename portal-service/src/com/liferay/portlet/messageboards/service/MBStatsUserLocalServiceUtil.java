@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -280,9 +280,9 @@ public class MBStatsUserLocalServiceUtil {
 		getService().deleteStatsUsersByUserId(userId);
 	}
 
-	public static java.util.Date getLasPostDateByUserId(long groupId,
+	public static java.util.Date getLastPostDateByUserId(long groupId,
 		long userId) throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().getLasPostDateByUserId(groupId, userId);
+		return getService().getLastPostDateByUserId(groupId, userId);
 	}
 
 	public static long getMessageCountByGroupId(long groupId)
@@ -350,7 +350,7 @@ public class MBStatsUserLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	public void setService(MBStatsUserLocalService service) {
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,7 +50,7 @@ public class DLSyncServiceWrapper implements DLSyncService,
 	}
 
 	public com.liferay.portlet.documentlibrary.model.DLSyncUpdate getDLSyncUpdate(
-		long companyId, long repositoryId, java.util.Date lastAccessDate)
+		long companyId, long repositoryId, long lastAccessDate)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _dlSyncService.getDLSyncUpdate(companyId, repositoryId,
@@ -79,14 +79,14 @@ public class DLSyncServiceWrapper implements DLSyncService,
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public DLSyncService getWrappedDLSyncService() {
 		return _dlSyncService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedDLSyncService(DLSyncService dlSyncService) {
 		_dlSyncService = dlSyncService;

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,8 +16,8 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandler" %><%@
-page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandlerRegistryUtil" %><%@
+<%@ page import="com.liferay.portal.kernel.template.TemplateHandler" %><%@
+page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><%@
 page import="com.liferay.portal.util.LayoutLister" %><%@
 page import="com.liferay.portal.util.LayoutView" %><%@
 page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateUtil" %>
@@ -44,7 +44,7 @@ Layout rootLayout = null;
 long rootLayoutId = LayoutConstants.DEFAULT_PARENT_LAYOUT_ID;
 
 if (Validator.isNotNull(rootLayoutUuid)) {
-	rootLayout = LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(rootLayoutUuid, scopeGroupId);
+	rootLayout = LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(rootLayoutUuid, scopeGroupId, layout.isPrivateLayout());
 
 	if (rootLayout != null) {
 		rootLayoutId = rootLayout.getLayoutId();

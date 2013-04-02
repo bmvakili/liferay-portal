@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -71,8 +71,8 @@ public interface MBMessageService extends BaseService {
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated {@link #addMessage(long, String, String, String,
-	java.util.List, boolean, double, boolean,
+	* @deprecated As of 6.2.0, replaced by {@link #addMessage(long, String,
+	String, String, java.util.List, boolean, double, boolean,
 	com.liferay.portal.service.ServiceContext)}
 	*/
 	public com.liferay.portlet.messageboards.model.MBMessage addMessage(
@@ -90,6 +90,12 @@ public interface MBMessageService extends BaseService {
 		java.lang.String body, java.lang.String format,
 		java.util.List<com.liferay.portal.kernel.util.ObjectValuePair<java.lang.String, java.io.InputStream>> inputStreamOVPs,
 		boolean anonymous, double priority, boolean allowPingbacks,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.messageboards.model.MBMessage addMessage(
+		long categoryId, java.lang.String subject, java.lang.String body,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;

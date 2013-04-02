@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,6 +22,8 @@ public interface Constants {
 	public static final String ACTION = "action";
 
 	public static final String ADD = "add";
+
+	public static final String ADD_DYNAMIC = "add_dynamic";
 
 	public static final String ADD_MULTIPLE = "add_multiple";
 
@@ -133,6 +135,8 @@ public interface Constants {
 	public static final String UPDATE = "update";
 
 	public static final String UPDATE_AND_CHECKIN = "update_and_checkin";
+
+	public static final String UPDATE_CONTENT = "update_content";
 
 	public static final String VIEW = "view";
 

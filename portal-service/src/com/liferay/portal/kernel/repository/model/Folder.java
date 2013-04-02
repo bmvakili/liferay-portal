@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,6 +39,9 @@ public interface Folder extends RepositoryModel<Folder> {
 
 	public boolean containsPermission(
 			PermissionChecker permissionChecker, String actionId)
+		throws PortalException, SystemException;
+
+	public List<Long> getAncestorFolderIds()
 		throws PortalException, SystemException;
 
 	public List<Folder> getAncestors()
@@ -95,5 +98,7 @@ public interface Folder extends RepositoryModel<Folder> {
 	public boolean isSupportsShortcuts();
 
 	public boolean isSupportsSocial();
+
+	public boolean isSupportsSubscribing();
 
 }

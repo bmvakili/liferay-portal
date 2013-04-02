@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -44,6 +44,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.portlet.ValidatorException;
 
 import javax.servlet.ServletContext;
 
@@ -123,7 +124,15 @@ public class DefaultConfigurationAction
 		}
 
 		if (SessionErrors.isEmpty(actionRequest)) {
-			portletPreferences.store();
+			try {
+				portletPreferences.store();
+			}
+			catch (ValidatorException ve) {
+				SessionErrors.add(
+					actionRequest, ValidatorException.class.getName(), ve);
+
+				return;
+			}
 
 			LiferayPortletConfig liferayPortletConfig =
 				(LiferayPortletConfig)portletConfig;

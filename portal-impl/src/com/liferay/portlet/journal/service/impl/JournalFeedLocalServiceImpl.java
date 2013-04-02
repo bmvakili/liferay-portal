@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,15 +30,15 @@ import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portlet.expando.model.ExpandoBridge;
+import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.journal.DuplicateFeedIdException;
 import com.liferay.portlet.journal.FeedContentFieldException;
 import com.liferay.portlet.journal.FeedIdException;
 import com.liferay.portlet.journal.FeedNameException;
 import com.liferay.portlet.journal.FeedTargetLayoutFriendlyUrlException;
+import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalFeed;
 import com.liferay.portlet.journal.model.JournalFeedConstants;
-import com.liferay.portlet.journal.model.JournalStructure;
 import com.liferay.portlet.journal.service.base.JournalFeedLocalServiceBaseImpl;
 import com.liferay.util.RSSUtil;
 
@@ -109,6 +109,8 @@ public class JournalFeedLocalServiceImpl
 			feed.setFeedVersion(feedVersion);
 		}
 
+		feed.setExpandoBridgeAttributes(serviceContext);
+
 		journalFeedPersistence.update(feed);
 
 		// Resources
@@ -125,12 +127,6 @@ public class JournalFeedLocalServiceImpl
 				feed, serviceContext.getGroupPermissions(),
 				serviceContext.getGuestPermissions());
 		}
-
-		// Expando
-
-		ExpandoBridge expandoBridge = feed.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		return feed;
 	}
@@ -316,13 +312,9 @@ public class JournalFeedLocalServiceImpl
 			feed.setFeedVersion(feedVersion);
 		}
 
+		feed.setExpandoBridgeAttributes(serviceContext);
+
 		journalFeedPersistence.update(feed);
-
-		// Expando
-
-		ExpandoBridge expandoBridge = feed.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		return feed;
 	}
@@ -337,10 +329,13 @@ public class JournalFeedLocalServiceImpl
 		}
 		else {
 			try {
-				JournalStructure structure =
-					journalStructurePersistence.findByG_S(groupId, structureId);
+				DDMStructure ddmStructure =
+					ddmStructureLocalService.getStructure(
+						groupId,
+						PortalUtil.getClassNameId(JournalArticle.class),
+						structureId);
 
-				Document document = SAXReaderUtil.read(structure.getXsd());
+				Document document = SAXReaderUtil.read(ddmStructure.getXsd());
 
 				contentField = HtmlUtil.escapeXPathAttribute(contentField);
 

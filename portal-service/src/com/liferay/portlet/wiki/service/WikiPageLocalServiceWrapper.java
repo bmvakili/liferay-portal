@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -184,12 +184,12 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	/**
-	* Returns the wiki page with the UUID in the group.
+	* Returns the wiki page matching the UUID and group.
 	*
-	* @param uuid the UUID of wiki page
-	* @param groupId the group id of the wiki page
-	* @return the wiki page
-	* @throws PortalException if a wiki page with the UUID in the group could not be found
+	* @param uuid the wiki page's UUID
+	* @param groupId the primary key of the group
+	* @return the matching wiki page
+	* @throws PortalException if a matching wiki page could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.wiki.model.WikiPage getWikiPageByUuidAndGroupId(
@@ -283,20 +283,21 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	public void addPageAttachment(long userId, long nodeId,
-		java.lang.String title, java.lang.String fileName, java.io.File file)
+		java.lang.String title, java.lang.String fileName, java.io.File file,
+		java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_wikiPageLocalService.addPageAttachment(userId, nodeId, title,
-			fileName, file);
+			fileName, file, mimeType);
 	}
 
 	public void addPageAttachment(long userId, long nodeId,
 		java.lang.String title, java.lang.String fileName,
-		java.io.InputStream inputStream)
+		java.io.InputStream inputStream, java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_wikiPageLocalService.addPageAttachment(userId, nodeId, title,
-			fileName, inputStream);
+			fileName, inputStream, mimeType);
 	}
 
 	public void addPageAttachments(long userId, long nodeId,
@@ -340,13 +341,13 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 			guestPermissions);
 	}
 
-	public java.lang.String addTempPageAttachment(long userId,
+	public void addTempPageAttachment(long groupId, long userId,
 		java.lang.String fileName, java.lang.String tempFolderName,
-		java.io.InputStream inputStream)
+		java.io.InputStream inputStream, java.lang.String mimeType)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _wikiPageLocalService.addTempPageAttachment(userId, fileName,
-			tempFolderName, inputStream);
+		_wikiPageLocalService.addTempPageAttachment(groupId, userId, fileName,
+			tempFolderName, inputStream, mimeType);
 	}
 
 	public void changeParent(long userId, long nodeId, java.lang.String title,
@@ -364,6 +365,10 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 		_wikiPageLocalService.deletePage(nodeId, title);
 	}
 
+	/**
+	* @deprecated As of 6.2.0 replaced by {@link #discardDraft(long, String,
+	double)}
+	*/
 	public void deletePage(long nodeId, java.lang.String title, double version)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -395,18 +400,24 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 		_wikiPageLocalService.deletePages(nodeId);
 	}
 
-	public void deleteTempPageAttachment(long userId,
+	public void deleteTempPageAttachment(long groupId, long userId,
 		java.lang.String fileName, java.lang.String tempFolderName)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_wikiPageLocalService.deleteTempPageAttachment(userId, fileName,
-			tempFolderName);
+		_wikiPageLocalService.deleteTempPageAttachment(groupId, userId,
+			fileName, tempFolderName);
 	}
 
 	public void deleteTrashPageAttachments(long nodeId, java.lang.String title)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_wikiPageLocalService.deleteTrashPageAttachments(nodeId, title);
+	}
+
+	public void discardDraft(long nodeId, java.lang.String title, double version)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_wikiPageLocalService.discardDraft(nodeId, title, version);
 	}
 
 	public com.liferay.portlet.wiki.model.WikiPage fetchPage(long nodeId,
@@ -628,7 +639,8 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	/**
-	* @deprecated {@link #getRecentChanges(long, long, int, int)}
+	* @deprecated As of 6.2.0, replaced by {@link #getRecentChanges(long, long,
+	int, int)}
 	*/
 	public java.util.List<com.liferay.portlet.wiki.model.WikiPage> getRecentChanges(
 		long nodeId, int start, int end)
@@ -645,7 +657,8 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	/**
-	* @deprecated {@link #getRecentChangesCount(long, long)}
+	* @deprecated As of 6.2.0, replaced by {@link #getRecentChangesCount(long,
+	long)}
 	*/
 	public int getRecentChangesCount(long nodeId)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -658,10 +671,12 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 		return _wikiPageLocalService.getRecentChangesCount(groupId, nodeId);
 	}
 
-	public java.lang.String[] getTempPageAttachmentNames(long userId,
-		java.lang.String tempFolderName) {
-		return _wikiPageLocalService.getTempPageAttachmentNames(userId,
-			tempFolderName);
+	public java.lang.String[] getTempPageAttachmentNames(long groupId,
+		long userId, java.lang.String tempFolderName)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _wikiPageLocalService.getTempPageAttachmentNames(groupId,
+			userId, tempFolderName);
 	}
 
 	public boolean hasDraftPage(long nodeId, java.lang.String title)
@@ -786,15 +801,6 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 
 	public com.liferay.portlet.wiki.model.WikiPage updateStatus(long userId,
 		com.liferay.portlet.wiki.model.WikiPage page, int status,
-		int nodeStatus, com.liferay.portal.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
-		return _wikiPageLocalService.updateStatus(userId, page, status,
-			nodeStatus, serviceContext);
-	}
-
-	public com.liferay.portlet.wiki.model.WikiPage updateStatus(long userId,
-		com.liferay.portlet.wiki.model.WikiPage page, int status,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -808,14 +814,14 @@ public class WikiPageLocalServiceWrapper implements WikiPageLocalService,
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public WikiPageLocalService getWrappedWikiPageLocalService() {
 		return _wikiPageLocalService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedWikiPageLocalService(
 		WikiPageLocalService wikiPageLocalService) {

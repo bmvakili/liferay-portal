@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,12 +31,18 @@ import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.theme.PortletDisplay;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PortletKeys;
 import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
+import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
+import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 
+import java.util.Date;
 import java.util.Locale;
 
 import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -48,6 +54,10 @@ import javax.portlet.WindowState;
  */
 public abstract class BaseAssetRenderer implements AssetRenderer {
 
+	public String getAddContentPortletId() throws Exception {
+		return PortletKeys.ASSET_PUBLISHER;
+	}
+
 	public AssetRendererFactory getAssetRendererFactory() {
 		if (_assetRendererFactory != null) {
 			return _assetRendererFactory;
@@ -55,7 +65,7 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 
 		_assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				getAssetRendererFactoryClassName());
+				getClassName());
 
 		return _assetRendererFactory;
 	}
@@ -68,6 +78,10 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		return null;
 	}
 
+	public Date getDisplayDate() {
+		return null;
+	}
+
 	public String getIconPath(PortletRequest portletRequest) {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -75,8 +89,25 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		return getIconPath(themeDisplay);
 	}
 
+	public String getPreviewPath(
+			PortletRequest portletRequest, PortletResponse PortletResponse)
+		throws Exception {
+
+		return "/html/portlet/asset_publisher/display/preview.jsp";
+	}
+
 	public String getSearchSummary(Locale locale) {
 		return getSummary(locale);
+	}
+
+	public String getThumbnailPath(PortletRequest portletRequest)
+		throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return themeDisplay.getPathThemeImages() +
+			"/file_system/large/default.png";
 	}
 
 	public String getURLDownload(ThemeDisplay themeDisplay) {
@@ -97,9 +128,8 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 			WindowState windowState, PortletURL redirectURL)
 		throws Exception {
 
-		LiferayPortletURL editPortletURL =
-			(LiferayPortletURL)getURLEdit(
-				liferayPortletRequest, liferayPortletResponse);
+		LiferayPortletURL editPortletURL = (LiferayPortletURL)getURLEdit(
+			liferayPortletRequest, liferayPortletResponse);
 
 		if (editPortletURL == null) {
 			return null;
@@ -153,6 +183,12 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		throws Exception {
 
 		return null;
+	}
+
+	public String getURLImagePreview(PortletRequest portletRequest)
+		throws Exception {
+
+		return getThumbnailPath(portletRequest);
 	}
 
 	public String getUrlTitle() {
@@ -219,6 +255,21 @@ public abstract class BaseAssetRenderer implements AssetRenderer {
 		throws Exception {
 
 		return null;
+	}
+
+	public void setAddContentPreferences(
+			PortletPreferences preferences, String portletId,
+			ThemeDisplay themeDisplay)
+		throws Exception {
+
+		preferences.setValue("selectionStyle", "manual");
+
+		AssetEntry entry = AssetEntryLocalServiceUtil.getEntry(
+			getClassName(), getClassPK());
+
+		AssetPublisherUtil.addSelection(
+			themeDisplay, preferences, portletId, entry.getEntryId(), -1,
+			entry.getClassName());
 	}
 
 	protected long getControlPanelPlid(

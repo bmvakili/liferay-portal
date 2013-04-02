@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,9 +18,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
-import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.model.ContainerModel;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.trash.model.TrashEntry;
@@ -37,35 +35,22 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class TrashUtil {
 
-	public static final String TRASH_ATTACHMENTS_DIR = ".trashed_";
+	public static void addBaseModelBreadcrumbEntries(
+			HttpServletRequest request, String className, long classPK,
+			PortletURL containerModelURL)
+		throws PortalException, SystemException {
 
-	public static final int TRASH_DEFAULT_VALUE = -1;
-
-	public static final int TRASH_DISABLED = 0;
-
-	public static final int TRASH_DISABLED_BY_DEFAULT = 1;
-
-	public static final int TRASH_ENABLED = 3;
-
-	public static final int TRASH_ENABLED_BY_DEFAULT = 2;
-
-	public static final String TRASH_TIME_SEPARATOR = "_TRASH_TIME_";
+		getTrash().addBaseModelBreadcrumbEntries(
+			request, className, classPK, containerModelURL);
+	}
 
 	public static void addContainerModelBreadcrumbEntries(
-			HttpServletRequest request, TrashHandler trashHandler,
-			ContainerModel containerModel, PortletURL containerModelURL)
+			HttpServletRequest request, String className, long classPK,
+			PortletURL containerModelURL)
 		throws PortalException, SystemException {
 
 		getTrash().addContainerModelBreadcrumbEntries(
-			request, trashHandler, containerModel, containerModelURL);
-	}
-
-	public static String appendTrashNamespace(String title) {
-		return getTrash().appendTrashNamespace(title);
-	}
-
-	public static String appendTrashNamespace(String title, String separator) {
-		return getTrash().appendTrashNamespace(title, separator);
+			request, className, classPK, containerModelURL);
 	}
 
 	public static void deleteEntriesAttachments(
@@ -99,6 +84,10 @@ public class TrashUtil {
 		return getTrash().getNewName(themeDisplay, oldName);
 	}
 
+	public static String getOriginalTitle(String title) {
+		return getTrash().getOriginalTitle(title);
+	}
+
 	public static Trash getTrash() {
 		PortalRuntimePermission.checkGetBeanProperty(TrashUtil.class);
 
@@ -107,6 +96,17 @@ public class TrashUtil {
 
 	public static String getTrashTime(String title, String separator) {
 		return getTrash().getTrashTime(title, separator);
+	}
+
+	public static String getTrashTitle(long trashEntryId) {
+		return getTrash().getTrashTitle(trashEntryId);
+	}
+
+	public static PortletURL getViewContentURL(
+			HttpServletRequest request, String className, long classPK)
+		throws PortalException, SystemException {
+
+		return getTrash().getViewContentURL(request, className, classPK);
 	}
 
 	public static boolean isInTrash(String className, long classPK)
@@ -119,14 +119,6 @@ public class TrashUtil {
 		throws PortalException, SystemException {
 
 		return getTrash().isTrashEnabled(groupId);
-	}
-
-	public static String stripTrashNamespace(String title) {
-		return getTrash().stripTrashNamespace(title);
-	}
-
-	public static String stripTrashNamespace(String title, String separator) {
-		return getTrash().stripTrashNamespace(title, separator);
 	}
 
 	public void setTrash(Trash trash) {

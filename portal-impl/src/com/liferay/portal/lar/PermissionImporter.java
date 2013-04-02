@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -136,7 +136,7 @@ public class PermissionImporter {
 
 				role = RoleLocalServiceUtil.addRole(
 					userId, null, 0, name, titleMap, descriptionMap, type,
-					subType);
+					subType, null);
 			}
 
 			String roleName = role.getName();

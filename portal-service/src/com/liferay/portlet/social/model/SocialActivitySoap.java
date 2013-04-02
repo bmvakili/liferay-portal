@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,6 +34,7 @@ public class SocialActivitySoap implements Serializable {
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
 		soapModel.setCreateDate(model.getCreateDate());
+		soapModel.setActivitySetId(model.getActivitySetId());
 		soapModel.setMirrorActivityId(model.getMirrorActivityId());
 		soapModel.setClassNameId(model.getClassNameId());
 		soapModel.setClassPK(model.getClassPK());
@@ -132,6 +133,14 @@ public class SocialActivitySoap implements Serializable {
 		_createDate = createDate;
 	}
 
+	public long getActivitySetId() {
+		return _activitySetId;
+	}
+
+	public void setActivitySetId(long activitySetId) {
+		_activitySetId = activitySetId;
+	}
+
 	public long getMirrorActivityId() {
 		return _mirrorActivityId;
 	}
@@ -185,6 +194,7 @@ public class SocialActivitySoap implements Serializable {
 	private long _companyId;
 	private long _userId;
 	private long _createDate;
+	private long _activitySetId;
 	private long _mirrorActivityId;
 	private long _classNameId;
 	private long _classPK;

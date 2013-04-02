@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -46,10 +46,12 @@ import java.util.TimeZone;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletConfig;
+import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import javax.portlet.PortletURL;
 import javax.portlet.PreferencesValidator;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -74,6 +76,8 @@ public interface Portal {
 	public static final String PATH_IMAGE = "/image";
 
 	public static final String PATH_MAIN = "/c";
+
+	public static final String PATH_MODULE = "/o";
 
 	public static final String PATH_PORTAL_LAYOUT = "/portal/layout";
 
@@ -379,7 +383,8 @@ public interface Portal {
 		throws PortalException, SystemException;
 
 	/**
-	 * @deprecated Replaced by the more general {@link #getCDNHost(boolean)}
+	 * @deprecated As of 6.2.0, replaced by the more general {@link
+	 *             #getCDNHost(boolean)}
 	 */
 	public String getCDNHost();
 
@@ -485,6 +490,14 @@ public interface Portal {
 	public List<Portlet> getControlPanelPortlets(
 			String category, ThemeDisplay themeDisplay)
 		throws SystemException;
+
+	public PortletURL getControlPanelPortletURL(
+		HttpServletRequest request, String portletId, long referrerPlid,
+		String lifecycle);
+
+	public PortletURL getControlPanelPortletURL(
+		PortletRequest portletRequest, String portletId, long referrerPlid,
+		String lifecycle);
 
 	public String getCreateAccountURL(
 			HttpServletRequest request, ThemeDisplay themeDisplay)
@@ -635,6 +648,9 @@ public interface Portal {
 
 	public String getFirstPageLayoutTypes(PageContext pageContext);
 
+	public String getFullName(
+		String firstName, String middleName, String lastName);
+
 	public String getGlobalLibDir();
 
 	public String getGoogleGadgetURL(Portlet portlet, ThemeDisplay themeDisplay)
@@ -683,8 +699,9 @@ public interface Portal {
 		PortletResponse portletResponse);
 
 	public String getJournalArticleActualURL(
-			long groupId, String mainPath, String friendlyURL,
-			Map<String, String[]> params, Map<String, Object> requestContext)
+			long groupId, boolean privateLayout, String mainPath,
+			String friendlyURL, Map<String, String[]> params,
+			Map<String, Object> requestContext)
 		throws PortalException, SystemException;
 
 	public String getJsSafePortletId(String portletId);
@@ -773,6 +790,9 @@ public interface Portal {
 	public HttpServletRequest getOriginalServletRequest(
 		HttpServletRequest request);
 
+	/**
+	 * @deprecated As of 6.2 renamed to {@link #getSiteGroupId(long)}
+	 */
 	public long getParentGroupId(long scopeGroupId)
 		throws PortalException, SystemException;
 
@@ -788,6 +808,8 @@ public interface Portal {
 
 	public String getPathMain();
 
+	public String getPathModule();
+
 	public String getPathProxy();
 
 	public long getPlidFromFriendlyURL(long companyId, String friendlyURL);
@@ -802,7 +824,8 @@ public interface Portal {
 	public String getPortalLibDir();
 
 	/**
-	 * @deprecated Replaced by the more general {@link #getPortalPort(boolean)}
+	 * @deprecated As of 6.2.0, replaced by the more general {@link
+	 *             #getPortalPort(boolean)}
 	 */
 	public int getPortalPort();
 
@@ -834,13 +857,18 @@ public interface Portal {
 	public Set<String> getPortletAddDefaultResourceCheckWhitelistActions();
 
 	/**
-	 * @deprecated Renamed to {@link #getPortletBreadcrumbs(HttpServletRequest)}
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             #getPortletBreadcrumbs(HttpServletRequest)}
 	 */
 	public List<BreadcrumbEntry> getPortletBreadcrumbList(
 		HttpServletRequest request);
 
 	public List<BreadcrumbEntry> getPortletBreadcrumbs(
 		HttpServletRequest request);
+
+	public PortletConfig getPortletConfig(
+			long companyId, String portletId, ServletContext servletContext)
+		throws PortletException, SystemException;
 
 	public String getPortletDescription(
 		Portlet portlet, ServletContext servletContext, Locale locale);
@@ -940,6 +968,9 @@ public interface Portal {
 		throws PortalException, SystemException;
 
 	public long[] getSiteAndCompanyGroupIds(ThemeDisplay themeDisplay)
+		throws PortalException, SystemException;
+
+	public long getSiteGroupId(long groupId)
 		throws PortalException, SystemException;
 
 	/**
@@ -1204,6 +1235,8 @@ public interface Portal {
 	public String[] stripURLAnchor(String url, String separator);
 
 	public String transformCustomSQL(String sql);
+
+	public String transformSQL(String sql);
 
 	public PortletMode updatePortletMode(
 		String portletId, User user, Layout layout, PortletMode portletMode,

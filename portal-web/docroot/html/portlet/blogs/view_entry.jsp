@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -45,7 +45,7 @@ BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);
 
 long entryId = BeanParamUtil.getLong(entry, request, "entryId");
 
-pageDisplayStyle = RSSUtil.DISPLAY_STYLE_FULL_CONTENT;
+pageDisplayStyle = BlogsUtil.DISPLAY_STYLE_FULL_CONTENT;
 
 AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(BlogsEntry.class.getName(), entry.getEntryId());
 

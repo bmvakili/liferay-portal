@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -61,6 +61,14 @@ public class IndexWriterProxyBean extends BaseMultiDestinationProxyBean
 		String searchEngineId = searchContext.getSearchEngineId();
 
 		return SearchEngineUtil.getSearchWriterDestinationName(searchEngineId);
+	}
+
+	public void indexDictionaries(SearchContext searchContext) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void indexDictionary(SearchContext searchContext) {
+		throw new UnsupportedOperationException();
 	}
 
 	public void updateDocument(SearchContext searchContext, Document document) {

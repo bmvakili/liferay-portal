@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,13 +17,22 @@
 <%@ include file="/html/portlet/roles_admin/init.jsp" %>
 
 <%
+String p_u_i_d = ParamUtil.getString(request, "p_u_i_d");
 int step = ParamUtil.getInteger(request, "step");
+String callback = ParamUtil.getString(request, "callback", "selectRole");
+
+User selUser = PortalUtil.getSelectedUser(request);
 
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("struts_action", "/roles_admin/select_organization_role");
 
-User selUser = null;
+if (selUser != null) {
+	portletURL.setParameter("p_u_i_d", String.valueOf(selUser.getUserId()));
+}
+
+portletURL.setParameter("callback", callback);
+
 long uniqueOrganizationId = 0;
 
 List<Organization> organizations = null;
@@ -247,23 +256,27 @@ if (step == 1) {
 					<liferay-util:param name="classHoverName" value="<%= RolesAdminUtil.getCssClassName(role) %>" />
 
 					<%
-					StringBundler sb = new StringBundler(13);
+					String rowHREF = null;
+					if (Validator.isNull(p_u_i_d) || OrganizationMembershipPolicyUtil.isRoleAllowed((selUser != null) ? selUser.getUserId() : 0, organization.getOrganizationId(), role.getRoleId())) {
+						StringBundler sb = new StringBundler(14);
 
-					sb.append("javascript:opener.");
-					sb.append(renderResponse.getNamespace());
-					sb.append("selectRole('");
-					sb.append(role.getRoleId());
-					sb.append("', '");
-					sb.append(UnicodeFormatter.toString(role.getTitle(locale)));
-					sb.append("', '");
-					sb.append("organizationRoles");
-					sb.append("', '");
-					sb.append(UnicodeFormatter.toString(organization.getGroup().getDescriptiveName(locale)));
-					sb.append("', '");
-					sb.append(organization.getGroup().getGroupId());
-					sb.append("'); window.close();");
+						sb.append("javascript:opener.");
+						sb.append(renderResponse.getNamespace());
+						sb.append(callback);
+						sb.append("('");
+						sb.append(role.getRoleId());
+						sb.append("', '");
+						sb.append(UnicodeFormatter.toString(role.getTitle(locale)));
+						sb.append("', '");
+						sb.append("organizationRoles");
+						sb.append("', '");
+						sb.append(UnicodeFormatter.toString(organization.getGroup().getDescriptiveName(locale)));
+						sb.append("', '");
+						sb.append(organization.getGroup().getGroupId());
+						sb.append("'); window.close();");
 
-					String rowHREF = sb.toString();
+						rowHREF = sb.toString();
+					}
 					%>
 
 					<liferay-ui:search-container-column-text

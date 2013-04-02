@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,7 +38,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,23 +46,21 @@ import java.util.List;
 public class DLSyncServiceImpl extends DLSyncServiceBaseImpl {
 
 	public DLSyncUpdate getDLSyncUpdate(
-			long companyId, long repositoryId, Date lastAccessDate)
+			long companyId, long repositoryId, long lastAccessDate)
 		throws PortalException, SystemException {
 
 		repositoryService.checkRepository(repositoryId);
 
-		Date now = new Date();
+		List<DLSync> dlSyncs = dlSyncFinder.filterFindByC_M_R(
+			companyId, lastAccessDate, repositoryId);
 
-		List<DLSync> dlSyncs = null;
-
-		if (lastAccessDate != null) {
-			dlSyncs = dlSyncFinder.filterFindByC_M_R(
-				companyId, lastAccessDate, repositoryId);
+		for (DLSync dlSync : dlSyncs) {
+			if (dlSync.getModifiedDate() > lastAccessDate) {
+				lastAccessDate = dlSync.getModifiedDate();
+			}
 		}
 
-		DLSyncUpdate dlSyncUpdate = new DLSyncUpdate(dlSyncs, now);
-
-		return dlSyncUpdate;
+		return new DLSyncUpdate(dlSyncs, lastAccessDate);
 	}
 
 	public InputStream getFileDeltaAsStream(

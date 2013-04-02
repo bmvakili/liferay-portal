@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,14 @@ import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.DoAsUserThread;
-import com.liferay.portal.service.*;
-import com.liferay.portal.test.EnvironmentExecutionTestListener;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceTestUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.TransactionalCallbackAwareExecutionTestListener;
+import com.liferay.portal.util.GroupTestUtil;
+import com.liferay.portal.util.UserTestUtil;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessageConstants;
@@ -44,7 +47,6 @@ import org.junit.runner.RunWith;
  */
 @ExecutionTestListeners(
 	listeners = {
-		EnvironmentExecutionTestListener.class,
 		MainServletExecutionTestListener.class,
 		TransactionalCallbackAwareExecutionTestListener.class
 	})
@@ -75,21 +77,20 @@ public class MBMessageServiceTest {
 		boolean allowAnonymous = false;
 		boolean mailingListActive = false;
 
-		_group = ServiceTestUtil.addGroup();
+		_group = GroupTestUtil.addGroup();
 
 		for (int i = 0; i < ServiceTestUtil.THREAD_COUNT; i++) {
-			ServiceTestUtil.addUser(
-				ServiceTestUtil.randomString(), false,
-				new long[] {_group.getGroupId()});
+			UserTestUtil.addUser(
+				ServiceTestUtil.randomString(), _group.getGroupId());
 		}
 
-		ServiceContext serviceContext = new ServiceContext();
+		ServiceContext serviceContext = ServiceTestUtil.getServiceContext(
+			_group.getGroupId());
 
 		serviceContext.setGroupPermissions(
 			new String[] {ActionKeys.ADD_MESSAGE, ActionKeys.VIEW});
 		serviceContext.setGuestPermissions(
 			new String[] {ActionKeys.ADD_MESSAGE, ActionKeys.VIEW});
-		serviceContext.setScopeGroupId(_group.getGroupId());
 
 		_category = MBCategoryServiceUtil.addCategory(
 			MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, name, description,

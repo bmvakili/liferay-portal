@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebServiceConfigurator;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.util.PortalUtil;
 
 import java.io.BufferedInputStream;
@@ -63,7 +62,8 @@ public class JSONWebServiceConfiguratorImpl extends ClassFinder
 				File[] classPathFiles = null;
 
 				if (getClassLoader() !=
-						PACLClassLoaderUtil.getPortalClassLoader()) {
+						com.liferay.portal.util.ClassLoaderUtil.
+							getPortalClassLoader()) {
 
 					classPathFiles = getPluginClassPathFiles();
 				}
@@ -93,8 +93,9 @@ public class JSONWebServiceConfiguratorImpl extends ClassFinder
 		_baseJSONWebServiceConfigurator.init(servletContext, classLoader);
 
 		setIncludedJars(
-			"*_wl_cls_gen.jar", "*-hook-service*.jar", "*-portlet-service*.jar",
-			"*-web-service*.jar", "*portal-impl.jar", "*portal-service.jar");
+			"**/_wl_cls_gen.jar", "**/*-hook-service*.jar",
+			"**/*-portlet-service*.jar", "**/*-web-service*.jar",
+			"**/portal-impl.jar", "**/portal-service.jar");
 	}
 
 	public void registerClass(String className, InputStream inputStream)
@@ -146,7 +147,7 @@ public class JSONWebServiceConfiguratorImpl extends ClassFinder
 
 		classPaths.add(classPathFile);
 
-		FindFile findFile = new RegExpFindFile(
+		FindFile<?> findFile = new RegExpFindFile(
 			".*-(hook|portlet|web)-service.*\\.jar");
 
 		findFile.searchPath(libDir);

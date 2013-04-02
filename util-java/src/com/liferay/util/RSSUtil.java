@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,9 +42,16 @@ public class RSSUtil {
 
 	public static final String DISPLAY_STYLE_ABSTRACT = "abstract";
 
+	public static final String DISPLAY_STYLE_DEFAULT =
+		_getDisplayStyleDefault();
+
 	public static final String DISPLAY_STYLE_FULL_CONTENT = "full-content";
 
 	public static final String DISPLAY_STYLE_TITLE = "title";
+
+	public static final String[] DISPLAY_STYLES = new String[] {
+		DISPLAY_STYLE_ABSTRACT, DISPLAY_STYLE_FULL_CONTENT, DISPLAY_STYLE_TITLE
+	};
 
 	public static final String ENTRY_TYPE_DEFAULT = "html";
 
@@ -58,7 +65,7 @@ public class RSSUtil {
 	public static final String RSS = "rss";
 
 	/**
-	 * @deprecated Renamed to {@link #FORMAT_DEFAULT}
+	 * @deprecated As of 6.2.0, replaced by {@link #FORMAT_DEFAULT}
 	 */
 	public static final String TYPE_DEFAULT = FORMAT_DEFAULT;
 
@@ -166,6 +173,12 @@ public class RSSUtil {
 		}
 
 		return VERSION_DEFAULT;
+	}
+
+	private static String _getDisplayStyleDefault() {
+		return GetterUtil.getString(
+			PropsUtil.get(PropsKeys.RSS_FEED_DISPLAY_STYLE_DEFAULT),
+			DISPLAY_STYLE_FULL_CONTENT);
 	}
 
 	private static String _getFeedTypeDefault() {

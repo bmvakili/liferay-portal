@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,12 +16,15 @@ package com.liferay.portlet.bookmarks.service;
 
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.test.EnvironmentExecutionTestListener;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.TransactionalCallbackAwareExecutionTestListener;
+import com.liferay.portal.util.GroupTestUtil;
 import com.liferay.portlet.bookmarks.model.BookmarksEntry;
 import com.liferay.portlet.bookmarks.util.BookmarksTestUtil;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,23 +40,32 @@ import org.junit.runner.RunWith;
 @Transactional
 public class BookmarksEntryServiceTest {
 
+	@Before
+	public void setUp() throws Exception {
+		_group = GroupTestUtil.addGroup();
+	}
+
 	@Test
 	public void testAddEntry() throws Exception {
-		BookmarksTestUtil.addEntry();
+		BookmarksTestUtil.addEntry(_group.getGroupId(), true);
 	}
 
 	@Test
 	public void testDeleteEntry() throws Exception {
-		BookmarksEntry entry = BookmarksTestUtil.addEntry();
+		BookmarksEntry entry = BookmarksTestUtil.addEntry(
+			_group.getGroupId(), true);
 
 		BookmarksEntryServiceUtil.deleteEntry(entry.getEntryId());
 	}
 
 	@Test
 	public void testGetEntry() throws Exception {
-		BookmarksEntry entry = BookmarksTestUtil.addEntry();
+		BookmarksEntry entry = BookmarksTestUtil.addEntry(
+			_group.getGroupId(), true);
 
 		BookmarksEntryServiceUtil.getEntry(entry.getEntryId());
 	}
+
+	private Group _group;
 
 }

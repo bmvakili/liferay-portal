@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,7 +27,6 @@ import com.liferay.portlet.documentlibrary.model.DLFileVersion;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryPermission;
 import com.liferay.portlet.expando.model.ExpandoBridge;
-import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -62,6 +61,14 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		ExpandoBridge expandoBridge = getExpandoBridge();
 
 		return expandoBridge.getAttributes();
+	}
+
+	public FileVersion getCachedFileVersion() {
+		if (_dlFileVersion == null) {
+			return null;
+		}
+
+		return new LiferayFileVersion(_dlFileVersion);
 	}
 
 	@Override
@@ -109,7 +116,13 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	public FileVersion getFileVersion()
 		throws PortalException, SystemException {
 
-		return new LiferayFileVersion(_dlFileEntry.getFileVersion());
+		DLFileVersion dlFileVersion = _dlFileVersion;
+
+		if (dlFileVersion == null) {
+			dlFileVersion = _dlFileEntry.getFileVersion();
+		}
+
+		return new LiferayFileVersion(dlFileVersion);
 	}
 
 	public FileVersion getFileVersion(String version)
@@ -207,7 +220,7 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	}
 
 	public String getTitle() {
-		return TrashUtil.stripTrashNamespace(_dlFileEntry.getTitle());
+		return _dlFileEntry.getTitle();
 	}
 
 	public long getUserId() {
@@ -279,6 +292,10 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		return true;
 	}
 
+	public void setCachedFileVersion(FileVersion fileVersion) {
+		_dlFileVersion = (DLFileVersion)fileVersion.getModel();
+	}
+
 	public void setCompanyId(long companyId) {
 		_dlFileEntry.setCompanyId(companyId);
 	}
@@ -324,6 +341,11 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return _dlFileEntry.toString();
+	}
+
 	public FileEntry toUnescapedModel() {
 		if (isEscapedModel()) {
 			return new LiferayFileEntry(_dlFileEntry.toUnescapedModel(), true);
@@ -334,6 +356,7 @@ public class LiferayFileEntry extends LiferayModel implements FileEntry {
 	}
 
 	private DLFileEntry _dlFileEntry;
+	private DLFileVersion _dlFileVersion;
 	private boolean _escapedModel;
 
 }

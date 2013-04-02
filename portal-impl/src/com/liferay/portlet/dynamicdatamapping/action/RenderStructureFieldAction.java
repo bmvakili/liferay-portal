@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -57,13 +57,17 @@ public class RenderStructureFieldAction extends Action {
 			long classNameId = ParamUtil.getLong(request, "classNameId");
 			long classPK = ParamUtil.getLong(request, "classPK");
 			String fieldName = ParamUtil.getString(request, "fieldName");
-			int repeatableIndex = ParamUtil.getInteger(
-				request, "repeatableIndex");
+			String namespace = ParamUtil.getString(request, "namespace");
+			String portletNamespace = ParamUtil.getString(
+				request, "portletNamespace");
 			boolean readOnly = ParamUtil.getBoolean(request, "readOnly");
 
+			request.setAttribute("aui:form:portletNamespace", portletNamespace);
+
 			String fieldHTML = DDMXSDUtil.getFieldHTMLByName(
-				pageContext, classNameId, classPK, fieldName, repeatableIndex,
-				null, null, null, readOnly, themeDisplay.getLocale());
+				pageContext, classNameId, classPK, fieldName, null,
+				portletNamespace, namespace, null, readOnly,
+				themeDisplay.getLocale());
 
 			response.setContentType(ContentTypes.TEXT_HTML);
 

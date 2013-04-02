@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -92,6 +92,11 @@ public class PostgreSQLDB extends BaseDB {
 		}
 
 		return indexes;
+	}
+
+	@Override
+	public boolean isSupportsQueryingAfterException() {
+		return _SUPPORTS_QUERYING_AFTER_EXCEPTION;
 	}
 
 	protected PostgreSQLDB() {
@@ -198,6 +203,8 @@ public class PostgreSQLDB extends BaseDB {
 		" bytea", " bool", " timestamp", " double precision", " integer",
 		" bigint", " text", " text", " varchar", "", "commit"
 	};
+
+	private static final boolean _SUPPORTS_QUERYING_AFTER_EXCEPTION = false;
 
 	private static PostgreSQLDB _instance = new PostgreSQLDB();
 

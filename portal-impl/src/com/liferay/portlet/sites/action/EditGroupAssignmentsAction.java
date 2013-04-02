@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.liveusers.LiveUsers;
 import com.liferay.portal.model.User;
 import com.liferay.portal.security.auth.PrincipalException;
+import com.liferay.portal.security.membershippolicy.MembershipPolicyException;
 import com.liferay.portal.service.OrganizationServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
@@ -92,7 +93,10 @@ public class EditGroupAssignmentsAction extends PortletAction {
 			}
 		}
 		catch (Exception e) {
-			if (e instanceof NoSuchGroupException ||
+			if (e instanceof MembershipPolicyException) {
+				SessionErrors.add(actionRequest, e.getClass(), e);
+			}
+			else if (e instanceof NoSuchGroupException ||
 				e instanceof PrincipalException) {
 
 				SessionErrors.add(actionRequest, e.getClass());
@@ -132,13 +136,28 @@ public class EditGroupAssignmentsAction extends PortletAction {
 				renderRequest, "portlet.sites_admin.edit_site_assignments"));
 	}
 
-	protected long[] filterUserIds(long groupId, long[] userIds)
+	protected long[] filterAddUserIds(long groupId, long[] userIds)
 		throws Exception {
 
 		Set<Long> filteredUserIds = new HashSet<Long>(userIds.length);
 
 		for (long userId : userIds) {
 			if (!UserLocalServiceUtil.hasGroupUser(groupId, userId)) {
+				filteredUserIds.add(userId);
+			}
+		}
+
+		return ArrayUtil.toArray(
+			filteredUserIds.toArray(new Long[filteredUserIds.size()]));
+	}
+
+	protected long[] filterRemoveUserIds(long groupId, long[] userIds)
+		throws Exception {
+
+		Set<Long> filteredUserIds = new HashSet<Long>(userIds.length);
+
+		for (long userId : userIds) {
+			if (UserLocalServiceUtil.hasGroupUser(groupId, userId)) {
 				filteredUserIds.add(userId);
 			}
 		}
@@ -188,10 +207,12 @@ public class EditGroupAssignmentsAction extends PortletAction {
 		long[] addUserIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "addUserIds"), 0L);
 
-		addUserIds = filterUserIds(groupId, addUserIds);
+		addUserIds = filterAddUserIds(groupId, addUserIds);
 
 		long[] removeUserIds = StringUtil.split(
 			ParamUtil.getString(actionRequest, "removeUserIds"), 0L);
+
+		removeUserIds = filterRemoveUserIds(groupId, removeUserIds);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);

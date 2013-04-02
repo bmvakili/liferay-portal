@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -13,6 +13,8 @@
  */
 
 package com.liferay.portal.kernel.test;
+
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -68,6 +70,13 @@ public class JDKLoggerTestUtil {
 		private List<LogRecord> _logRecords =
 			new CopyOnWriteArrayList<LogRecord>();
 
+	}
+
+	static {
+
+		// See LPS-32051 and LPS-32471
+
+		LogFactoryUtil.getLog(JDKLoggerTestUtil.class);
 	}
 
 }

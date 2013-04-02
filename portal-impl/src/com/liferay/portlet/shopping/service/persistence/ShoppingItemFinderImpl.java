@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -62,7 +62,7 @@ public class ShoppingItemFinderImpl
 			query.append("ShoppingItem.groupId = ? AND (");
 
 			if ((categoryIds != null) && (categoryIds.length > 0)) {
-				query.append("(");
+				query.append(StringPool.OPEN_PARENTHESIS);
 
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
@@ -129,7 +129,7 @@ public class ShoppingItemFinderImpl
 			query.append("ShoppingItem.groupId = ? AND (");
 
 			if ((categoryIds != null) && (categoryIds.length > 0)) {
-				query.append("(");
+				query.append(StringPool.OPEN_PARENTHESIS);
 
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
@@ -199,7 +199,7 @@ public class ShoppingItemFinderImpl
 			query.append("ShoppingItem.groupId = ? AND (");
 
 			if ((categoryIds != null) && (categoryIds.length > 0)) {
-				query.append("(");
+				query.append(StringPool.OPEN_PARENTHESIS);
 
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
@@ -274,7 +274,7 @@ public class ShoppingItemFinderImpl
 			query.append("ShoppingItem.groupId = ? AND (");
 
 			if ((categoryIds != null) && (categoryIds.length > 0)) {
-				query.append("(");
+				query.append(StringPool.OPEN_PARENTHESIS);
 
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
@@ -333,7 +333,7 @@ public class ShoppingItemFinderImpl
 			query.append("ShoppingItem.groupId = ? AND (");
 
 			if ((categoryIds != null) && (categoryIds.length > 0)) {
-				query.append("(");
+				query.append(StringPool.OPEN_PARENTHESIS);
 
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");
@@ -397,7 +397,7 @@ public class ShoppingItemFinderImpl
 			query.append("ShoppingItem.groupId = ? AND (");
 
 			if ((categoryIds != null) && (categoryIds.length > 0)) {
-				query.append("(");
+				query.append(StringPool.OPEN_PARENTHESIS);
 
 				for (int i = 0; i < categoryIds.length; i++) {
 					query.append("ShoppingItem.categoryId = ? ");

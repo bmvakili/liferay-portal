@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,12 +14,13 @@
 
 package com.liferay.portal.kernel.process;
 
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.ProcessExecutor.ProcessContext;
 import com.liferay.portal.kernel.process.ProcessExecutor.ShutdownHook;
 import com.liferay.portal.kernel.process.log.ProcessOutputStream;
-import com.liferay.portal.kernel.test.BaseTestCase;
+import com.liferay.portal.kernel.test.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ReflectionUtil;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.util.SocketUtil.ServerSocketConfigurator;
 import com.liferay.portal.kernel.util.SocketUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -41,6 +43,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -70,15 +73,30 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
+
 /**
  * @author Shuyang Zhou
  */
-public class ProcessExecutorTest extends BaseTestCase {
+public class ProcessExecutorTest {
 
-	@Override
+	@ClassRule
+	public static CodeCoverageAssertor codeCoverageAssertor =
+		new CodeCoverageAssertor();
+
+	@Before
+	public void setUp() throws Exception {
+		Class<?> clazz = getClass();
+
+		PortalClassLoaderUtil.setClassLoader(clazz.getClassLoader());
+	}
+
+	@After
 	public void tearDown() throws Exception {
-		super.tearDown();
-
 		ExecutorService executorService = _getExecutorService();
 
 		if (executorService != null) {
@@ -90,6 +108,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 		}
 	}
 
+	@Test
 	public void testAttach1() throws Exception {
 
 		// No attach
@@ -104,17 +123,17 @@ public class ProcessExecutorTest extends BaseTestCase {
 			int port = serverSocket.getLocalPort();
 
 			ProcessExecutor.execute(
-				_classPath, _createArguments(),
+				_classPath, _createArguments(_JPDA_OPTIONS1),
 				new AttachParentProcessCallable(
 					AttachChildProcessCallable1.class.getName(), port));
 
 			Socket parentSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(parentSocket));
+			Assert.assertTrue(ServerThread.isAlive(parentSocket));
 
 			Socket childSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(childSocket));
+			Assert.assertTrue(ServerThread.isAlive(childSocket));
 
 			// Kill parent
 
@@ -125,7 +144,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 			for (int i = 0; i < 10; i++) {
 				Thread.sleep(100);
 
-				assertTrue(ServerThread.isAlive(childSocket));
+				Assert.assertTrue(ServerThread.isAlive(childSocket));
 			}
 
 			// Kill child
@@ -137,6 +156,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 		}
 	}
 
+	@Test
 	public void testAttach2() throws Exception {
 
 		// Attach
@@ -151,17 +171,17 @@ public class ProcessExecutorTest extends BaseTestCase {
 			int port = serverSocket.getLocalPort();
 
 			ProcessExecutor.execute(
-				_classPath, _createArguments(),
+				_classPath, _createArguments(_JPDA_OPTIONS1),
 				new AttachParentProcessCallable(
 					AttachChildProcessCallable2.class.getName(), port));
 
 			Socket parentSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(parentSocket));
+			Assert.assertTrue(ServerThread.isAlive(parentSocket));
 
 			Socket childSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(childSocket));
+			Assert.assertTrue(ServerThread.isAlive(childSocket));
 
 			// Kill parent
 
@@ -193,6 +213,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 		}
 	}
 
+	@Test
 	public void testAttach3() throws Exception {
 
 		// Detach
@@ -207,17 +228,17 @@ public class ProcessExecutorTest extends BaseTestCase {
 			int port = serverSocket.getLocalPort();
 
 			ProcessExecutor.execute(
-				_classPath, _createArguments(),
+				_classPath, _createArguments(_JPDA_OPTIONS1),
 				new AttachParentProcessCallable(
 					AttachChildProcessCallable3.class.getName(), port));
 
 			Socket parentSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(parentSocket));
+			Assert.assertTrue(ServerThread.isAlive(parentSocket));
 
 			Socket childSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(childSocket));
+			Assert.assertTrue(ServerThread.isAlive(childSocket));
 
 			// Kill parent
 
@@ -244,6 +265,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 		}
 	}
 
+	@Test
 	public void testAttach4() throws Exception {
 
 		// Shutdown by interruption
@@ -258,17 +280,17 @@ public class ProcessExecutorTest extends BaseTestCase {
 			int port = serverSocket.getLocalPort();
 
 			ProcessExecutor.execute(
-				_classPath, _createArguments(),
+				_classPath, _createArguments(_JPDA_OPTIONS1),
 				new AttachParentProcessCallable(
 					AttachChildProcessCallable4.class.getName(), port));
 
 			Socket parentSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(parentSocket));
+			Assert.assertTrue(ServerThread.isAlive(parentSocket));
 
 			Socket childSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(childSocket));
+			Assert.assertTrue(ServerThread.isAlive(childSocket));
 
 			// Interrupt child process heartbeat thread
 
@@ -283,6 +305,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 		}
 	}
 
+	@Test
 	public void testAttach5() throws Exception {
 
 		// Bad shutdown hook
@@ -297,17 +320,17 @@ public class ProcessExecutorTest extends BaseTestCase {
 			int port = serverSocket.getLocalPort();
 
 			ProcessExecutor.execute(
-				_classPath, _createArguments(),
+				_classPath, _createArguments(_JPDA_OPTIONS1),
 				new AttachParentProcessCallable(
 					AttachChildProcessCallable5.class.getName(), port));
 
 			Socket parentSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(parentSocket));
+			Assert.assertTrue(ServerThread.isAlive(parentSocket));
 
 			Socket childSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(childSocket));
+			Assert.assertTrue(ServerThread.isAlive(childSocket));
 
 			// Interrupt child process heartbeat thread
 
@@ -322,6 +345,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 		}
 	}
 
+	@Test
 	public void testAttach6() throws Exception {
 
 		// NPE on heartbeat piping back
@@ -336,17 +360,17 @@ public class ProcessExecutorTest extends BaseTestCase {
 			int port = serverSocket.getLocalPort();
 
 			ProcessExecutor.execute(
-				_classPath, _createArguments(),
+				_classPath, _createArguments(_JPDA_OPTIONS1),
 				new AttachParentProcessCallable(
 					AttachChildProcessCallable6.class.getName(), port));
 
 			Socket parentSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(parentSocket));
+			Assert.assertTrue(ServerThread.isAlive(parentSocket));
 
 			Socket childSocket = serverSocket.accept();
 
-			assertTrue(ServerThread.isAlive(childSocket));
+			Assert.assertTrue(ServerThread.isAlive(childSocket));
 
 			// Null out child process' OOS to cause NPE in heartbeat thread
 
@@ -382,6 +406,53 @@ public class ProcessExecutorTest extends BaseTestCase {
 		}
 	}
 
+	@Test
+	public void testBrokenPiping() throws Exception {
+		List<LogRecord> logRecords = JDKLoggerTestUtil.configureJDKLogger(
+			ProcessExecutor.class.getName(), Level.SEVERE);
+
+		BrokenPipingProcessCallable brokenPipingProcessCallable =
+			new BrokenPipingProcessCallable();
+
+		Future<String> future = ProcessExecutor.execute(
+			_classPath, brokenPipingProcessCallable);
+
+		try {
+			future.get();
+
+			Assert.fail();
+		}
+		catch (ExecutionException ee) {
+			Throwable cause = ee.getCause();
+
+			Assert.assertTrue(cause instanceof ProcessException);
+
+			Assert.assertEquals(
+				"Corrupted object input stream", cause.getMessage());
+		}
+
+		Assert.assertFalse(future.isCancelled());
+		Assert.assertTrue(future.isDone());
+
+		Assert.assertEquals(1, logRecords.size());
+
+		String message = logRecords.get(0).getMessage();
+
+		int index = message.lastIndexOf(' ');
+
+		Assert.assertTrue(index != -1);
+		Assert.assertEquals(
+			"Dumping content of corrupted object input stream to",
+			message.substring(0, index));
+
+		File file = new File(message.substring(index + 1));
+
+		Assert.assertTrue(file.exists());
+
+		file.delete();
+	}
+
+	@Test
 	public void testCancel() throws Exception {
 		ReturnWithoutExitProcessCallable returnWithoutExitProcessCallable =
 			new ReturnWithoutExitProcessCallable("");
@@ -389,24 +460,25 @@ public class ProcessExecutorTest extends BaseTestCase {
 		Future<String> future = ProcessExecutor.execute(
 			_classPath, returnWithoutExitProcessCallable);
 
-		assertFalse(future.isCancelled());
-		assertFalse(future.isDone());
+		Assert.assertFalse(future.isCancelled());
+		Assert.assertFalse(future.isDone());
 
-		assertTrue(future.cancel(true));
+		Assert.assertTrue(future.cancel(true));
 
 		try {
 			future.get();
 
-			fail();
+			Assert.fail();
 		}
 		catch (CancellationException ce) {
 		}
 
-		assertTrue(future.isCancelled());
-		assertTrue(future.isDone());
-		assertFalse(future.cancel(true));
+		Assert.assertTrue(future.isCancelled());
+		Assert.assertTrue(future.isDone());
+		Assert.assertFalse(future.cancel(true));
 	}
 
+	@Test
 	public void testConcurrentCreateExecutorService() throws Exception {
 		final AtomicReference<ExecutorService> atomicReference =
 			new AtomicReference<ExecutorService>();
@@ -422,7 +494,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 					atomicReference.set(executorService);
 				}
 				catch (Exception e) {
-					fail();
+					Assert.fail();
 				}
 			}
 
@@ -440,9 +512,10 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 		thread.join();
 
-		assertSame(executorService, atomicReference.get());
+		Assert.assertSame(executorService, atomicReference.get());
 	}
 
+	@Test
 	public void testCrash() throws Exception {
 		JDKLoggerTestUtil.configureJDKLogger(
 			ProcessExecutor.class.getName(), Level.OFF);
@@ -458,15 +531,15 @@ public class ProcessExecutorTest extends BaseTestCase {
 		try {
 			future.get();
 
-			fail();
+			Assert.fail();
 		}
 		catch (ExecutionException ee) {
-			assertFalse(future.isCancelled());
-			assertTrue(future.isDone());
+			Assert.assertFalse(future.isCancelled());
+			Assert.assertTrue(future.isDone());
 
 			Throwable throwable = ee.getCause();
 
-			assertTrue(throwable instanceof ProcessException);
+			Assert.assertTrue(throwable instanceof ProcessException);
 		}
 
 		// Zero crash
@@ -478,22 +551,23 @@ public class ProcessExecutorTest extends BaseTestCase {
 		try {
 			future.get();
 
-			fail();
+			Assert.fail();
 		}
 		catch (ExecutionException ee) {
-			assertFalse(future.isCancelled());
-			assertTrue(future.isDone());
+			Assert.assertFalse(future.isCancelled());
+			Assert.assertTrue(future.isDone());
 
 			Throwable throwable = ee.getCause();
 
-			assertTrue(throwable instanceof ProcessException);
+			Assert.assertTrue(throwable instanceof ProcessException);
 
 			throwable = throwable.getCause();
 
-			assertTrue(throwable instanceof EOFException);
+			Assert.assertTrue(throwable instanceof EOFException);
 		}
 	}
 
+	@Test
 	public void testCreateProcessContext() throws Exception {
 		Constructor<ProcessContext> constructor =
 			ProcessContext.class.getDeclaredConstructor();
@@ -502,9 +576,10 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 		constructor.newInstance();
 
-		assertNotNull(ProcessContext.getAttributes());
+		Assert.assertNotNull(ProcessContext.getAttributes());
 	}
 
+	@Test
 	public void testDestroy() throws Exception {
 
 		// Clean destroy
@@ -513,25 +588,25 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 		processExecutor.destroy();
 
-		assertNull(_getExecutorService());
+		Assert.assertNull(_getExecutorService());
 
 		// Idle destroy
 
 		ExecutorService executorService = _invokeGetExecutorService();
 
-		assertNotNull(executorService);
-		assertNotNull(_getExecutorService());
+		Assert.assertNotNull(executorService);
+		Assert.assertNotNull(_getExecutorService());
 
 		processExecutor.destroy();
 
-		assertNull(_getExecutorService());
+		Assert.assertNull(_getExecutorService());
 
 		// Busy destroy
 
 		executorService = _invokeGetExecutorService();
 
-		assertNotNull(executorService);
-		assertNotNull(_getExecutorService());
+		Assert.assertNotNull(executorService);
+		Assert.assertNotNull(_getExecutorService());
 
 		DummyJob dummyJob = new DummyJob();
 
@@ -544,15 +619,15 @@ public class ProcessExecutorTest extends BaseTestCase {
 		try {
 			future.get();
 
-			fail();
+			Assert.fail();
 		}
 		catch (ExecutionException ee) {
 			Throwable throwable = ee.getCause();
 
-			assertTrue(throwable instanceof InterruptedException);
+			Assert.assertTrue(throwable instanceof InterruptedException);
 		}
 
-		assertNull(_getExecutorService());
+		Assert.assertNull(_getExecutorService());
 
 		// Concurrent destroy
 
@@ -587,33 +662,36 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 		processExecutor.destroy();
 
-		assertNull(_getExecutorService());
+		Assert.assertNull(_getExecutorService());
 	}
 
+	@Test
 	public void testException() throws Exception {
 		DummyExceptionProcessCallable dummyExceptionProcessCallable =
 			new DummyExceptionProcessCallable();
 
 		Future<Serializable> future = ProcessExecutor.execute(
-			_classPath, _createArguments(), dummyExceptionProcessCallable);
+			_classPath, _createArguments(_JPDA_OPTIONS1),
+			dummyExceptionProcessCallable);
 
 		try {
 			future.get();
 
-			fail();
+			Assert.fail();
 		}
 		catch (ExecutionException ee) {
-			assertFalse(future.isCancelled());
-			assertTrue(future.isDone());
+			Assert.assertFalse(future.isCancelled());
+			Assert.assertTrue(future.isDone());
 
 			Throwable throwable = ee.getCause();
 
-			assertEquals(
+			Assert.assertEquals(
 				DummyExceptionProcessCallable.class.getName(),
 				throwable.getMessage());
 		}
 	}
 
+	@Test
 	public void testExecuteOnDestroy() throws Exception {
 		ExecutorService executorService = _invokeGetExecutorService();
 
@@ -621,7 +699,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 		boolean result = executorService.awaitTermination(10, TimeUnit.SECONDS);
 
-		assertTrue(result);
+		Assert.assertTrue(result);
 
 		DummyReturnProcessCallable dummyReturnProcessCallable =
 			new DummyReturnProcessCallable();
@@ -629,16 +707,17 @@ public class ProcessExecutorTest extends BaseTestCase {
 		try {
 			ProcessExecutor.execute(_classPath, dummyReturnProcessCallable);
 
-			fail();
+			Assert.fail();
 		}
 		catch (ProcessException pe) {
 			Throwable throwable = pe.getCause();
 
-			assertEquals(
+			Assert.assertEquals(
 				throwable.getClass(), RejectedExecutionException.class);
 		}
 	}
 
+	@Test
 	public void testGetWithTimeout() throws Exception {
 
 		// Success return
@@ -651,9 +730,10 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 		String returnValue = future.get(100, TimeUnit.SECONDS);
 
-		assertEquals(DummyReturnProcessCallable.class.getName(), returnValue);
-		assertFalse(future.isCancelled());
-		assertTrue(future.isDone());
+		Assert.assertEquals(
+			DummyReturnProcessCallable.class.getName(), returnValue);
+		Assert.assertFalse(future.isCancelled());
+		Assert.assertTrue(future.isDone());
 
 		// Timeout return
 
@@ -666,13 +746,13 @@ public class ProcessExecutorTest extends BaseTestCase {
 		try {
 			future.get(1, TimeUnit.SECONDS);
 
-			fail();
+			Assert.fail();
 		}
 		catch (TimeoutException te) {
 		}
 
-		assertFalse(future.isCancelled());
-		assertFalse(future.isDone());
+		Assert.assertFalse(future.isCancelled());
+		Assert.assertFalse(future.isDone());
 
 		future.cancel(true);
 
@@ -682,15 +762,14 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 		executorService.awaitTermination(10, TimeUnit.SECONDS);
 
-		assertTrue(future.isCancelled());
-		assertTrue(future.isDone());
+		Assert.assertTrue(future.isCancelled());
+		Assert.assertTrue(future.isDone());
 	}
 
+	@Test
 	public void testLeadingLog() throws Exception {
 
 		// Warn level
-
-		boolean junitCodeCoverage = Boolean.getBoolean("junit.code.coverage");
 
 		String leadingLog = "Test leading log.\n";
 		String bodyLog = "Test body log.\n";
@@ -701,110 +780,76 @@ public class ProcessExecutorTest extends BaseTestCase {
 		LeadingLogProcessCallable leadingLogProcessCallable =
 			new LeadingLogProcessCallable(leadingLog, bodyLog);
 
-		List<String> arguments = _createArguments();
+		List<String> arguments = _createArguments(_JPDA_OPTIONS1);
 
 		Future<String> future = ProcessExecutor.execute(
 			_classPath, arguments, leadingLogProcessCallable);
 
 		future.get();
 
-		assertFalse(future.isCancelled());
-		assertTrue(future.isDone());
+		Assert.assertFalse(future.isCancelled());
+		Assert.assertTrue(future.isDone());
 
-		if (junitCodeCoverage) {
-			assertEquals(2, logRecords.size());
-		}
-		else {
-			assertEquals(1, logRecords.size());
-		}
+		Assert.assertEquals(1, logRecords.size());
 
 		LogRecord logRecord = logRecords.get(0);
 
-		assertEquals(
+		Assert.assertEquals(
 			"Found corrupt leading log " + leadingLog, logRecord.getMessage());
-
-		if (junitCodeCoverage) {
-			logRecord = logRecords.get(1);
-
-			String message = logRecord.getMessage();
-
-			_assertBrokenPiping(message);
-		}
 
 		// Fine level
 
 		logRecords = JDKLoggerTestUtil.configureJDKLogger(
 			ProcessExecutor.class.getName(), Level.FINE);
 
-		leadingLogProcessCallable =
-			new LeadingLogProcessCallable(leadingLog, bodyLog);
+		leadingLogProcessCallable = new LeadingLogProcessCallable(
+			leadingLog, bodyLog);
 
-		arguments = _createArguments();
+		arguments = _createArguments(_JPDA_OPTIONS1);
 
 		future = ProcessExecutor.execute(
 			_classPath, arguments, leadingLogProcessCallable);
 
 		future.get();
 
-		assertFalse(future.isCancelled());
-		assertTrue(future.isDone());
+		Assert.assertFalse(future.isCancelled());
+		Assert.assertTrue(future.isDone());
 
-		if (junitCodeCoverage) {
-			assertEquals(3, logRecords.size());
-		}
-		else {
-			assertEquals(2, logRecords.size());
-		}
+		Assert.assertEquals(2, logRecords.size());
 
 		LogRecord logRecord1 = logRecords.get(0);
 
-		assertEquals(
+		Assert.assertEquals(
 			"Found corrupt leading log " + leadingLog, logRecord1.getMessage());
 
 		LogRecord logRecord2 = logRecords.get(1);
 
 		String message = logRecord2.getMessage();
 
-		assertTrue(message.contains("Invoked generic process callable "));
-
-		if (junitCodeCoverage) {
-			LogRecord logRecord3 = logRecords.get(2);
-
-			message = logRecord3.getMessage();
-
-			_assertBrokenPiping(message);
-		}
+		Assert.assertTrue(message.contains("Invoked generic process callable"));
 
 		// Severe level
 
 		logRecords = JDKLoggerTestUtil.configureJDKLogger(
 			ProcessExecutor.class.getName(), Level.SEVERE);
 
-		leadingLogProcessCallable =
-			new LeadingLogProcessCallable(leadingLog, bodyLog);
+		leadingLogProcessCallable = new LeadingLogProcessCallable(
+			leadingLog, bodyLog);
 
-		arguments = _createArguments();
+		arguments = _createArguments(_JPDA_OPTIONS1);
 
 		future = ProcessExecutor.execute(
 			_classPath, arguments, leadingLogProcessCallable);
 
 		future.get();
 
-		assertFalse(future.isCancelled());
-		assertTrue(future.isDone());
+		Assert.assertFalse(future.isCancelled());
+		Assert.assertTrue(future.isDone());
 
-		if (junitCodeCoverage) {
-			assertEquals(1, logRecords.size());
-
-			logRecord = logRecords.get(0);
-
-			_assertBrokenPiping(logRecord.getMessage());
-		}
-		else {
-			assertEquals(0, logRecords.size());
-		}
+		Assert.assertEquals(0, logRecords.size());
 	}
 
+	@Test
 	public void testLogging() throws Exception {
 		PrintStream oldOutPrintStream = System.out;
 
@@ -849,8 +894,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 						future.get();
 
-						assertFalse(future.isCancelled());
-						assertTrue(future.isDone());
+						Assert.assertFalse(future.isCancelled());
+						Assert.assertTrue(future.isDone());
 					}
 					catch (Exception e) {
 						exceptionAtomicReference.set(e);
@@ -861,20 +906,22 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 			thread.start();
 
-			assertTrue(signalFile.createNewFile());
+			Assert.assertTrue(signalFile.createNewFile());
 
 			_waitForSignalFile(signalFile, false);
 
 			String outByteArrayOutputStreamString =
 				outByteArrayOutputStream.toString();
 
-			assertTrue(outByteArrayOutputStreamString.contains(logMessage));
+			Assert.assertTrue(
+				outByteArrayOutputStreamString.contains(logMessage));
 
 			String errByteArrayOutputStreamString =
 				errByteArrayOutputStream.toString();
 
-			assertTrue(errByteArrayOutputStreamString.contains(logMessage));
-			assertTrue(signalFile.createNewFile());
+			Assert.assertTrue(
+				errByteArrayOutputStreamString.contains(logMessage));
+			Assert.assertTrue(signalFile.createNewFile());
 
 			thread.join();
 
@@ -892,6 +939,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 		}
 	}
 
+	@Test
 	public void testPropertyPassing() throws Exception {
 		String propertyKey = "test-key";
 		String propertyValue = "test-value";
@@ -899,18 +947,19 @@ public class ProcessExecutorTest extends BaseTestCase {
 		ReadPropertyProcessCallable readPropertyProcessCallable =
 			new ReadPropertyProcessCallable(propertyKey);
 
-		List<String> arguments = _createArguments();
+		List<String> arguments = _createArguments(_JPDA_OPTIONS1);
 
 		arguments.add("-D" + propertyKey + "=" + propertyValue);
 
 		Future<String> future = ProcessExecutor.execute(
 			_classPath, arguments, readPropertyProcessCallable);
 
-		assertEquals(propertyValue, future.get());
-		assertFalse(future.isCancelled());
-		assertTrue(future.isDone());
+		Assert.assertEquals(propertyValue, future.get());
+		Assert.assertFalse(future.isCancelled());
+		Assert.assertTrue(future.isDone());
 	}
 
+	@Test
 	public void testReturn() throws Exception {
 		DummyReturnProcessCallable dummyReturnProcessCallable =
 			new DummyReturnProcessCallable();
@@ -918,12 +967,14 @@ public class ProcessExecutorTest extends BaseTestCase {
 		Future<String> future = ProcessExecutor.execute(
 			_classPath, dummyReturnProcessCallable);
 
-		assertEquals(DummyReturnProcessCallable.class.getName(), future.get());
-		assertFalse(future.isCancelled());
-		assertTrue(future.isDone());
-		assertFalse(future.cancel(true));
+		Assert.assertEquals(
+			DummyReturnProcessCallable.class.getName(), future.get());
+		Assert.assertFalse(future.isCancelled());
+		Assert.assertTrue(future.isDone());
+		Assert.assertFalse(future.cancel(true));
 	}
 
+	@Test
 	public void testReturnWithoutExit() throws Exception {
 		ReturnWithoutExitProcessCallable returnWithoutExitProcessCallable =
 			new ReturnWithoutExitProcessCallable("Premature return value");
@@ -935,7 +986,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 			try {
 				future.get(1, TimeUnit.SECONDS);
 
-				fail();
+				Assert.fail();
 			}
 			catch (TimeoutException te) {
 			}
@@ -951,18 +1002,19 @@ public class ProcessExecutorTest extends BaseTestCase {
 		try {
 			future.get();
 
-			fail();
+			Assert.fail();
 		}
 		catch (ExecutionException ee) {
-			assertFalse(future.isCancelled());
-			assertTrue(future.isDone());
+			Assert.assertFalse(future.isCancelled());
+			Assert.assertTrue(future.isDone());
 
 			Throwable throwable = ee.getCause();
 
-			assertTrue(throwable instanceof ProcessException);
+			Assert.assertTrue(throwable instanceof ProcessException);
 		}
 	}
 
+	@Test
 	public void testUnserializableProcessCallable() {
 		UnserializableProcessCallable unserializableProcessCallable =
 			new UnserializableProcessCallable();
@@ -970,15 +1022,16 @@ public class ProcessExecutorTest extends BaseTestCase {
 		try {
 			ProcessExecutor.execute(_classPath, unserializableProcessCallable);
 
-			fail();
+			Assert.fail();
 		}
 		catch (ProcessException pe) {
 			Throwable throwable = pe.getCause();
 
-			assertTrue(throwable instanceof NotSerializableException);
+			Assert.assertTrue(throwable instanceof NotSerializableException);
 		}
 	}
 
+	@Test
 	public void testWrongJavaExecutable() {
 		DummyReturnProcessCallable dummyReturnProcessCallable =
 			new DummyReturnProcessCallable();
@@ -988,32 +1041,44 @@ public class ProcessExecutorTest extends BaseTestCase {
 				"javax", _classPath, Collections.<String>emptyList(),
 				dummyReturnProcessCallable);
 
-			fail();
+			Assert.fail();
 		}
 		catch (ProcessException pe) {
 			Throwable throwable = pe.getCause();
 
-			assertTrue(throwable instanceof IOException);
+			Assert.assertTrue(throwable instanceof IOException);
 		}
 	}
 
-	private static void _assertBrokenPiping(String message) {
-		int index = message.lastIndexOf(' ');
-
-		assertTrue(index != -1);
-		assertEquals(
-			"Dumping content of corrupted object input stream to",
-			message.substring(0, index));
-
-		File file = new File(message.substring(index + 1));
-
-		assertTrue(file.exists());
-
-		file.delete();
-	}
-
-	private static List<String> _createArguments() {
+	private static List<String> _createArguments(String jpdaOptions) {
 		List<String> arguments = new ArrayList<String>();
+
+		boolean coberturaParentDynamicallyInstrumented = Boolean.getBoolean(
+			"cobertura.parent.dynamically.instrumented");
+
+		if (coberturaParentDynamicallyInstrumented) {
+			arguments.add("-Dcobertura.parent.dynamically.instrumented=true");
+		}
+
+		String agentLine = System.getProperty("junit.cobertura.agent");
+
+		if (!Validator.isNull(agentLine)) {
+			arguments.add(agentLine);
+			arguments.add("-Djunit.cobertura.agent=" + agentLine);
+		}
+
+		boolean junitCodeCoverage = Boolean.getBoolean("junit.code.coverage");
+
+		if (junitCodeCoverage) {
+			arguments.add("-Djunit.code.coverage=true");
+		}
+
+		boolean junitDebug = Boolean.getBoolean("junit.debug");
+
+		if (junitDebug) {
+			arguments.add(jpdaOptions);
+			arguments.add("-Djunit.debug=true");
+		}
 
 		String fileName = System.getProperty(
 			"net.sourceforge.cobertura.datafile");
@@ -1102,6 +1167,12 @@ public class ProcessExecutorTest extends BaseTestCase {
 		}
 	}
 
+	private static final String _JPDA_OPTIONS1 =
+		"-agentlib:jdwp=transport=dt_socket,address=8001,server=y,suspend=y";
+
+	private static final String _JPDA_OPTIONS2 =
+		"-agentlib:jdwp=transport=dt_socket,address=8002,server=y,suspend=y";
+
 	private static Log _log = LogFactoryUtil.getLog(ProcessExecutorTest.class);
 
 	private static String _classPath = System.getProperty("java.class.path");
@@ -1150,6 +1221,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 			return clazz.getSimpleName();
 		}
 
+		private static final long serialVersionUID = 1L;
+
 		private int _serverPort;
 
 	}
@@ -1176,7 +1249,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 					"Child Process", 100, new TestShutdownHook());
 
 				if (!result || !ProcessContext.isAttached()) {
-					throw new ProcessException("Attach failed!");
+					throw new ProcessException("Unable to attach");
 				}
 
 				Thread.sleep(1000);
@@ -1197,6 +1270,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 			return null;
 		}
 
+		private static final long serialVersionUID = 1L;
+
 	}
 
 	private static class AttachChildProcessCallable3
@@ -1215,7 +1290,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 					"Child Process", Long.MAX_VALUE, new TestShutdownHook());
 
 				if (!result || !ProcessContext.isAttached()) {
-					throw new ProcessException("Attach failed!");
+					throw new ProcessException("Unable to attach");
 				}
 
 				Thread heartbeatThread = _getHeartbeatThread(false);
@@ -1262,6 +1337,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 			return null;
 		}
 
+		private static final long serialVersionUID = 1L;
+
 	}
 
 	private static class AttachChildProcessCallable4
@@ -1290,6 +1367,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 			return null;
 		}
 
+		private static final long serialVersionUID = 1L;
+
 	}
 
 	private static class AttachChildProcessCallable5
@@ -1306,6 +1385,18 @@ public class ProcessExecutorTest extends BaseTestCase {
 					"Child Process", Long.MAX_VALUE,
 					new TestShutdownHook(true));
 
+				Thread heartbeatThread = _getHeartbeatThread(false);
+
+				heartbeatThread.setUncaughtExceptionHandler(
+					new UncaughtExceptionHandler() {
+
+						public void uncaughtException(Thread t, Throwable e) {
+
+							// Swallow unconcerned uncaught exception
+
+						}
+					});
+
 				if (!result || !ProcessContext.isAttached()) {
 					throw new ProcessException("Unable to attach");
 				}
@@ -1318,6 +1409,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 			return null;
 		}
+
+		private static final long serialVersionUID = 1L;
 
 	}
 
@@ -1346,6 +1439,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 			return null;
 		}
+
+		private static final long serialVersionUID = 1L;
 
 	}
 
@@ -1381,7 +1476,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 					_processCallableClass.getConstructor(int.class);
 
 				ProcessExecutor.execute(
-					_classPath, _createArguments(),
+					_classPath, _createArguments(_JPDA_OPTIONS2),
 					constructor.newInstance(_serverPort));
 			}
 			catch (Exception e) {
@@ -1415,8 +1510,63 @@ public class ProcessExecutorTest extends BaseTestCase {
 			return sb.toString();
 		}
 
+		private static final long serialVersionUID = 1L;
+
 		private Class<ProcessCallable<?>> _processCallableClass;
 		private int _serverPort;
+
+	}
+
+	private static class BrokenPipingProcessCallable
+		implements ProcessCallable<Serializable> {
+
+		public BrokenPipingProcessCallable() throws IOException {
+			DummyReturnProcessCallable dummyReturnProcessCallable =
+				new DummyReturnProcessCallable();
+
+			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
+				new UnsyncByteArrayOutputStream();
+
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+				unsyncByteArrayOutputStream);
+
+			objectOutputStream.writeObject(dummyReturnProcessCallable);
+
+			objectOutputStream.close();
+
+			byte[] serializedData = unsyncByteArrayOutputStream.toByteArray();
+
+			serializedData[5] = (byte) (serializedData[5] + 1);
+
+			_brokenPipingData = serializedData;
+		}
+
+		public Serializable call() throws ProcessException {
+			try {
+				FileOutputStream fileOutputStream = new FileOutputStream(
+					FileDescriptor.out);
+
+				fileOutputStream.write(_brokenPipingData);
+
+				fileOutputStream.flush();
+			}
+			catch (Exception e) {
+				throw new ProcessException(e);
+			}
+
+			return null;
+		}
+
+		@Override
+		public String toString() {
+			Class<?> clazz = getClass();
+
+			return clazz.getSimpleName();
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		private final byte[] _brokenPipingData;
 
 	}
 
@@ -1434,6 +1584,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 			return clazz.getSimpleName();
 		}
+
+		private static final long serialVersionUID = 1L;
 
 	}
 
@@ -1473,6 +1625,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 			return clazz.getSimpleName();
 		}
 
+		private static final long serialVersionUID = 1L;
+
 	}
 
 	private static class KillJVMProcessCallable
@@ -1504,6 +1658,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 			return sb.toString();
 		}
 
+		private static final long serialVersionUID = 1L;
+
 		private int _exitCode;
 
 	}
@@ -1533,7 +1689,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 				// for code coverage. Cobertura's collector thread will output
 				// to System.out after the subprocess's main thread has exited.
 				// That information will be captured by the parent unit test
-				// process which will cause an assert failure.
+				// process which will cause an assert Assert.failure.
 
 				System.setOut(new PrintStream(fileOutputStream));
 			}
@@ -1561,6 +1717,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 			return sb.toString();
 		}
+
+		private static final long serialVersionUID = 1L;
 
 		private String _bodyLog;
 		private String _leadingLog;
@@ -1614,6 +1772,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 			return sb.toString();
 		}
+
+		private static final long serialVersionUID = 1L;
 
 		private String _logMessage;
 		private File _signalFile;
@@ -1686,6 +1846,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 			return sb.toString();
 		}
 
+		private static final long serialVersionUID = 1L;
+
 		private String _propertyKey;
 
 	}
@@ -1732,6 +1894,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 			return sb.toString();
 		}
 
+		private static final long serialVersionUID = 1L;
+
 		private String _returnValue;
 
 	}
@@ -1748,7 +1912,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 			int code = inputStream.read();
 
-			assertEquals(-1, code);
+			Assert.assertEquals(-1, code);
 
 			socket.close();
 		}
@@ -1765,7 +1929,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 			int code = inputStream.read();
 
-			assertEquals(-1, code);
+			Assert.assertEquals(-1, code);
 
 			socket.close();
 		}
@@ -1801,7 +1965,7 @@ public class ProcessExecutorTest extends BaseTestCase {
 			int code = inputStream.read();
 
 			if (code != _CODE_NULL_OUT_OOS) {
-				fail("Unable to null out OOS because of code " + code);
+				Assert.fail("Unable to null out OOS because of code " + code);
 			}
 		}
 
@@ -1929,6 +2093,8 @@ public class ProcessExecutorTest extends BaseTestCase {
 
 			return clazz.getSimpleName();
 		}
+
+		private static final long serialVersionUID = 1L;
 
 		@SuppressWarnings("unused")
 		private Object _unserializableObject = new Object();

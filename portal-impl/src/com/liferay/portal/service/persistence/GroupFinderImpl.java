@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -427,10 +427,6 @@ public class GroupFinderImpl
 			params = _emptyLinkedHashMap;
 		}
 
-		Long userId = (Long)params.get("usersGroups");
-
-		boolean doUnion = Validator.isNotNull(userId);
-
 		LinkedHashMap<String, Object> params1 = params;
 
 		LinkedHashMap<String, Object> params2 = null;
@@ -438,6 +434,10 @@ public class GroupFinderImpl
 		LinkedHashMap<String, Object> params3 = null;
 
 		LinkedHashMap<String, Object> params4 = null;
+
+		Long userId = (Long)params.get("usersGroups");
+
+		boolean doUnion = Validator.isNotNull(userId);
 
 		if (doUnion) {
 			params2 = new LinkedHashMap<String, Object>(params1);
@@ -745,11 +745,6 @@ public class GroupFinderImpl
 			params = _emptyLinkedHashMap;
 		}
 
-		Long userId = (Long)params.get("usersGroups");
-		boolean inherit = GetterUtil.getBoolean(params.get("inherit"), true);
-
-		boolean doUnion = Validator.isNotNull(userId) && inherit;
-
 		LinkedHashMap<String, Object> params1 = params;
 
 		LinkedHashMap<String, Object> params2 = null;
@@ -757,6 +752,11 @@ public class GroupFinderImpl
 		LinkedHashMap<String, Object> params3 = null;
 
 		LinkedHashMap<String, Object> params4 = null;
+
+		Long userId = (Long)params.get("usersGroups");
+		boolean inherit = GetterUtil.getBoolean(params.get("inherit"), true);
+
+		boolean doUnion = Validator.isNotNull(userId) && inherit;
 
 		if (doUnion) {
 			params2 = new LinkedHashMap<String, Object>(params1);
@@ -801,9 +801,9 @@ public class GroupFinderImpl
 
 			StringBundler sb = new StringBundler();
 
-			sb.append("(");
+			sb.append(StringPool.OPEN_PARENTHESIS);
 			sb.append(replaceJoinAndWhere(findByC_C_SQL, params1));
-			sb.append(")");
+			sb.append(StringPool.CLOSE_PARENTHESIS);
 
 			if (doUnion) {
 				sb.append(" UNION (");
@@ -812,7 +812,7 @@ public class GroupFinderImpl
 				sb.append(replaceJoinAndWhere(findByC_C_SQL, params3));
 				sb.append(") UNION (");
 				sb.append(replaceJoinAndWhere(findByC_C_SQL, params4));
-				sb.append(")");
+				sb.append(StringPool.CLOSE_PARENTHESIS);
 			}
 
 			if (obc != null) {
@@ -1032,11 +1032,6 @@ public class GroupFinderImpl
 			params = _emptyLinkedHashMap;
 		}
 
-		Long userId = (Long)params.get("usersGroups");
-		boolean inherit = GetterUtil.getBoolean(params.get("inherit"), true);
-
-		boolean doUnion = Validator.isNotNull(userId) && inherit;
-
 		LinkedHashMap<String, Object> params1 = params;
 
 		LinkedHashMap<String, Object> params2 = null;
@@ -1044,6 +1039,11 @@ public class GroupFinderImpl
 		LinkedHashMap<String, Object> params3 = null;
 
 		LinkedHashMap<String, Object> params4 = null;
+
+		Long userId = (Long)params.get("usersGroups");
+		boolean inherit = GetterUtil.getBoolean(params.get("inherit"), true);
+
+		boolean doUnion = Validator.isNotNull(userId) && inherit;
 
 		if (doUnion) {
 			params2 = new LinkedHashMap<String, Object>(params1);
@@ -1091,9 +1091,9 @@ public class GroupFinderImpl
 
 			StringBundler sb = new StringBundler();
 
-			sb.append("(");
+			sb.append(StringPool.OPEN_PARENTHESIS);
 			sb.append(replaceJoinAndWhere(findByC_PG_N_D_SQL, params1));
-			sb.append(")");
+			sb.append(StringPool.CLOSE_PARENTHESIS);
 
 			if (doUnion) {
 				sb.append(" UNION (");
@@ -1102,7 +1102,7 @@ public class GroupFinderImpl
 				sb.append(replaceJoinAndWhere(findByC_PG_N_D_SQL, params3));
 				sb.append(") UNION (");
 				sb.append(replaceJoinAndWhere(findByC_PG_N_D_SQL, params4));
-				sb.append(")");
+				sb.append(StringPool.CLOSE_PARENTHESIS);
 			}
 
 			if (obc != null) {
@@ -1335,11 +1335,28 @@ public class GroupFinderImpl
 		for (Map.Entry<String, Object> entry : params.entrySet()) {
 			String key = entry.getKey();
 
-			if (key.equals("types")) {
+			if (key.equals("groupsTree")) {
+				List<Group> groupsTree = (List<Group>)entry.getValue();
+
+				if (!groupsTree.isEmpty()) {
+					sb.append(StringPool.OPEN_PARENTHESIS);
+
+					for (int i = 0; i < groupsTree.size(); i++) {
+						sb.append("(Group_.treePath LIKE ?) ");
+
+						if ((i + 1) < groupsTree.size()) {
+							sb.append("OR ");
+						}
+					}
+
+					sb.append(") AND ");
+				}
+			}
+			else if (key.equals("types")) {
 				List<Integer> types = (List<Integer>)entry.getValue();
 
 				if (!types.isEmpty()) {
-					sb.append("(");
+					sb.append(StringPool.OPEN_PARENTHESIS);
 
 					for (int i = 0; i < types.size(); i++) {
 						sb.append("(Group_.type_ = ?) ");
@@ -1437,6 +1454,23 @@ public class GroupFinderImpl
 				Boolean value = (Boolean)entry.getValue();
 
 				qPos.add(value);
+			}
+			else if (key.equals("groupsTree")) {
+				List<Group> groupsTree = (List<Group>)entry.getValue();
+
+				if (!groupsTree.isEmpty()) {
+					for (Group group : groupsTree) {
+						StringBundler sb = new StringBundler(5);
+
+						sb.append(StringPool.PERCENT);
+						sb.append(StringPool.SLASH);
+						sb.append(group.getGroupId());
+						sb.append(StringPool.SLASH);
+						sb.append(StringPool.PERCENT);
+
+						qPos.add(sb.toString());
+					}
+				}
 			}
 			else if (key.equals("pageCount")) {
 			}

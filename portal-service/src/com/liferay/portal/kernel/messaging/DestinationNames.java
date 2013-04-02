@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -24,15 +24,9 @@ public interface DestinationNames {
 	public static final String AUDIT = "liferay/audit";
 
 	/**
-	 * @deprecated {@link #SUBSCRIPTION_SENDER}
+	 * @deprecated As of 6.1.0, replaced by {@link #SUBSCRIPTION_SENDER}
 	 */
 	public static final String BLOGS = "liferay/blogs";
-
-	public static final String BUFFERED_INCREMENT_PARALLEL =
-		"liferay/buffered_increment_parallel";
-
-	public static final String BUFFERED_INCREMENT_SERIAL =
-		"liferay/buffered_increment_serial";
 
 	public static final String CONVERT_PROCESS = "liferay/convert_process";
 
@@ -73,7 +67,7 @@ public interface DestinationNames {
 		"liferay/ip_geocoder/response";
 
 	/**
-	 * @deprecated {@link #SUBSCRIPTION_SENDER}
+	 * @deprecated As of 6.1.0, replaced by {@link #SUBSCRIPTION_SENDER}
 	 */
 	public static final String JOURNAL = "liferay/journal";
 
@@ -92,7 +86,7 @@ public interface DestinationNames {
 	public static final String MARKETPLACE = "liferay/marketplace";
 
 	/**
-	 * @deprecated {@link #SUBSCRIPTION_SENDER}
+	 * @deprecated As of 6.1.0, replaced by {@link #SUBSCRIPTION_SENDER}
 	 */
 	public static final String MESSAGE_BOARDS = "liferay/message_boards";
 
@@ -140,7 +134,7 @@ public interface DestinationNames {
 	public static final String TEST_TRANSACTION = "liferay/test_transaction";
 
 	/**
-	 * @deprecated {@link #SUBSCRIPTION_SENDER}
+	 * @deprecated As of 6.1.0, replaced by {@link #SUBSCRIPTION_SENDER}
 	 */
 	public static final String WIKI = "liferay/wiki";
 

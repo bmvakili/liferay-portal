@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -73,6 +73,10 @@ public class SearchContext implements Serializable {
 
 	public long[] getCategoryIds() {
 		return _categoryIds;
+	}
+
+	public long[] getClassTypeIds() {
+		return _classTypeIds;
 	}
 
 	public long getCompanyId() {
@@ -159,8 +163,20 @@ public class SearchContext implements Serializable {
 		return _userId;
 	}
 
+	public boolean hasOverridenKeywords() {
+		return Validator.isNull(_originalKeywords);
+	}
+
 	public boolean isAndSearch() {
 		return _andSearch;
+	}
+
+	public boolean isIncludeAttachments() {
+		return _includeAttachments;
+	}
+
+	public boolean isIncludeDiscussions() {
+		return _includeDiscussions;
 	}
 
 	public boolean isIncludeLiveGroups() {
@@ -173,6 +189,12 @@ public class SearchContext implements Serializable {
 
 	public boolean isScopeStrict() {
 		return _scopeStrict;
+	}
+
+	public void overrideKeywords(String keywords) {
+		_originalKeywords = _keywords;
+
+		_keywords = keywords;
 	}
 
 	public void setAndSearch(boolean andSearch) {
@@ -207,6 +229,10 @@ public class SearchContext implements Serializable {
 		_categoryIds = categoryIds;
 	}
 
+	public void setClassTypeIds(long[] classTypeIds) {
+		_classTypeIds = classTypeIds;
+	}
+
 	public void setCompanyId(long companyId) {
 		_companyId = companyId;
 	}
@@ -236,6 +262,14 @@ public class SearchContext implements Serializable {
 
 	public void setGroupIds(long[] groupIds) {
 		_groupIds = groupIds;
+	}
+
+	public void setIncludeAttachments(boolean includeAttachments) {
+		_includeAttachments = includeAttachments;
+	}
+
+	public void setIncludeDiscussions(boolean includeDiscussions) {
+		_includeDiscussions = includeDiscussions;
 	}
 
 	public void setIncludeLiveGroups(boolean includeLiveGroups) {
@@ -304,17 +338,21 @@ public class SearchContext implements Serializable {
 	private Map<String, Serializable> _attributes;
 	private BooleanClause[] _booleanClauses;
 	private long[] _categoryIds;
+	private long[] _classTypeIds;
 	private long _companyId;
 	private int _end = QueryUtil.ALL_POS;
 	private String[] _entryClassNames;
 	private Map<String, Facet> _facets = new ConcurrentHashMap<String, Facet>();
 	private long[] _folderIds;
 	private long[] _groupIds;
+	private boolean _includeAttachments;
+	private boolean _includeDiscussions;
 	private boolean _includeLiveGroups = true;
 	private boolean _includeStagingGroups = true;
 	private String _keywords;
 	private Locale _locale = LocaleUtil.getMostRelevantLocale();
 	private long[] _nodeIds;
+	private String _originalKeywords;
 	private long _ownerUserId;
 	private String[] _portletIds;
 	private QueryConfig _queryConfig;

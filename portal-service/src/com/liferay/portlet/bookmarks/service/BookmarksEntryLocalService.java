@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -179,12 +179,12 @@ public interface BookmarksEntryLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Returns the bookmarks entry with the UUID in the group.
+	* Returns the bookmarks entry matching the UUID and group.
 	*
-	* @param uuid the UUID of bookmarks entry
-	* @param groupId the group id of the bookmarks entry
-	* @return the bookmarks entry
-	* @throws PortalException if a bookmarks entry with the UUID in the group could not be found
+	* @param uuid the bookmarks entry's UUID
+	* @param groupId the primary key of the group
+	* @return the matching bookmarks entry
+	* @throws PortalException if a matching bookmarks entry could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -256,6 +256,11 @@ public interface BookmarksEntryLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	public void deleteEntries(long groupId, long folderId,
+		boolean includeTrashedEntries)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public com.liferay.portlet.bookmarks.model.BookmarksEntry deleteEntry(
 		com.liferay.portlet.bookmarks.model.BookmarksEntry entry)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -314,7 +319,36 @@ public interface BookmarksEntryLocalService extends BaseLocalService,
 	public java.util.List<com.liferay.portlet.bookmarks.model.BookmarksEntry> getNoAssetEntries()
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntry(
+		long entryId, long parentFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryFromTrash(
+		long userId, long entryId, long parentFolderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryToTrash(
+		long userId, com.liferay.portlet.bookmarks.model.BookmarksEntry entry)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry moveEntryToTrash(
+		long userId, long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public com.liferay.portlet.bookmarks.model.BookmarksEntry openEntry(
+		long userId, com.liferay.portlet.bookmarks.model.BookmarksEntry entry)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry openEntry(
+		long userId, long entryId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry restoreEntryFromTrash(
 		long userId, long entryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -339,6 +373,12 @@ public interface BookmarksEntryLocalService extends BaseLocalService,
 		java.lang.String name, java.lang.String url,
 		java.lang.String description,
 		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.bookmarks.model.BookmarksEntry updateStatus(
+		long userId, com.liferay.portlet.bookmarks.model.BookmarksEntry entry,
+		int status)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 }

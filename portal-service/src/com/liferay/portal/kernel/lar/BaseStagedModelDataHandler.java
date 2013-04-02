@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.lar;
 
-import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.StagedModel;
 
 /**
@@ -24,30 +23,50 @@ import com.liferay.portal.model.StagedModel;
 public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 	implements StagedModelDataHandler<T> {
 
-	public void export(
-		T stagedModel, PortletDataContext portletDataContext,
-		Element... elements) {
+	public void exportStagedModel(
+			PortletDataContext portletDataContext, T stagedModel)
+		throws PortletDataException {
+
+		String path = StagedModelPathUtil.getPath(stagedModel);
+
+		if (portletDataContext.isPathProcessed(path)) {
+			return;
+		}
+
+		try {
+			doExportStagedModel(portletDataContext, (T)stagedModel.clone());
+		}
+		catch (Exception e) {
+			throw new PortletDataException(e);
+		}
 	}
 
 	public abstract String getClassName();
 
-	public void importData(
-		Element stagedModelElement, PortletDataContext portletDataContext) {
+	public void importStagedModel(
+			PortletDataContext portletDataContext, T stagedModel)
+		throws PortletDataException {
 
-		String path = stagedModelElement.attributeValue("path");
+		String path = StagedModelPathUtil.getPath(stagedModel);
 
-		T stagedModel = (T)portletDataContext.getZipEntryAsObject(
-			stagedModelElement, path);
-
-		if (!portletDataContext.isPathNotProcessed(path)) {
+		if (portletDataContext.isPathProcessed(path)) {
 			return;
 		}
 
-		importData(stagedModel, path, portletDataContext);
+		try {
+			doImportStagedModel(portletDataContext, stagedModel);
+		}
+		catch (Exception e) {
+			throw new PortletDataException(e);
+		}
 	}
 
-	public void importData(
-		T stagedModel, String path, PortletDataContext portletDataContext) {
-	}
+	protected abstract void doExportStagedModel(
+			PortletDataContext portletDataContext, T stagedModel)
+		throws Exception;
+
+	protected abstract void doImportStagedModel(
+			PortletDataContext portletDataContext, T stagedModel)
+		throws Exception;
 
 }

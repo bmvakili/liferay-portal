@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,17 +28,19 @@ int maxEntries = GetterUtil.getInteger(PropsUtil.get(PropsKeys.ASSET_CATEGORIES_
 
 List<AssetVocabulary> vocabularies = new ArrayList<AssetVocabulary>();
 
-Group group = themeDisplay.getScopeGroup();
+Group siteGroup = themeDisplay.getSiteGroup();
 
-if (group.isLayout()) {
-	vocabularies.addAll(AssetVocabularyServiceUtil.getGroupVocabularies(group.getParentGroupId(), false));
-}
-else {
-	vocabularies.addAll(AssetVocabularyServiceUtil.getGroupVocabularies(scopeGroupId, false));
-}
+StringBundler vocabularyGroupIds = new StringBundler(3);
+
+vocabularies.addAll(AssetVocabularyServiceUtil.getGroupVocabularies(siteGroup.getGroupId(), false));
+
+vocabularyGroupIds.append(siteGroup.getGroupId());
 
 if (scopeGroupId != themeDisplay.getCompanyGroupId()) {
 	vocabularies.addAll(AssetVocabularyServiceUtil.getGroupVocabularies(themeDisplay.getCompanyGroupId(), false));
+
+	vocabularyGroupIds.append(StringPool.COMMA);
+	vocabularyGroupIds.append(themeDisplay.getCompanyGroupId());
 }
 
 if (Validator.isNotNull(className)) {
@@ -109,6 +111,7 @@ if (Validator.isNotNull(className)) {
 					maxEntries: <%= maxEntries %>,
 					portalModelResource: <%= Validator.isNotNull(className) && (ResourceActionsUtil.isPortalModelResource(className) || className.equals(Group.class.getName())) %>,
 					singleSelect: <%= !vocabulary.isMultiValued() %>,
+					title: '<%= UnicodeLanguageUtil.format(pageContext, "select-x", vocabulary.getTitle(locale)) %>',
 					vocabularyGroupIds: '<%= vocabulary.getGroupId() %>',
 					vocabularyIds: '<%= String.valueOf(vocabulary.getVocabularyId()) %>'
 				}
@@ -143,7 +146,7 @@ else {
 				instanceVar: '<%= namespace + randomNamespace %>',
 				maxEntries: <%= maxEntries %>,
 				portalModelResource: <%= Validator.isNotNull(className) && (ResourceActionsUtil.isPortalModelResource(className) || className.equals(Group.class.getName())) %>,
-				vocabularyGroupIds: '<%= scopeGroupId %>',
+				vocabularyGroupIds: '<%= vocabularyGroupIds.toString() %>',
 				vocabularyIds: '<%= ListUtil.toString(vocabularies, "vocabularyId") %>'
 			}
 		).render();

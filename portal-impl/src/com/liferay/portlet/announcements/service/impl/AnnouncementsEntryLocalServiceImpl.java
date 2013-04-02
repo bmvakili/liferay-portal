@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -32,6 +31,7 @@ import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.util.PortalUtil;
@@ -373,6 +373,7 @@ public class AnnouncementsEntryLocalServiceImpl
 
 				toName = group.getName();
 
+				params.put("inherit", Boolean.TRUE);
 				params.put("usersGroups", classPK);
 			}
 			else if (className.equals(Organization.class.getName())) {
@@ -390,7 +391,14 @@ public class AnnouncementsEntryLocalServiceImpl
 
 				toName = role.getName();
 
-				params.put("usersRoles", classPK);
+				if (role.getType() == RoleConstants.TYPE_REGULAR) {
+					params.put("inherit", Boolean.TRUE);
+					params.put("usersRoles", classPK);
+				}
+				else {
+					params.put(
+						"userGroupRole", new Long[] {Long.valueOf(0), classPK});
+				}
 			}
 			else if (className.equals(UserGroup.class.getName())) {
 				UserGroup userGroup = userGroupPersistence.findByPrimaryKey(
@@ -463,8 +471,9 @@ public class AnnouncementsEntryLocalServiceImpl
 
 		subscriptionSender.setBody(body);
 		subscriptionSender.setCompanyId(entry.getCompanyId());
+		subscriptionSender.setContextAttribute(
+			"[$ENTRY_CONTENT$]", entry.getContent(), false);
 		subscriptionSender.setContextAttributes(
-			"[$ENTRY_CONTENT$]", HtmlUtil.extractText(entry.getContent()),
 			"[$ENTRY_ID$]", entry.getEntryId(), "[$ENTRY_TITLE$]",
 			entry.getTitle(), "[$ENTRY_TYPE$]",
 			LanguageUtil.get(company.getLocale(), entry.getType()),

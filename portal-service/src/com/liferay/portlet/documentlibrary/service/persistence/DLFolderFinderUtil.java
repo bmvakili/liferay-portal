@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,6 +90,11 @@ public class DLFolderFinderUtil {
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getFinder()
 				   .filterFindFE_FS_ByG_F(groupId, folderId, queryDefinition);
+	}
+
+	public static java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> findF_ByNoAssets()
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getFinder().findF_ByNoAssets();
 	}
 
 	public static java.util.List<java.lang.Object> findF_FE_FS_ByG_F_M_M(

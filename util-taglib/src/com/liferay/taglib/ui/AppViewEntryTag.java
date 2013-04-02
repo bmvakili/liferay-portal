@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,6 +49,10 @@ public class AppViewEntryTag extends IncludeTag {
 
 	public void setAssetTagClassPK(long assetTagClassPK) {
 		_assetTagClassPK = assetTagClassPK;
+	}
+
+	public void setCssClass(String cssClass) {
+		_cssClass = cssClass;
 	}
 
 	public void setData(Map<String, Object> data) {
@@ -118,6 +122,7 @@ public class AppViewEntryTag extends IncludeTag {
 		_assetCategoryClassPK = 0;
 		_assetTagClassName = null;
 		_assetTagClassPK = 0;
+		_cssClass = null;
 		_data = null;
 		_description = null;
 		_displayStyle = null;
@@ -158,6 +163,7 @@ public class AppViewEntryTag extends IncludeTag {
 			"liferay-ui:app-view-entry:assetTagClassName", _assetTagClassName);
 		request.setAttribute(
 			"liferay-ui:app-view-entry:assetTagClassPK", _assetTagClassPK);
+		request.setAttribute("liferay-ui:app-view-entry:cssClass", _cssClass);
 		request.setAttribute("liferay-ui:app-view-entry:data", _data);
 		request.setAttribute(
 			"liferay-ui:app-view-entry:description", _description);
@@ -193,6 +199,7 @@ public class AppViewEntryTag extends IncludeTag {
 	private long _assetCategoryClassPK;
 	private String _assetTagClassName;
 	private long _assetTagClassPK;
+	private String _cssClass;
 	private Map<String, Object> _data;
 	private String _description;
 	private String _displayStyle;

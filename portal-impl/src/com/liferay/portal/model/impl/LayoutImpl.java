@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -131,9 +131,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 		String keyword = _getFriendlyURLKeyword(friendlyURL);
 
 		if (Validator.isNotNull(keyword)) {
-			LayoutFriendlyURLException lfurle =
-				new LayoutFriendlyURLException(
-					LayoutFriendlyURLException.KEYWORD_CONFLICT);
+			LayoutFriendlyURLException lfurle = new LayoutFriendlyURLException(
+				LayoutFriendlyURLException.KEYWORD_CONFLICT);
 
 			lfurle.setKeywordConflict(keyword);
 
@@ -362,6 +361,16 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 		if (value != null) {
 			return value;
+		}
+
+		if (!isInheritLookAndFeel()) {
+			try {
+				Theme theme = _getTheme(device);
+
+				return theme.getSetting(key);
+			}
+			catch (Exception e) {
+			}
 		}
 
 		try {
@@ -745,6 +754,17 @@ public class LayoutImpl extends LayoutBaseImpl {
 		}
 
 		return layoutTypePortlet;
+	}
+
+	private Theme _getTheme(String device)
+		throws PortalException, SystemException {
+
+		if (device.equals("regular")) {
+			return getTheme();
+		}
+		else {
+			return getWapTheme();
+		}
 	}
 
 	private String _getURL(

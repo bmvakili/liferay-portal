@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,8 +34,6 @@ else {
 
 long groupId = ParamUtil.getLong(request, "groupId");
 
-Group group = themeDisplay.getScopeGroup();
-
 String keywords = ParamUtil.getString(request, "keywords");
 
 String format = ParamUtil.getString(request, "format");
@@ -64,11 +62,6 @@ request.setAttribute("search.jsp-returnToFullPageURL", portletDisplay.getURLBack
 
 	<aui:fieldset>
 		<aui:input inlineField="<%= true %>" label="" name="keywords" size="30" value="<%= HtmlUtil.escape(keywords) %>" />
-
-		<aui:select inlineField="<%= true %>" label="" name="groupId">
-			<aui:option label="everything" selected="<%= groupId == 0 %>" value="0" />
-			<aui:option label='<%= "this-" + (group.isOrganization() ? "organization" : "site") %>' selected="<%= groupId != 0 %>" value="<%= group.getGroupId() %>" />
-		</aui:select>
 
 		<aui:button align="absmiddle" border="0" name="search" onClick='<%= renderResponse.getNamespace() + "search();" %>' src='<%= themeDisplay.getPathThemeImages() + "/common/search.png" %>' title="search" type="image" />
 
@@ -207,6 +200,8 @@ request.setAttribute("search.jsp-returnToFullPageURL", portletDisplay.getURLBack
 		window,
 		'<portlet:namespace />search',
 		function() {
+			document.<portlet:namespace />fm.<portlet:namespace /><%= SearchContainer.DEFAULT_CUR_PARAM %>.value = 1;
+
 			var keywords = document.<portlet:namespace />fm.<portlet:namespace />keywords.value;
 
 			keywords = keywords.replace(/^\s+|\s+$/, '');

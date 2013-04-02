@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -163,6 +163,26 @@ public class AssetTagServiceSoap {
 		}
 	}
 
+	public static com.liferay.portlet.asset.model.AssetTagDisplay getGroupTagsDisplay(
+		long groupId, java.lang.String name, int start, int end)
+		throws RemoteException {
+		try {
+			com.liferay.portlet.asset.model.AssetTagDisplay returnValue = AssetTagServiceUtil.getGroupTagsDisplay(groupId,
+					name, start, end);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	/**
+	* @deprecated As of 6.2.0, replaced by {@link #getGroupTagsDisplay(long,
+	String, int, int)}
+	*/
 	public static java.lang.String getJSONGroupTags(long groupId,
 		java.lang.String name, int start, int end) throws RemoteException {
 		try {
@@ -232,6 +252,24 @@ public class AssetTagServiceSoap {
 		try {
 			java.util.List<com.liferay.portlet.asset.model.AssetTag> returnValue =
 				AssetTagServiceUtil.getTags(groupId, name, tagProperties,
+					start, end);
+
+			return com.liferay.portlet.asset.model.AssetTagSoap.toSoapModels(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.portlet.asset.model.AssetTagSoap[] getTags(
+		long[] groupIds, java.lang.String name,
+		java.lang.String[] tagProperties, int start, int end)
+		throws RemoteException {
+		try {
+			java.util.List<com.liferay.portlet.asset.model.AssetTag> returnValue =
+				AssetTagServiceUtil.getTags(groupIds, name, tagProperties,
 					start, end);
 
 			return com.liferay.portlet.asset.model.AssetTagSoap.toSoapModels(returnValue);
@@ -332,6 +370,22 @@ public class AssetTagServiceSoap {
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.json.JSONArray returnValue = AssetTagServiceUtil.search(groupId,
+					name, tagProperties, start, end);
+
+			return returnValue.toString();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static java.lang.String search(long[] groupIds,
+		java.lang.String name, java.lang.String[] tagProperties, int start,
+		int end) throws RemoteException {
+		try {
+			com.liferay.portal.kernel.json.JSONArray returnValue = AssetTagServiceUtil.search(groupIds,
 					name, tagProperties, start, end);
 
 			return returnValue.toString();

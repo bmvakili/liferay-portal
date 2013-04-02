@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -488,7 +488,7 @@ public class BlogsEntryServiceImpl extends BlogsEntryServiceBaseImpl {
 
 			syndEntry.setLink(link);
 
-			syndEntry.setPublishedDate(entry.getCreateDate());
+			syndEntry.setPublishedDate(entry.getDisplayDate());
 			syndEntry.setTitle(entry.getTitle());
 			syndEntry.setUpdatedDate(entry.getModifiedDate());
 			syndEntry.setUri(link);

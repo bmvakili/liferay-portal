@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -33,23 +33,8 @@ Set<Long> categorySubscriptionClassPKs = null;
 Set<Long> threadSubscriptionClassPKs = null;
 
 if (themeDisplay.isSignedIn()) {
-	List<Subscription> categorySubscriptions = SubscriptionLocalServiceUtil.getUserSubscriptions(user.getUserId(), MBCategory.class.getName());
-
-	categorySubscriptionClassPKs = new HashSet<Long>(categorySubscriptions.size());
-
-	for (Subscription subscription : categorySubscriptions) {
-		categorySubscriptionClassPKs.add(subscription.getClassPK());
-	}
-
-	threadSubscriptionClassPKs = new HashSet<Long>();
-
-	List<Subscription> threadSubscriptions = SubscriptionLocalServiceUtil.getUserSubscriptions(user.getUserId(), MBThread.class.getName());
-
-	threadSubscriptionClassPKs = new HashSet<Long>(threadSubscriptions.size());
-
-	for (Subscription subscription : threadSubscriptions) {
-		threadSubscriptionClassPKs.add(subscription.getClassPK());
-	}
+	categorySubscriptionClassPKs = MBUtil.getCategorySubscriptionClassPKs(user.getUserId());
+	threadSubscriptionClassPKs = MBUtil.getThreadSubscriptionClassPKs(user.getUserId());
 }
 
 long groupThreadsUserId = ParamUtil.getLong(request, "groupThreadsUserId");
@@ -75,7 +60,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 %>
 
 <portlet:actionURL var="undoTrashURL">
-	<portlet:param name="struts_action" value="/message_boards/restore_thread" />
+	<portlet:param name="struts_action" value="/message_boards/edit_entry" />
 	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
 </portlet:actionURL>
 
@@ -203,7 +188,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 						/>
 					</c:if>
 
-					<c:if test="<%= MBCategoryPermission.contains(permissionChecker, category, ActionKeys.SUBSCRIBE) %>">
+					<c:if test="<%= MBCategoryPermission.contains(permissionChecker, category, ActionKeys.SUBSCRIBE) && (MBUtil.getEmailMessageAddedEnabled(preferences) || MBUtil.getEmailMessageUpdatedEnabled(preferences)) %>">
 						<c:choose>
 							<c:when test="<%= (categorySubscriptionClassPKs != null) && categorySubscriptionClassPKs.contains(category.getCategoryId()) %>">
 								<portlet:actionURL var="unsubscribeURL">

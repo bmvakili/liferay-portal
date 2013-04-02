@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,16 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
+ * Provides a serializable loose representation for {@link Method}, considering
+ * the declaring class, name, and parameter types of the {@link Method}, while
+ * ignoring its return type and exceptions. This means the compiler generated
+ * bridging method is considered logically the same as it source counterpart. On
+ * deserialization for a generic {@link Method}, the {@link Method} that is
+ * resolved (bridge method or source method) is runtime environment dependent.
+ * Whether it is resolved to a bridge method or source method is of no
+ * consequence, as a force cast is performed on the method's return value,
+ * assuring the same result.
+ *
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
  */
@@ -185,6 +195,8 @@ public class MethodKey implements Externalizable {
 		objectOutput.write(
 			byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining());
 	}
+
+	private static final long serialVersionUID = 1L;
 
 	private Class<?> _declaringClass;
 

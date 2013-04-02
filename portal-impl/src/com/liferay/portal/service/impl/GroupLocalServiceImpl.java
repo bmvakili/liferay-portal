@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -303,6 +303,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		group.setClassPK(classPK);
 		group.setParentGroupId(parentGroupId);
 		group.setLiveGroupId(liveGroupId);
+		group.setTreePath(group.buildTreePath());
 		group.setName(name);
 		group.setDescription(description);
 		group.setType(type);
@@ -390,8 +391,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 *             found, or if a valid friendly URL could not be created for
 	 *             the group
 	 * @throws     SystemException if a system exception occurred
-	 * @deprecated {@link #addGroup(long, long, String, long, long, String,
-	 *             String, int, String, boolean, boolean, ServiceContext)}
+	 * @deprecated As of 6.2.0, replaced by {@link #addGroup(long, long, String,
+	 *             long, long, String, String, int, String, boolean, boolean,
+	 *             ServiceContext)}
 	 */
 	public Group addGroup(
 			long userId, long parentGroupId, String className, long classPK,
@@ -412,6 +414,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * @param  groupIds the primary keys of the groups
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void addRoleGroups(long roleId, long[] groupIds)
 		throws SystemException {
 
@@ -427,6 +430,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * @param  groupIds the primary keys of the groups
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void addUserGroups(long userId, long[] groupIds)
 		throws SystemException {
 
@@ -468,7 +472,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 	/**
 	 * Creates systems groups and other related data needed by the system on the
-	 * very first startup. Also takes care of creating the control panel groups
+	 * very first startup. Also takes care of creating the Control Panel groups
 	 * and layouts.
 	 *
 	 * @param  companyId the primary key of the company
@@ -706,7 +710,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		// Resources
 
 		List<ResourcePermission> resourcePermissions =
-			resourcePermissionPersistence.findByC_P(
+			resourcePermissionPersistence.findByC_LikeP(
 				group.getCompanyId(), String.valueOf(group.getGroupId()));
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
@@ -1011,7 +1015,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns all the sites that are children of the parent group.
+	 * Returns all the groups that are direct children of the parent group.
 	 *
 	 * @param  companyId the primary key of the company
 	 * @param  parentGroupId the primary key of the parent group
@@ -1029,6 +1033,50 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		}
 
 		return groupPersistence.findByC_P_S(companyId, parentGroupId, site);
+	}
+
+	/**
+	 * Returns all the groups that are direct children of the parent group with
+	 * the matching className.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  className the class name of the group
+	 * @param  parentGroupId the primary key of the parent group
+	 * @return the matching groups, or <code>null</code> if no matches were
+	 *         found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Group> getGroups(
+			long companyId, String className, long parentGroupId)
+		throws SystemException {
+
+		long classNameId = PortalUtil.getClassNameId(className);
+
+		return groupPersistence.findByC_C_P(
+			companyId, classNameId, parentGroupId);
+	}
+
+	/**
+	 * Returns a range of all the groups that are direct children of the parent
+	 * group with the matching className.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  className the class name of the group
+	 * @param  parentGroupId the primary key of the parent group
+	 * @param  start the lower bound of the range of results
+	 * @param  end the upper bound of the range of results (not inclusive)
+	 * @return the range of matching groups
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Group> getGroups(
+			long companyId, String className, long parentGroupId, int start,
+			int end)
+		throws SystemException {
+
+		long classNameId = PortalUtil.getClassNameId(className);
+
+		return groupPersistence.findByC_C_P(
+			companyId, classNameId, parentGroupId, start, end);
 	}
 
 	/**
@@ -1051,6 +1099,46 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		}
 
 		return groups;
+	}
+
+	/**
+	 * Returns the number of groups that are direct children of the parent
+	 * group.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  parentGroupId the primary key of the parent group
+	 * @param  site whether the group is to be associated with a main site
+	 * @return the number of matching groups
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int getGroupsCount(long companyId, long parentGroupId, boolean site)
+		throws SystemException {
+
+		if (parentGroupId == GroupConstants.ANY_PARENT_GROUP_ID) {
+			return groupPersistence.countByC_S(companyId, site);
+		}
+
+		return groupPersistence.countByC_P_S(companyId, parentGroupId, site);
+	}
+
+	/**
+	 * Returns the number of groups that are direct children of the parent group
+	 * with the matching className.
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  className the class name of the group
+	 * @param  parentGroupId the primary key of the parent group
+	 * @return the number of matching groups
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int getGroupsCount(
+			long companyId, String className, long parentGroupId)
+		throws SystemException {
+
+		long classNameId = PortalUtil.getClassNameId(className);
+
+		return groupPersistence.countByC_C_P(
+			companyId, classNameId, parentGroupId);
 	}
 
 	/**
@@ -1277,17 +1365,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns all the groups associated with the role.
-	 *
-	 * @param  roleId the primary key of the role
-	 * @return the groups associated with the role
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<Group> getRoleGroups(long roleId) throws SystemException {
-		return rolePersistence.getGroups(roleId);
-	}
-
-	/**
 	 * Returns the staging group.
 	 *
 	 * @param  liveGroupId the primary key of the live group
@@ -1335,21 +1412,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		return groupPersistence.findByC_C_C(
 			companyId, classNameId, userGroupId);
-	}
-
-	/**
-	 * Returns all the user's site groups and immediate organization groups.
-	 * System and staged groups are not included.
-	 *
-	 * @param  userId the primary key of the user
-	 * @return the user's groups and organization groups
-	 * @throws PortalException if a user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<Group> getUserGroups(long userId)
-		throws PortalException, SystemException {
-
-		return getUserGroups(userId, false);
 	}
 
 	/**
@@ -1416,35 +1478,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		else {
 			return userPersistence.getGroups(userId, start, end);
 		}
-	}
-
-	/**
-	 * Returns an ordered range of all the user's site groups and immediate
-	 * organization groups. System and staged groups are not included.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end -
-	 * start</code> instances. <code>start</code> and <code>end</code> are not
-	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
-	 * refers to the first result in the set. Setting both <code>start</code>
-	 * and <code>end</code> to {@link
-	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
-	 * result set.
-	 * </p>
-	 *
-	 * @param  userId the primary key of the user
-	 * @param  start the lower bound of the range of groups to return
-	 * @param  end the upper bound of the range of groups to return (not
-	 *         inclusive)
-	 * @return the range of the user's groups and organization groups ordered by
-	 *         name
-	 * @throws PortalException if a user with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public List<Group> getUserGroups(long userId, int start, int end)
-		throws PortalException, SystemException {
-
-		return getUserGroups(userId, false, start, end);
 	}
 
 	/**
@@ -1547,21 +1580,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns <code>true</code> if the group is associated with the role.
-	 *
-	 * @param  roleId the primary key of the role
-	 * @param  groupId the primary key of the group
-	 * @return <code>true</code> if the group is associated with the role;
-	 *         <code>false</code> otherwise
-	 * @throws SystemException if a system exception occurred
-	 */
-	public boolean hasRoleGroup(long roleId, long groupId)
-		throws SystemException {
-
-		return rolePersistence.containsGroup(roleId, groupId);
-	}
-
-	/**
 	 * Returns <code>true</code> if the live group has a staging group.
 	 *
 	 * @param  liveGroupId the primary key of the live group
@@ -1589,6 +1607,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 *         <code>false</code> otherwise
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public boolean hasUserGroup(long userId, long groupId)
 		throws SystemException {
 
@@ -1648,6 +1667,34 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		return groupPersistence.findByC_N(companyId, name);
+	}
+
+	/**
+	 * Rebuilds the group tree.
+	 *
+	 * <p>
+	 * Only call this method if the tree has become stale through operations
+	 * other than normal CRUD. Under normal circumstances the tree is
+	 * automatically rebuilt whenever necessary.
+	 * </p>
+	 *
+	 * @param  companyId the primary key of the group's company
+	 * @throws PortalException if a group with the primary key could not be
+	 *         found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void rebuildTree(long companyId)
+		throws PortalException, SystemException {
+
+		List<Group> groups = groupPersistence.findByCompanyId(companyId);
+
+		for (Group group : groups) {
+			String treePath = group.buildTreePath();
+
+			group.setTreePath(treePath);
+
+			groupPersistence.update(group);
+		}
 	}
 
 	/**
@@ -1907,8 +1954,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * </p>
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the class names of entities to include in the search
-	 *         (optionally <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  parentGroupId the primary key of the parent group
 	 * @param  keywords the keywords (space separated), which may occur in the
 	 *         sites's name, or description (optionally <code>null</code>)
@@ -1953,8 +2000,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * </p>
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the group's class name IDs (optionally
-	 *         <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  parentGroupId the primary key of the parent group
 	 * @param  keywords the keywords (space separated), which may occur in the
 	 *         sites's name, or description (optionally <code>null</code>)
@@ -2011,8 +2058,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * </p>
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the class names of entities to include in the search
-	 *         (optionally <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  parentGroupId the primary key of the parent group
 	 * @param  name the group's name (optionally <code>null</code>)
 	 * @param  description the group's description (optionally
@@ -2061,8 +2108,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * </p>
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the group's class name IDs (optionally
-	 *         <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  parentGroupId the primary key of the parent group
 	 * @param  name the group's name (optionally <code>null</code>)
 	 * @param  description the group's description (optionally
@@ -2124,8 +2171,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * </p>
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the class names of entities to include in the search
-	 *         (optionally <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  keywords the keywords (space separated), which may occur in the
 	 *         sites's name, or description (optionally <code>null</code>)
 	 * @param  params the finder params (optionally <code>null</code>). To
@@ -2166,8 +2213,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * </p>
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the group's class name IDs (optionally
-	 *         <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  keywords the keywords (space separated), which may occur in the
 	 *         sites's name, or description (optionally <code>null</code>)
 	 * @param  params the finder params (optionally <code>null</code>). To
@@ -2216,8 +2263,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * </p>
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the class names of entities to include in the search
-	 *         (optionally <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  name the group's name (optionally <code>null</code>)
 	 * @param  description the group's description (optionally
 	 *         <code>null</code>)
@@ -2264,8 +2311,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * </p>
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the group's class name IDs (optionally
-	 *         <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  name the group's name (optionally <code>null</code>)
 	 * @param  description the group's description (optionally
 	 *         <code>null</code>)
@@ -2568,8 +2615,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * included.
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the class names of entities to include in the search
-	 *         (optionally <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  parentGroupId the primary key of the parent group
 	 * @param  keywords the keywords (space separated), which may occur in the
 	 *         sites's name, or description (optionally <code>null</code>)
@@ -2606,8 +2653,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * are not included.
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the class names of entities to include in the search
-	 *         (optionally <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  parentGroupId the primary key of the parent group
 	 * @param  name the group's name (optionally <code>null</code>)
 	 * @param  description the group's description (optionally
@@ -2649,8 +2696,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * groups. System and staged groups are not included.
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the class names of entities to include in the search
-	 *         (optionally <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  keywords the keywords (space separated), which may occur in the
 	 *         sites's name, or description (optionally <code>null</code>)
 	 * @param  params the finder params (optionally <code>null</code>). To
@@ -2678,8 +2725,8 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * groups and user groups. System and staged groups are not included.
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  classNameIds the class names of entities to include in the search
-	 *         (optionally <code>null</code>)
+	 * @param  classNameIds the primary keys of the class names of the entities
+	 *         the groups are related to (optionally <code>null</code>)
 	 * @param  name the group's name (optionally <code>null</code>)
 	 * @param  description the group's description (optionally
 	 *         <code>null</code>)
@@ -2775,6 +2822,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * @param  groupIds the primary keys of the groups
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public void setRoleGroups(long roleId, long[] groupIds)
 		throws SystemException {
 
@@ -2952,6 +3000,7 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			group.getClassPK(), friendlyURL);
 
 		group.setParentGroupId(parentGroupId);
+		group.setTreePath(group.buildTreePath());
 		group.setName(name);
 		group.setDescription(description);
 		group.setType(type);
@@ -3206,10 +3255,10 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 				new HashSet<String>(), null, null, null);
 
 			// For now, we are going to throw an exception if one portlet data
-			// handler has an exception to ensure that the transaction is
-			// rolled back for data integrity. We may decide that this is not
-			// the best behavior in the future because a bad plugin could
-			// disallow deletion of groups.
+			// handler has an exception to ensure that the transaction is rolled
+			// back for data integrity. We may decide that this is not the best
+			// behavior in the future because a bad plugin could disallow
+			// deletion of groups.
 
 			//try {
 				portletDataHandler.deleteData(

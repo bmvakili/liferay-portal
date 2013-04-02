@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -50,6 +50,7 @@ public class SocialActivityWrapper implements SocialActivity,
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
 		attributes.put("createDate", getCreateDate());
+		attributes.put("activitySetId", getActivitySetId());
 		attributes.put("mirrorActivityId", getMirrorActivityId());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
@@ -89,6 +90,12 @@ public class SocialActivityWrapper implements SocialActivity,
 
 		if (createDate != null) {
 			setCreateDate(createDate);
+		}
+
+		Long activitySetId = (Long)attributes.get("activitySetId");
+
+		if (activitySetId != null) {
+			setActivitySetId(activitySetId);
 		}
 
 		Long mirrorActivityId = (Long)attributes.get("mirrorActivityId");
@@ -254,6 +261,24 @@ public class SocialActivityWrapper implements SocialActivity,
 	*/
 	public void setCreateDate(long createDate) {
 		_socialActivity.setCreateDate(createDate);
+	}
+
+	/**
+	* Returns the activity set ID of this social activity.
+	*
+	* @return the activity set ID of this social activity
+	*/
+	public long getActivitySetId() {
+		return _socialActivity.getActivitySetId();
+	}
+
+	/**
+	* Sets the activity set ID of this social activity.
+	*
+	* @param activitySetId the activity set ID of this social activity
+	*/
+	public void setActivitySetId(long activitySetId) {
+		_socialActivity.setActivitySetId(activitySetId);
 	}
 
 	/**
@@ -430,6 +455,16 @@ public class SocialActivityWrapper implements SocialActivity,
 	}
 
 	public void setExpandoBridgeAttributes(
+		com.liferay.portal.model.BaseModel<?> baseModel) {
+		_socialActivity.setExpandoBridgeAttributes(baseModel);
+	}
+
+	public void setExpandoBridgeAttributes(
+		com.liferay.portlet.expando.model.ExpandoBridge expandoBridge) {
+		_socialActivity.setExpandoBridgeAttributes(expandoBridge);
+	}
+
+	public void setExpandoBridgeAttributes(
 		com.liferay.portal.service.ServiceContext serviceContext) {
 		_socialActivity.setExpandoBridgeAttributes(serviceContext);
 	}
@@ -480,13 +515,22 @@ public class SocialActivityWrapper implements SocialActivity,
 		return _socialActivity.getAssetEntry();
 	}
 
+	public java.lang.String getExtraDataValue(java.lang.String key)
+		throws com.liferay.portal.kernel.json.JSONException {
+		return _socialActivity.getExtraDataValue(key);
+	}
+
+	public boolean isClassName(java.lang.String className) {
+		return _socialActivity.isClassName(className);
+	}
+
 	public void setAssetEntry(
 		com.liferay.portlet.asset.model.AssetEntry assetEntry) {
 		_socialActivity.setAssetEntry(assetEntry);
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedModel}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedModel}
 	 */
 	public SocialActivity getWrappedSocialActivity() {
 		return _socialActivity;

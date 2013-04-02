@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -99,6 +99,12 @@ public class TranslationToXHTMLTest {
 	@Test
 	public void testParseCorrectlyNoClosedThirdHeadingBlock() {
 		Assert.assertEquals("<h3>Level 3</h3>", translate("heading-7.creole"));
+	}
+
+	@Test
+	public void testParseCorrectlyNoWikiBlockInline() {
+		Assert.assertEquals(
+			"<p><pre> Inline </pre></p>", translate("nowikiblock-10.creole"));
 	}
 
 	@Test

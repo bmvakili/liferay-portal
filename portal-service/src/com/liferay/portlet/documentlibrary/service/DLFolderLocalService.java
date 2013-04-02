@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -179,12 +179,12 @@ public interface DLFolderLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Returns the document library folder with the UUID in the group.
+	* Returns the document library folder matching the UUID and group.
 	*
-	* @param uuid the UUID of document library folder
-	* @param groupId the group id of the document library folder
-	* @return the document library folder
-	* @throws PortalException if a document library folder with the UUID in the group could not be found
+	* @param uuid the document library folder's UUID
+	* @param groupId the primary key of the group
+	* @return the matching document library folder
+	* @throws PortalException if a matching document library folder could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -232,6 +232,121 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addDLFileEntryTypeDLFolder(long fileEntryTypeId, long folderId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addDLFileEntryTypeDLFolder(long fileEntryTypeId,
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		long[] folderIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void addDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> DLFolders)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void clearDLFileEntryTypeDLFolders(long fileEntryTypeId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteDLFileEntryTypeDLFolder(long fileEntryTypeId,
+		long folderId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteDLFileEntryTypeDLFolder(long fileEntryTypeId,
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		long[] folderIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void deleteDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> DLFolders)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getDLFileEntryTypeDLFolders(
+		long fileEntryTypeId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getDLFileEntryTypeDLFolders(
+		long fileEntryTypeId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getDLFileEntryTypeDLFolders(
+		long fileEntryTypeId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getDLFileEntryTypeDLFoldersCount(long fileEntryTypeId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasDLFileEntryTypeDLFolder(long fileEntryTypeId,
+		long folderId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasDLFileEntryTypeDLFolders(long fileEntryTypeId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* @throws SystemException if a system exception occurred
+	*/
+	public void setDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		long[] folderIds)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns the Spring bean ID for this bean.
 	*
 	* @return the Spring bean ID for this bean
@@ -270,11 +385,29 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void deleteFolder(long folderId)
+	public com.liferay.portlet.documentlibrary.model.DLFolder deleteFolder(
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void deleteFolder(long folderId, boolean includeTrashedEntries)
+	public com.liferay.portlet.documentlibrary.model.DLFolder deleteFolder(
+		com.liferay.portlet.documentlibrary.model.DLFolder dlFolder,
+		boolean includeTrashedEntries)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.documentlibrary.model.DLFolder deleteFolder(
+		long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.documentlibrary.model.DLFolder deleteFolder(
+		long folderId, boolean includeTrashedEntries)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.documentlibrary.model.DLFolder deleteFolder(
+		long userId, long folderId, boolean includeTrashedEntries)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -293,8 +426,8 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated Replaced by {@link #getFileEntriesAndFileShortcuts(long,
-	long, QueryDefinition)}
+	* @deprecated As of 6.2.0, replaced by {@link
+	#getFileEntriesAndFileShortcuts(long, long, QueryDefinition)}
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public java.util.List<java.lang.Object> getFileEntriesAndFileShortcuts(
@@ -308,8 +441,9 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated Replaced by {@link #getFileEntriesAndFileShortcutsCount(long,
-	long, QueryDefinition)}
+	* @deprecated As of 6.2.0, replaced by {@link
+	#getFileEntriesAndFileShortcutsCount(long, long,
+	QueryDefinition)}
 	*/
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getFileEntriesAndFileShortcutsCount(long groupId, long folderId,
@@ -359,7 +493,7 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated Replaced by {@link
+	* @deprecated As of 6.2.0, replaced by {@link
 	#getFoldersAndFileEntriesAndFileShortcuts(long, long,
 	String[], boolean, QueryDefinition)}
 	*/
@@ -370,7 +504,7 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated Replaced by {@link
+	* @deprecated As of 6.2.0, replaced by {@link
 	#getFoldersAndFileEntriesAndFileShortcutsCount(long, long,
 	String[], boolean, QueryDefinition)}
 	*/
@@ -389,7 +523,7 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated Replaced by {@link
+	* @deprecated As of 6.2.0, replaced by {@link
 	#getFoldersAndFileEntriesAndFileShortcutsCount(long, long,
 	String[], boolean, QueryDefinition)}
 	*/
@@ -399,7 +533,7 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* @deprecated Replaced by {@link
+	* @deprecated As of 6.2.0, replaced by {@link
 	#getFoldersAndFileEntriesAndFileShortcutsCount(long, long,
 	String[], boolean, QueryDefinition)}
 	*/
@@ -442,13 +576,39 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFolder> getNoAssetFolders()
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public void getSubfolderIds(java.util.List<java.lang.Long> folderIds,
 		long groupId, long folderId)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public boolean hasFolderLock(long userId, long folderId)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.model.Lock lockFolder(long userId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portal.model.Lock lockFolder(long userId, long folderId,
+		java.lang.String owner, boolean inheritable, long expirationTime)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
 	public com.liferay.portlet.documentlibrary.model.DLFolder moveFolder(
-		long folderId, long parentFolderId,
+		long userId, long folderId, long parentFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void unlockFolder(long groupId, long parentFolderId,
+		java.lang.String name, java.lang.String lockUuid)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public void unlockFolder(long folderId, java.lang.String lockUuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
@@ -471,7 +631,7 @@ public interface DLFolderLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.portlet.documentlibrary.model.DLFolder updateFolderAndFileEntryTypes(
-		long folderId, long parentFolderId, java.lang.String name,
+		long userId, long folderId, long parentFolderId, java.lang.String name,
 		java.lang.String description, long defaultFileEntryTypeId,
 		java.util.List<java.lang.Long> fileEntryTypeIds,
 		boolean overrideFileEntryTypes,
@@ -479,6 +639,9 @@ public interface DLFolderLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated As of 6.2.0
+	*/
 	public void updateLastPostDate(long folderId, java.util.Date lastPostDate)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;

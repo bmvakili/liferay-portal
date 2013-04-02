@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.OSDetector;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -438,6 +439,13 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 				FileUtil.copyFile(
 					portalJarPath, srcFile + "/WEB-INF/lib/log4j.jar", true);
+
+				portalJarPath =
+					PortalUtil.getPortalLibDir() + "log4j-extras.jar";
+
+				FileUtil.copyFile(
+					portalJarPath, srcFile + "/WEB-INF/lib/log4j-extras.jar",
+					true);
 			}
 		}
 	}
@@ -1663,14 +1671,23 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		String webSphereHome = System.getenv("WAS_HOME");
 
+		String wsadminBatchFileName = null;
+
+		if (OSDetector.isWindows()) {
+			wsadminBatchFileName = webSphereHome + "\\bin\\wsadmin.bat";
+		}
+		else {
+			wsadminBatchFileName = webSphereHome + "/bin/wsadmin.sh";
+		}
+
 		if (_log.isInfoEnabled()) {
 			_log.info(
-				"Installing plugin by executing " + webSphereHome +
-					"\\bin\\wsadmin.bat -f " + wsadminFileName);
+				"Installing plugin by executing " + wsadminBatchFileName +
+					" -f " + wsadminFileName);
 		}
 
 		ProcessBuilder processBuilder = new ProcessBuilder(
-			webSphereHome + "\\bin\\wsadmin.bat", "-f", wsadminFileName);
+			wsadminBatchFileName, "-f", wsadminFileName);
 
 		processBuilder.redirectErrorStream(true);
 
@@ -1684,8 +1701,6 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			for (String line : StringUtil.split(output, CharPool.NEW_LINE)) {
 				_log.info("Process output: " + line);
 			}
-
-			inputStream.close();
 
 			int exitValue = process.exitValue();
 

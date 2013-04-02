@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,8 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 	public static final String ASSET_LAYOUT_TAG_NAMES = "ASSET_LAYOUT_TAG_NAMES";
 
 	public static final String ASSET_PUBLISHER_ABSTRACT_LENGTH = "ASSET_PUBLISHER_ABSTRACT_LENGTH";
+
+	public static final String ASSET_PUBLISHER_VIEW_URL = "ASSET_PUBLISHER_VIEW_URL";
 
 	public static final String ASSET_TAG = "ASSET_TAG";
 
@@ -118,6 +120,8 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 
 	public static final String FACEBOOK_CANVAS_PAGE_URL = "FACEBOOK_CANVAS_PAGE_URL";
 
+	public static final String FACEBOOK_INCOMPLETE_USER_ID = "FACEBOOK_INCOMPLETE_USER_ID";
+
 	public static final String FACEBOOK_USER_EMAIL_ADDRESS = "FACEBOOK_USER_EMAIL_ADDRESS";
 
 	public static final String FACEBOOK_USER_ID = "FACEBOOK_USER_ID";
@@ -160,9 +164,9 @@ public class WebKeys implements com.liferay.portal.kernel.util.WebKeys {
 
 	public static final String JOURNAL_RECENT_ARTICLES = "JOURNAL_RECENT_ARTICLES";
 
-	public static final String JOURNAL_RECENT_STRUCTURES = "JOURNAL_RECENT_STRUCTURES";
+	public static final String JOURNAL_RECENT_DYNAMIC_DATA_MAPPING_STRUCTURES = "JOURNAL_RECENT_DYNAMIC_DATA_MAPPING_STRUCTURES";
 
-	public static final String JOURNAL_RECENT_TEMPLATES = "JOURNAL_RECENT_TEMPLATES";
+	public static final String JOURNAL_RECENT_DYNAMIC_DATA_MAPPING_TEMPLATES = "JOURNAL_RECENT_DYNAMIC_DATA_MAPPING_TEMPLATES";
 
 	public static final String JOURNAL_STRUCTURE = "JOURNAL_STRUCTURE";
 

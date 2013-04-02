@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,7 +56,7 @@ iteratorURL.setParameter("messageId", String.valueOf(messageId));
 <liferay-ui:trash-empty
 	confirmMessage="are-you-sure-you-want-to-remove-the-attachments-for-this-message"
 	emptyMessage="remove-the-attachments-for-this-message"
-	infoMessage="attachments-that-have-been-removed-for-more-than-x-days-will-be-automatically-deleted"
+	infoMessage="attachments-that-have-been-removed-for-more-than-x-will-be-automatically-deleted"
 	portletURL="<%= emptyTrashURL.toString() %>"
 	totalEntries="<%= message.getDeletedAttachmentsFileEntriesCount() %>"
 />
@@ -77,15 +77,10 @@ iteratorURL.setParameter("messageId", String.valueOf(messageId));
 		keyProperty="fileEntryId"
 		modelVar="fileEntry"
 	>
-
-		<%
-		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
-		%>
-
 		<portlet:actionURL var="rowURL" windowState="<%= LiferayWindowState.EXCLUSIVE.toString() %>">
 			<portlet:param name="struts_action" value="/message_boards/get_message_attachment" />
 			<portlet:param name="messageId" value="<%= String.valueOf(message.getMessageId()) %>" />
-			<portlet:param name="attachment" value="<%= dlFileEntry.getTitle() %>" />
+			<portlet:param name="attachment" value="<%= fileEntry.getTitle() %>" />
 			<portlet:param name="status" value="<%= String.valueOf(WorkflowConstants.STATUS_IN_TRASH) %>" />
 		</portlet:actionURL>
 
@@ -94,16 +89,16 @@ iteratorURL.setParameter("messageId", String.valueOf(messageId));
 			name="file-name"
 		>
 			<liferay-ui:icon
-				image='<%= "../file_system/small/" + DLUtil.getFileIcon(dlFileEntry.getExtension()) %>'
+				image='<%= "../file_system/small/" + DLUtil.getFileIcon(fileEntry.getExtension()) %>'
 				label="<%= true %>"
-				message="<%= TrashUtil.stripTrashNamespace(dlFileEntry.getTitle()) %>"
+				message="<%= TrashUtil.getOriginalTitle(fileEntry.getTitle()) %>"
 			/>
 		</liferay-ui:search-container-column-text>
 
 		<liferay-ui:search-container-column-text
 			href="<%= rowURL %>"
 			name="size"
-			value="<%= TextFormatter.formatStorageSize(dlFileEntry.getSize(), locale) %>"
+			value="<%= TextFormatter.formatStorageSize(fileEntry.getSize(), locale) %>"
 		/>
 
 		<liferay-ui:search-container-column-jsp

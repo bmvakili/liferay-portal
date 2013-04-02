@@ -54,7 +54,7 @@
 		</finder>
 		<finder name="G_V" return-type="Collection">
 			<finder-column name="groupId" />
-			<finder-column name="vocabularyId" />
+			<finder-column name="vocabularyId" arrayable-operator="OR" />
 		</finder>
 		<finder name="P_N" return-type="Collection">
 			<finder-column name="parentCategoryId" />
@@ -67,6 +67,16 @@
 		<finder name="N_V" return-type="Collection">
 			<finder-column name="name" />
 			<finder-column name="vocabularyId" />
+		</finder>
+		<finder name="G_P_V" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="parentCategoryId" />
+			<finder-column name="vocabularyId" />
+		</finder>
+		<finder name="G_LikeN_V" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="name" comparator="LIKE" />
+			<finder-column name="vocabularyId" arrayable-operator="OR" />
 		</finder>
 		<finder name="P_N_V" return-type="AssetCategory" unique="true">
 			<finder-column name="parentCategoryId" />
@@ -127,7 +137,7 @@
 
 		<!-- PK fields -->
 
-		<column name="entryId" type="long" primary="true" />
+		<column name="entryId" type="long" primary="true" accessor="true" />
 
 		<!-- Group instance -->
 
@@ -268,7 +278,7 @@
 
 		<!-- PK fields -->
 
-		<column name="tagId" type="long" primary="true" />
+		<column name="tagId" type="long" primary="true" accessor="true" />
 
 		<!-- Group instance -->
 

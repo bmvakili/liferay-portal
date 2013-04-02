@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -49,6 +49,10 @@ import com.liferay.portal.service.persistence.WebDAVPropsPersistence;
 import com.liferay.portal.service.persistence.WorkflowDefinitionLinkPersistence;
 import com.liferay.portal.service.persistence.WorkflowInstanceLinkPersistence;
 
+import com.liferay.portlet.asset.service.AssetEntryLocalService;
+import com.liferay.portlet.asset.service.AssetEntryService;
+import com.liferay.portlet.asset.service.persistence.AssetEntryFinder;
+import com.liferay.portlet.asset.service.persistence.AssetEntryPersistence;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppHelperLocalService;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalService;
@@ -260,12 +264,12 @@ public abstract class DLFolderLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the document library folder with the UUID in the group.
+	 * Returns the document library folder matching the UUID and group.
 	 *
-	 * @param uuid the UUID of document library folder
-	 * @param groupId the group id of the document library folder
-	 * @return the document library folder
-	 * @throws PortalException if a document library folder with the UUID in the group could not be found
+	 * @param uuid the document library folder's UUID
+	 * @param groupId the primary key of the group
+	 * @return the matching document library folder
+	 * @throws PortalException if a matching document library folder could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public DLFolder getDLFolderByUuidAndGroupId(String uuid, long groupId)
@@ -310,6 +314,138 @@ public abstract class DLFolderLocalServiceBaseImpl extends BaseLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	public DLFolder updateDLFolder(DLFolder dlFolder) throws SystemException {
 		return dlFolderPersistence.update(dlFolder);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void addDLFileEntryTypeDLFolder(long fileEntryTypeId, long folderId)
+		throws SystemException {
+		dlFileEntryTypePersistence.addDLFolder(fileEntryTypeId, folderId);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void addDLFileEntryTypeDLFolder(long fileEntryTypeId,
+		DLFolder dlFolder) throws SystemException {
+		dlFileEntryTypePersistence.addDLFolder(fileEntryTypeId, dlFolder);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void addDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		long[] folderIds) throws SystemException {
+		dlFileEntryTypePersistence.addDLFolders(fileEntryTypeId, folderIds);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void addDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		List<DLFolder> DLFolders) throws SystemException {
+		dlFileEntryTypePersistence.addDLFolders(fileEntryTypeId, DLFolders);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void clearDLFileEntryTypeDLFolders(long fileEntryTypeId)
+		throws SystemException {
+		dlFileEntryTypePersistence.clearDLFolders(fileEntryTypeId);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void deleteDLFileEntryTypeDLFolder(long fileEntryTypeId,
+		long folderId) throws SystemException {
+		dlFileEntryTypePersistence.removeDLFolder(fileEntryTypeId, folderId);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void deleteDLFileEntryTypeDLFolder(long fileEntryTypeId,
+		DLFolder dlFolder) throws SystemException {
+		dlFileEntryTypePersistence.removeDLFolder(fileEntryTypeId, dlFolder);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void deleteDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		long[] folderIds) throws SystemException {
+		dlFileEntryTypePersistence.removeDLFolders(fileEntryTypeId, folderIds);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void deleteDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		List<DLFolder> DLFolders) throws SystemException {
+		dlFileEntryTypePersistence.removeDLFolders(fileEntryTypeId, DLFolders);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<DLFolder> getDLFileEntryTypeDLFolders(long fileEntryTypeId)
+		throws SystemException {
+		return dlFileEntryTypePersistence.getDLFolders(fileEntryTypeId);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<DLFolder> getDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		int start, int end) throws SystemException {
+		return dlFileEntryTypePersistence.getDLFolders(fileEntryTypeId, start,
+			end);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<DLFolder> getDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		int start, int end, OrderByComparator orderByComparator)
+		throws SystemException {
+		return dlFileEntryTypePersistence.getDLFolders(fileEntryTypeId, start,
+			end, orderByComparator);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int getDLFileEntryTypeDLFoldersCount(long fileEntryTypeId)
+		throws SystemException {
+		return dlFileEntryTypePersistence.getDLFoldersSize(fileEntryTypeId);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public boolean hasDLFileEntryTypeDLFolder(long fileEntryTypeId,
+		long folderId) throws SystemException {
+		return dlFileEntryTypePersistence.containsDLFolder(fileEntryTypeId,
+			folderId);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public boolean hasDLFileEntryTypeDLFolders(long fileEntryTypeId)
+		throws SystemException {
+		return dlFileEntryTypePersistence.containsDLFolders(fileEntryTypeId);
+	}
+
+	/**
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void setDLFileEntryTypeDLFolders(long fileEntryTypeId,
+		long[] folderIds) throws SystemException {
+		dlFileEntryTypePersistence.setDLFolders(fileEntryTypeId, folderIds);
 	}
 
 	/**
@@ -1258,6 +1394,80 @@ public abstract class DLFolderLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
+	 * Returns the asset entry local service.
+	 *
+	 * @return the asset entry local service
+	 */
+	public AssetEntryLocalService getAssetEntryLocalService() {
+		return assetEntryLocalService;
+	}
+
+	/**
+	 * Sets the asset entry local service.
+	 *
+	 * @param assetEntryLocalService the asset entry local service
+	 */
+	public void setAssetEntryLocalService(
+		AssetEntryLocalService assetEntryLocalService) {
+		this.assetEntryLocalService = assetEntryLocalService;
+	}
+
+	/**
+	 * Returns the asset entry remote service.
+	 *
+	 * @return the asset entry remote service
+	 */
+	public AssetEntryService getAssetEntryService() {
+		return assetEntryService;
+	}
+
+	/**
+	 * Sets the asset entry remote service.
+	 *
+	 * @param assetEntryService the asset entry remote service
+	 */
+	public void setAssetEntryService(AssetEntryService assetEntryService) {
+		this.assetEntryService = assetEntryService;
+	}
+
+	/**
+	 * Returns the asset entry persistence.
+	 *
+	 * @return the asset entry persistence
+	 */
+	public AssetEntryPersistence getAssetEntryPersistence() {
+		return assetEntryPersistence;
+	}
+
+	/**
+	 * Sets the asset entry persistence.
+	 *
+	 * @param assetEntryPersistence the asset entry persistence
+	 */
+	public void setAssetEntryPersistence(
+		AssetEntryPersistence assetEntryPersistence) {
+		this.assetEntryPersistence = assetEntryPersistence;
+	}
+
+	/**
+	 * Returns the asset entry finder.
+	 *
+	 * @return the asset entry finder
+	 */
+	public AssetEntryFinder getAssetEntryFinder() {
+		return assetEntryFinder;
+	}
+
+	/**
+	 * Sets the asset entry finder.
+	 *
+	 * @param assetEntryFinder the asset entry finder
+	 */
+	public void setAssetEntryFinder(AssetEntryFinder assetEntryFinder) {
+		this.assetEntryFinder = assetEntryFinder;
+	}
+
+	/**
 	 * Returns the expando value local service.
 	 *
 	 * @return the expando value local service
@@ -1526,6 +1736,14 @@ public abstract class DLFolderLocalServiceBaseImpl extends BaseLocalServiceImpl
 	protected WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService;
 	@BeanReference(type = WorkflowInstanceLinkPersistence.class)
 	protected WorkflowInstanceLinkPersistence workflowInstanceLinkPersistence;
+	@BeanReference(type = AssetEntryLocalService.class)
+	protected AssetEntryLocalService assetEntryLocalService;
+	@BeanReference(type = AssetEntryService.class)
+	protected AssetEntryService assetEntryService;
+	@BeanReference(type = AssetEntryPersistence.class)
+	protected AssetEntryPersistence assetEntryPersistence;
+	@BeanReference(type = AssetEntryFinder.class)
+	protected AssetEntryFinder assetEntryFinder;
 	@BeanReference(type = ExpandoValueLocalService.class)
 	protected ExpandoValueLocalService expandoValueLocalService;
 	@BeanReference(type = ExpandoValueService.class)

@@ -1,12 +1,17 @@
 *~
-*.ant-*
 *.bak
 *.iml
+*.ipr
+*.iws
 *.swp
 .ant_targets
+.ant-targets-build.xml
 .sass-cache/
 .sass_cache_*.css
 _sass_cache_*.css
+cobertura.ser
+
+**/.sonar
 
 /*.ant-*
 /*.ipr
@@ -16,6 +21,7 @@ _sass_cache_*.css
 /.checkstyle
 /.idea
 /.settings
+/.sonar
 /.xmlcatalog
 /ActiveMQ
 /ant.install.log
@@ -38,9 +44,26 @@ _sass_cache_*.css
 
 /classes/Test.class
 
+/intellij
+
+/lib/development/db2jcc.jar
+/lib/development/db2jcc_license_cu.jar
 /lib/development/ojdbc14.jar
+/lib/development/ojdbc5.jar
+/lib/development/ojdbc6.jar
 
 /nbproject/private
+
+/osgi/bootstrap/classes
+/osgi/bootstrap/osgi-bootstrap.jar
+/osgi/modules/*/*.jar
+/osgi/modules/*/classes
+/osgi/modules/*/docroot/WEB-INF/classes
+/osgi/modules/*/lib/*.jar
+/osgi/modules/*/test-classes
+/osgi/modules/*/test-coverage
+/osgi/modules/*/test-results
+/osgi/modules/*/woven-classes
 
 /portal-client/*.iml
 /portal-client/*.ipr
@@ -91,6 +114,7 @@ _sass_cache_*.css
 /portal-web/portal-web.war
 /portal-web/portal-web.war.asc
 /portal-web/ROOT.war
+/portal-web/test/functional-generated
 /portal-web/test-ant-scripts
 /portal-web/test-classes
 /portal-web/test-output
@@ -176,13 +200,17 @@ _sass_cache_*.css
 /support-tomcat/classes
 /support-tomcat/support-tomcat*.jar
 
+/test-coverage
 /test-results
+
+/tools/cobertura-agent/classes
 
 /tools/maven/*.asc
 
 /tools/liferay-doclet
 
 /tools/selenium/*.exe
+/tools/selenium/extensions/ide.*.js
 
 /tools/tck
 
@@ -206,9 +234,19 @@ _sass_cache_*.css
 /util-java/*.iws
 /util-java/classes
 /util-java/test-classes
+/util-java/test-coverage
 /util-java/test-results
 /util-java/util-java*.asc
 /util-java/util-java*.jar
+
+/util-slf4j/*.iml
+/util-slf4j/*.ipr
+/util-slf4j/*.iws
+/util-slf4j/classes
+/util-slf4j/test-classes
+/util-slf4j/test-results
+/util-slf4j/util-slf4j*.asc
+/util-slf4j/util-slf4j*.jar
 
 /util-taglib/*.iml
 /util-taglib/*.ipr

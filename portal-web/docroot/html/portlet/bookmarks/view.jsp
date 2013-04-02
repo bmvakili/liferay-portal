@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -56,6 +56,13 @@ request.setAttribute("view.jsp-viewFolder", Boolean.TRUE.toString());
 
 request.setAttribute("view.jsp-useAssetEntryQuery", String.valueOf(useAssetEntryQuery));
 %>
+
+<portlet:actionURL var="undoTrashURL">
+	<portlet:param name="struts_action" value="/bookmarks/edit_entry" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo portletURL="<%= undoTrashURL %>" />
 
 <liferay-util:include page="/html/portlet/bookmarks/top_links.jsp" />
 

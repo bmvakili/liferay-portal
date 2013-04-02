@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -150,6 +150,7 @@ public class EditPasswordPolicyAction extends PortletAction {
 		int minNumbers = ParamUtil.getInteger(actionRequest, "minNumbers");
 		int minSymbols = ParamUtil.getInteger(actionRequest, "minSymbols");
 		int minUpperCase = ParamUtil.getInteger(actionRequest, "minUpperCase");
+		String regex = ParamUtil.getString(actionRequest, "regex");
 		boolean history = ParamUtil.getBoolean(actionRequest, "history");
 		int historyCount = ParamUtil.getInteger(actionRequest, "historyCount");
 		boolean expireable = ParamUtil.getBoolean(actionRequest, "expireable");
@@ -172,10 +173,10 @@ public class EditPasswordPolicyAction extends PortletAction {
 			PasswordPolicyServiceUtil.addPasswordPolicy(
 				name, description, changeable, changeRequired, minAge,
 				checkSyntax, allowDictionaryWords, minAlphanumeric, minLength,
-				minLowerCase, minNumbers, minSymbols, minUpperCase, history,
-				historyCount, expireable, maxAge, warningTime, graceLimit,
-				lockout, maxFailure, lockoutDuration, resetFailureCount,
-				resetTicketMaxAge);
+				minLowerCase, minNumbers, minSymbols, minUpperCase, regex,
+				history, historyCount, expireable, maxAge, warningTime,
+				graceLimit, lockout, maxFailure, lockoutDuration,
+				resetFailureCount, resetTicketMaxAge);
 		}
 		else {
 
@@ -185,7 +186,7 @@ public class EditPasswordPolicyAction extends PortletAction {
 				passwordPolicyId, name, description, changeable, changeRequired,
 				minAge, checkSyntax, allowDictionaryWords, minAlphanumeric,
 				minLength, minLowerCase, minNumbers, minSymbols, minUpperCase,
-				history, historyCount, expireable, maxAge, warningTime,
+				regex, history, historyCount, expireable, maxAge, warningTime,
 				graceLimit, lockout, maxFailure, lockoutDuration,
 				resetFailureCount, resetTicketMaxAge);
 		}

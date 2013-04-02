@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,9 +20,11 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.security.lang.PortalSecurityManager;
-import com.liferay.portal.security.lang.PortalSecurityManagerThreadLocal;
+import com.liferay.portal.security.lang.SecurityManagerUtil;
 import com.liferay.portal.spring.aop.ServiceBeanAopCacheManagerUtil;
-import com.liferay.portal.util.PropsValues;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,7 @@ import java.util.Properties;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Raymond Augé
  */
 public class PACLPolicyManager {
 
@@ -37,21 +40,22 @@ public class PACLPolicyManager {
 		String servletContextName, ClassLoader classLoader,
 		Properties properties) {
 
-		boolean active = GetterUtil.getBoolean(
-			properties.get("security-manager-enabled"));
+		String value = properties.getProperty(
+			"security-manager-enabled", "false");
 
-		PACLPolicy paclPolicy = null;
+		if (value.equals("generate")) {
+			return new GeneratingPACLPolicy(
+				servletContextName, classLoader, properties);
+		}
 
-		if (active) {
-			paclPolicy = new ActivePACLPolicy(
+		if (GetterUtil.getBoolean(value)) {
+			return new ActivePACLPolicy(
 				servletContextName, classLoader, properties);
 		}
 		else {
-			paclPolicy = new InactivePACLPolicy(
+			return new InactivePACLPolicy(
 				servletContextName, classLoader, properties);
 		}
-
-		return paclPolicy;
 	}
 
 	public static int getActiveCount() {
@@ -63,7 +67,8 @@ public class PACLPolicyManager {
 	}
 
 	public static PACLPolicy getPACLPolicy(ClassLoader classLoader) {
-		return _paclPolicies.get(classLoader);
+		return AccessController.doPrivileged(
+			new PACLPolicyPrivilegedAction(classLoader));
 	}
 
 	public static boolean isActive() {
@@ -123,10 +128,7 @@ public class PACLPolicyManager {
 			return;
 		}
 
-		String portalSecurityManagerStrategy =
-			PropsValues.PORTAL_SECURITY_MANAGER_STRATEGY;
-
-		if (!portalSecurityManagerStrategy.equals("smart")) {
+		if (!SecurityManagerUtil.isSmart()) {
 			if (_log.isInfoEnabled()) {
 				StringBundler sb = new StringBundler(4);
 
@@ -148,7 +150,10 @@ public class PACLPolicyManager {
 						"plugin security management");
 			}
 
-			System.setSecurityManager(new PortalSecurityManager());
+			SecurityManager securityManager =
+				(SecurityManager)SecurityManagerUtil.getPortalSecurityManager();
+
+			System.setSecurityManager(securityManager);
 		}
 		catch (SecurityException se) {
 			_log.error(
@@ -164,10 +169,7 @@ public class PACLPolicyManager {
 			return;
 		}
 
-		String portalSecurityManagerStrategy =
-			PropsValues.PORTAL_SECURITY_MANAGER_STRATEGY;
-
-		if (!portalSecurityManagerStrategy.equals("smart")) {
+		if (!SecurityManagerUtil.isSmart()) {
 			return;
 		}
 
@@ -176,16 +178,7 @@ public class PACLPolicyManager {
 				_log.info("Resetting to the original security manager");
 			}
 
-			boolean enabled = PortalSecurityManagerThreadLocal.isEnabled();
-
-			try {
-				PortalSecurityManagerThreadLocal.setEnabled(false);
-
-				System.setSecurityManager(_originalSecurityManager);
-			}
-			finally {
-				PortalSecurityManagerThreadLocal.setEnabled(enabled);
-			}
+			System.setSecurityManager(_originalSecurityManager);
 		}
 		catch (SecurityException se) {
 			_log.error("Unable to reset to the original security manager");
@@ -203,5 +196,28 @@ public class PACLPolicyManager {
 	private static SecurityManager _originalSecurityManager;
 	private static Map<ClassLoader, PACLPolicy> _paclPolicies =
 		new HashMap<ClassLoader, PACLPolicy>();
+
+	private static class PACLPolicyPrivilegedAction
+		implements PrivilegedAction<PACLPolicy> {
+
+		public PACLPolicyPrivilegedAction(ClassLoader classLoader) {
+			_classLoader = classLoader;
+		}
+
+		public PACLPolicy run() {
+			PACLPolicy paclPolicy = _paclPolicies.get(_classLoader);
+
+			while ((paclPolicy == null) && (_classLoader.getParent() != null)) {
+				_classLoader = _classLoader.getParent();
+
+				paclPolicy = _paclPolicies.get(_classLoader);
+			}
+
+			return paclPolicy;
+		}
+
+		private ClassLoader _classLoader;
+
+	}
 
 }

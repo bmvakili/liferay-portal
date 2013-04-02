@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,8 +15,12 @@
 package com.liferay.portal.upgrade.util;
 
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.model.impl.LayoutTypePortletImpl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,19 +34,45 @@ public class UpgradePortletId extends UpgradeProcess {
 	@Override
 	protected void doUpgrade() throws Exception {
 
-		// This is only tested to work on instanceable portlets
+		// Rename instanceable portlet IDs. We expect the root form of the
+		// portlet ID because we will rename all instances of the portlet ID.
 
-		String[][] portletIdsArray = getPortletIdsArray();
+		String[][] renamePortletIdsArray = getRenamePortletIdsArray();
 
-		for (String[] portletIds : portletIdsArray) {
-			String oldRootPortletId = portletIds[0];
-			String newRootPortletId = portletIds[1];
+		for (String[] renamePortletIds : renamePortletIdsArray) {
+			String oldRootPortletId = renamePortletIds[0];
+			String newRootPortletId = renamePortletIds[1];
 
 			updatePortlet(oldRootPortletId, newRootPortletId);
+			updateLayouts(oldRootPortletId, newRootPortletId);
+		}
+
+		// Rename uninstanceable portlet IDs to instanceable portlet IDs
+
+		String[] uninstanceablePortletIds = getUninstanceablePortletIds();
+
+		for (String portletId : uninstanceablePortletIds) {
+			if (portletId.contains(PortletConstants.INSTANCE_SEPARATOR)) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Portlet " + portletId + " is already instanceable");
+				}
+
+				continue;
+			}
+
+			String instanceId = LayoutTypePortletImpl.generateInstanceId();
+
+			String newPortletId = PortletConstants.assemblePortletId(
+				portletId, instanceId);
+
+			updateResourcePermission(portletId, newPortletId, false);
+			updateInstanceablePortletPreferences(portletId, newPortletId);
+			updateLayouts(portletId, newPortletId);
 		}
 	}
 
-	protected String[][] getPortletIdsArray() {
+	protected String[][] getRenamePortletIdsArray() {
 		return new String[][] {
 			new String[] {
 				"109", "1_WAR_webformportlet"
@@ -60,6 +90,43 @@ public class UpgradePortletId extends UpgradeProcess {
 				"1_WAR_googlemapsportlet"
 			}
 		};
+	}
+
+	protected String[] getUninstanceablePortletIds() {
+		return new String[0];
+	}
+
+	protected void updateInstanceablePortletPreferences(
+			String oldRootPortletId, String newRootPortletId)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select portletPreferencesId, portletId from " +
+					"PortletPreferences where portletId like '" +
+						oldRootPortletId + "%'");
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long portletPreferencesId = rs.getLong("portletPreferencesId");
+				String portletId = rs.getString("portletId");
+
+				String newPortletId = StringUtil.replace(
+					portletId, oldRootPortletId, newRootPortletId);
+
+				updatePortletPreference(portletPreferencesId, newPortletId);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
 	}
 
 	protected void updateLayout(long plid, String typeSettings)
@@ -113,6 +180,38 @@ public class UpgradePortletId extends UpgradeProcess {
 		}
 	}
 
+	protected void updateLayouts(
+			String oldRootPortletId, String newRootPortletId)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select plid, typeSettings from Layout where typeSettings " +
+					"like '%" + oldRootPortletId + "%'");
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long plid = rs.getLong("plid");
+				String typeSettings = rs.getString("typeSettings");
+
+				String newTypeSettings = StringUtil.replace(
+					typeSettings, oldRootPortletId, newRootPortletId);
+
+				updateLayout(plid, newTypeSettings);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
 	protected void updatePortlet(
 			String oldRootPortletId, String newRootPortletId)
 		throws Exception {
@@ -120,6 +219,107 @@ public class UpgradePortletId extends UpgradeProcess {
 		runSQL(
 			"update Portlet set portletId = '" + newRootPortletId +
 				"' where portletId = '" + oldRootPortletId + "'");
+
+		runSQL(
+			"update ResourceAction set name = '" + newRootPortletId +
+				"' where name = '" + oldRootPortletId + "'");
+
+		updateResourcePermission(oldRootPortletId, newRootPortletId, true);
+
+		updateInstanceablePortletPreferences(
+			oldRootPortletId, newRootPortletId);
 	}
+
+	protected void updatePortletPreference(
+			long portletPreferencesId, String portletId)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"update PortletPreferences set portletId = ? where " +
+					"portletPreferencesId = " + portletPreferencesId);
+
+			ps.setString(1, portletId);
+
+			ps.executeUpdate();
+		}
+		finally {
+			DataAccess.cleanUp(con, ps);
+		}
+	}
+
+	protected void updateResourcePermission(
+			long resourcePermissionId, String name, String primKey)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"update ResourcePermission set name = ?, primKey = ? where " +
+					"resourcePermissionId = " + resourcePermissionId);
+
+			ps.setString(1, name);
+			ps.setString(2, primKey);
+
+			ps.executeUpdate();
+		}
+		finally {
+			DataAccess.cleanUp(con, ps);
+		}
+	}
+
+	protected void updateResourcePermission(
+			String oldRootPortletId, String newRootPortletId,
+			boolean updateName)
+		throws Exception {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(
+				"select resourcePermissionId, name, primKey from " +
+					"ResourcePermission where name = '" + oldRootPortletId +
+						"'");
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				long resourcePermissionId = rs.getLong("resourcePermissionId");
+				String name = rs.getString("name");
+				String primKey = rs.getString("primKey");
+
+				String newName = name;
+
+				if (updateName) {
+					newName = StringUtil.replace(
+						name, oldRootPortletId, newRootPortletId);
+				}
+
+				String newPrimKey = StringUtil.replace(
+					primKey, oldRootPortletId, newRootPortletId);
+
+				updateResourcePermission(
+					resourcePermissionId, newName, newPrimKey);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	private static Log _log = LogFactoryUtil.getLog(UpgradePortletId.class);
 
 }

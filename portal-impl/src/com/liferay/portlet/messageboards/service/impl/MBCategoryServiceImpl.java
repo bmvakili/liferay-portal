@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,11 @@
 
 package com.liferay.portlet.messageboards.service.impl;
 
+import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.messageboards.model.MBCategory;
@@ -32,6 +34,19 @@ import java.util.List;
  * @author Brian Wing Shun Chan
  */
 public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
+
+	public MBCategory addCategory(
+			long userId, long parentCategoryId, String name, String description,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		MBCategoryPermission.check(
+			getPermissionChecker(), serviceContext.getScopeGroupId(),
+			parentCategoryId, ActionKeys.ADD_CATEGORY);
+
+		return mbCategoryLocalService.addCategory(
+			userId, parentCategoryId, name, description, serviceContext);
+	}
 
 	public MBCategory addCategory(
 			long parentCategoryId, String name, String description,
@@ -56,6 +71,18 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			mailingListActive, allowAnonymousEmail, serviceContext);
 	}
 
+	public void deleteCategory(long categoryId, boolean includeTrashedEntries)
+		throws PortalException, SystemException {
+
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
+
+		MBCategoryPermission.check(
+			getPermissionChecker(), category, ActionKeys.DELETE);
+
+		mbCategoryLocalService.deleteCategory(category, includeTrashedEntries);
+	}
+
 	public void deleteCategory(long groupId, long categoryId)
 		throws PortalException, SystemException {
 
@@ -69,12 +96,31 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 		return mbCategoryPersistence.filterFindByGroupId(groupId);
 	}
 
+	public List<MBCategory> getCategories(long groupId, int status)
+		throws SystemException {
+
+		return mbCategoryPersistence.filterFindByG_S(groupId, status);
+	}
+
 	public List<MBCategory> getCategories(
 			long groupId, long parentCategoryId, int start, int end)
 		throws SystemException {
 
 		return mbCategoryPersistence.filterFindByG_P(
 			groupId, parentCategoryId, start, end);
+	}
+
+	public List<MBCategory> getCategories(
+			long groupId, long parentCategoryId, int status, int start, int end)
+		throws SystemException {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return mbCategoryPersistence.filterFindByG_P(
+				groupId, parentCategoryId, start, end);
+		}
+
+		return mbCategoryPersistence.filterFindByG_P_S(
+			groupId, parentCategoryId, status, start, end);
 	}
 
 	public List<MBCategory> getCategories(
@@ -85,11 +131,38 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			groupId, parentCategoryIds, start, end);
 	}
 
+	public List<MBCategory> getCategories(
+			long groupId, long[] parentCategoryIds, int status, int start,
+			int end)
+		throws SystemException {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return mbCategoryPersistence.filterFindByG_P(
+				groupId, parentCategoryIds, start, end);
+		}
+
+		return mbCategoryPersistence.filterFindByG_P_S(
+			groupId, parentCategoryIds, status, start, end);
+	}
+
 	public int getCategoriesCount(long groupId, long parentCategoryId)
 		throws SystemException {
 
 		return mbCategoryPersistence.filterCountByG_P(
 			groupId, parentCategoryId);
+	}
+
+	public int getCategoriesCount(
+			long groupId, long parentCategoryId, int status)
+		throws SystemException {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return mbCategoryPersistence.filterCountByG_P(
+				groupId, parentCategoryId);
+		}
+
+		return mbCategoryPersistence.filterCountByG_P_S(
+			groupId, parentCategoryId, status);
 	}
 
 	public int getCategoriesCount(long groupId, long[] parentCategoryIds)
@@ -99,10 +172,24 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			groupId, parentCategoryIds);
 	}
 
+	public int getCategoriesCount(
+			long groupId, long[] parentCategoryIds, int status)
+		throws SystemException {
+
+		if (status == WorkflowConstants.STATUS_ANY) {
+			return mbCategoryPersistence.filterCountByG_P(
+				groupId, parentCategoryIds);
+		}
+
+		return mbCategoryPersistence.filterCountByG_P_S(
+			groupId, parentCategoryIds, status);
+	}
+
 	public MBCategory getCategory(long categoryId)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.VIEW);
@@ -131,6 +218,10 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			groupId, categoryId);
 
 		for (MBCategory category : categories) {
+			if (category.isInTrash() || category.isInTrashContainer()) {
+				continue;
+			}
+
 			categoryIds.add(category.getCategoryId());
 
 			getSubcategoryIds(
@@ -151,8 +242,11 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			return Collections.emptyList();
 		}
 		else {
+			QueryDefinition queryDefinition = new QueryDefinition(
+				WorkflowConstants.STATUS_ANY, start, end, null);
+
 			return mbCategoryFinder.filterFindByS_G_U_P(
-				groupId, userId, categoryIds, start, end);
+				groupId, userId, categoryIds, queryDefinition);
 		}
 	}
 
@@ -166,8 +260,11 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			return 0;
 		}
 		else {
+			QueryDefinition queryDefinition = new QueryDefinition(
+				WorkflowConstants.STATUS_ANY);
+
 			return mbCategoryFinder.filterCountByS_G_U_P(
-				groupId, userId, categoryIds);
+				groupId, userId, categoryIds, queryDefinition);
 		}
 	}
 
@@ -176,13 +273,53 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			boolean mergeWithParentCategory)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.UPDATE);
 
 		return mbCategoryLocalService.moveCategory(
 			categoryId, parentCategoryId, mergeWithParentCategory);
+	}
+
+	public MBCategory moveCategoryFromTrash(long categoryId, long newCategoryId)
+		throws PortalException, SystemException {
+
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
+
+		MBCategoryPermission.check(
+			getPermissionChecker(), category, ActionKeys.UPDATE);
+
+		return mbCategoryLocalService.moveCategoryFromTrash(
+			getUserId(), categoryId, newCategoryId);
+	}
+
+	public MBCategory moveCategoryToTrash(long categoryId)
+		throws PortalException, SystemException {
+
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
+
+		MBCategoryPermission.check(
+			getPermissionChecker(), category, ActionKeys.DELETE);
+
+		return mbCategoryLocalService.moveCategoryToTrash(
+			getUserId(), categoryId);
+	}
+
+	public void restoreCategoryFromTrash(long categoryId)
+		throws PortalException, SystemException {
+
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
+
+		MBCategoryPermission.check(
+			getPermissionChecker(), category, ActionKeys.DELETE);
+
+		mbCategoryLocalService.restoreCategoryFromTrash(
+			getUserId(), categoryId);
 	}
 
 	public void subscribeCategory(long groupId, long categoryId)
@@ -217,7 +354,8 @@ public class MBCategoryServiceImpl extends MBCategoryServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		MBCategory category = mbCategoryLocalService.getCategory(categoryId);
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
 
 		MBCategoryPermission.check(
 			getPermissionChecker(), category, ActionKeys.UPDATE);

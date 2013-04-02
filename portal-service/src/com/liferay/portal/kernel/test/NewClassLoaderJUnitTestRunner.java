@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.runner.manipulation.Sorter;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
@@ -45,6 +46,8 @@ public class NewClassLoaderJUnitTestRunner extends BlockJUnit4ClassRunner {
 		throws InitializationError {
 
 		super(clazz);
+
+		sort(new Sorter(new DescriptionComparator()));
 	}
 
 	protected ClassLoader createClassLoader(FrameworkMethod frameworkMethod) {

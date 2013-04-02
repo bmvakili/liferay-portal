@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.messageboards.service.persistence;
 
-import com.liferay.portal.NoSuchModelException;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -197,16 +196,18 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_SELECT_MBMESSAGE_WHERE);
 
+			boolean bindUuid = false;
+
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_UUID_1);
 			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_UUID_3);
+			}
 			else {
-				if (uuid.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_UUID_UUID_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_UUID_UUID_2);
-				}
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_UUID_2);
 			}
 
 			if (orderByComparator != null) {
@@ -229,7 +230,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (uuid != null) {
+				if (bindUuid) {
 					qPos.add(uuid);
 				}
 
@@ -419,16 +420,18 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
 
+		boolean bindUuid = false;
+
 		if (uuid == null) {
 			query.append(_FINDER_COLUMN_UUID_UUID_1);
 		}
+		else if (uuid.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_UUID_UUID_3);
+		}
 		else {
-			if (uuid.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_UUID_UUID_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_UUID_UUID_2);
-			}
+			bindUuid = true;
+
+			query.append(_FINDER_COLUMN_UUID_UUID_2);
 		}
 
 		if (orderByComparator != null) {
@@ -499,7 +502,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (uuid != null) {
+		if (bindUuid) {
 			qPos.add(uuid);
 		}
 
@@ -554,16 +557,18 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_COUNT_MBMESSAGE_WHERE);
 
+			boolean bindUuid = false;
+
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_UUID_1);
 			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_UUID_3);
+			}
 			else {
-				if (uuid.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_UUID_UUID_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_UUID_UUID_2);
-				}
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_UUID_2);
 			}
 
 			String sql = query.toString();
@@ -577,7 +582,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (uuid != null) {
+				if (bindUuid) {
 					qPos.add(uuid);
 				}
 
@@ -600,7 +605,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 	private static final String _FINDER_COLUMN_UUID_UUID_1 = "mbMessage.uuid IS NULL";
 	private static final String _FINDER_COLUMN_UUID_UUID_2 = "mbMessage.uuid = ?";
-	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(mbMessage.uuid IS NULL OR mbMessage.uuid = ?)";
+	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(mbMessage.uuid IS NULL OR mbMessage.uuid = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_UUID_G = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
@@ -695,16 +700,18 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_SELECT_MBMESSAGE_WHERE);
 
+			boolean bindUuid = false;
+
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_G_UUID_1);
 			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_G_UUID_3);
+			}
 			else {
-				if (uuid.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_UUID_G_UUID_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_UUID_G_UUID_2);
-				}
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_G_UUID_2);
 			}
 
 			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
@@ -720,7 +727,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (uuid != null) {
+				if (bindUuid) {
 					qPos.add(uuid);
 				}
 
@@ -803,16 +810,18 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_COUNT_MBMESSAGE_WHERE);
 
+			boolean bindUuid = false;
+
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_G_UUID_1);
 			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_G_UUID_3);
+			}
 			else {
-				if (uuid.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_UUID_G_UUID_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_UUID_G_UUID_2);
-				}
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_G_UUID_2);
 			}
 
 			query.append(_FINDER_COLUMN_UUID_G_GROUPID_2);
@@ -828,7 +837,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (uuid != null) {
+				if (bindUuid) {
 					qPos.add(uuid);
 				}
 
@@ -853,7 +862,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 	private static final String _FINDER_COLUMN_UUID_G_UUID_1 = "mbMessage.uuid IS NULL AND ";
 	private static final String _FINDER_COLUMN_UUID_G_UUID_2 = "mbMessage.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(mbMessage.uuid IS NULL OR mbMessage.uuid = ?) AND ";
+	private static final String _FINDER_COLUMN_UUID_G_UUID_3 = "(mbMessage.uuid IS NULL OR mbMessage.uuid = '') AND ";
 	private static final String _FINDER_COLUMN_UUID_G_GROUPID_2 = "mbMessage.groupId = ?";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
@@ -973,16 +982,18 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_SELECT_MBMESSAGE_WHERE);
 
+			boolean bindUuid = false;
+
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
 			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+			}
 			else {
-				if (uuid.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_UUID_C_UUID_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_UUID_C_UUID_2);
-				}
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
 			}
 
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
@@ -1007,7 +1018,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (uuid != null) {
+				if (bindUuid) {
 					qPos.add(uuid);
 				}
 
@@ -1213,16 +1224,18 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
 
+		boolean bindUuid = false;
+
 		if (uuid == null) {
 			query.append(_FINDER_COLUMN_UUID_C_UUID_1);
 		}
+		else if (uuid.equals(StringPool.BLANK)) {
+			query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+		}
 		else {
-			if (uuid.equals(StringPool.BLANK)) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
-			}
-			else {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
-			}
+			bindUuid = true;
+
+			query.append(_FINDER_COLUMN_UUID_C_UUID_2);
 		}
 
 		query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
@@ -1295,7 +1308,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 		QueryPos qPos = QueryPos.getInstance(q);
 
-		if (uuid != null) {
+		if (bindUuid) {
 			qPos.add(uuid);
 		}
 
@@ -1356,16 +1369,18 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 			query.append(_SQL_COUNT_MBMESSAGE_WHERE);
 
+			boolean bindUuid = false;
+
 			if (uuid == null) {
 				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
 			}
+			else if (uuid.equals(StringPool.BLANK)) {
+				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
+			}
 			else {
-				if (uuid.equals(StringPool.BLANK)) {
-					query.append(_FINDER_COLUMN_UUID_C_UUID_3);
-				}
-				else {
-					query.append(_FINDER_COLUMN_UUID_C_UUID_2);
-				}
+				bindUuid = true;
+
+				query.append(_FINDER_COLUMN_UUID_C_UUID_2);
 			}
 
 			query.append(_FINDER_COLUMN_UUID_C_COMPANYID_2);
@@ -1381,7 +1396,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				QueryPos qPos = QueryPos.getInstance(q);
 
-				if (uuid != null) {
+				if (bindUuid) {
 					qPos.add(uuid);
 				}
 
@@ -1406,7 +1421,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 	private static final String _FINDER_COLUMN_UUID_C_UUID_1 = "mbMessage.uuid IS NULL AND ";
 	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "mbMessage.uuid = ? AND ";
-	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(mbMessage.uuid IS NULL OR mbMessage.uuid = ?) AND ";
+	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(mbMessage.uuid IS NULL OR mbMessage.uuid = '') AND ";
 	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "mbMessage.companyId = ?";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_GROUPID = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
@@ -8115,10 +8130,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 	private static final String _FINDER_COLUMN_U_C_USERID_2 = "mbMessage.userId = ? AND ";
 	private static final String _FINDER_COLUMN_U_C_USERID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_U_C_USERID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_U_C_USERID_2) + ")";
 	private static final String _FINDER_COLUMN_U_C_CLASSNAMEID_2 = "mbMessage.classNameId = ?";
 	private static final String _FINDER_COLUMN_U_C_CLASSNAMEID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_U_C_CLASSNAMEID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_U_C_CLASSNAMEID_2) + ")";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_C = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C",
@@ -14948,13 +14963,13 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 	private static final String _FINDER_COLUMN_U_C_S_USERID_2 = "mbMessage.userId = ? AND ";
 	private static final String _FINDER_COLUMN_U_C_S_USERID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_U_C_S_USERID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_U_C_S_USERID_2) + ")";
 	private static final String _FINDER_COLUMN_U_C_S_CLASSNAMEID_2 = "mbMessage.classNameId = ? AND ";
 	private static final String _FINDER_COLUMN_U_C_S_CLASSNAMEID_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_U_C_S_CLASSNAMEID_2) + ")";
+		removeConjunction(_FINDER_COLUMN_U_C_S_CLASSNAMEID_2) + ")";
 	private static final String _FINDER_COLUMN_U_C_S_STATUS_2 = "mbMessage.status = ?";
 	private static final String _FINDER_COLUMN_U_C_S_STATUS_5 = "(" +
-		_removeConjunction(_FINDER_COLUMN_U_C_S_STATUS_2) + ")";
+		removeConjunction(_FINDER_COLUMN_U_C_S_STATUS_2) + ")";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_C_S = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_C_S",
@@ -15511,6 +15526,1639 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	private static final String _FINDER_COLUMN_C_C_S_CLASSNAMEID_2 = "mbMessage.classNameId = ? AND ";
 	private static final String _FINDER_COLUMN_C_C_S_CLASSPK_2 = "mbMessage.classPK = ? AND ";
 	private static final String _FINDER_COLUMN_C_C_S_STATUS_2 = "mbMessage.status = ?";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_U_C_S = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
+			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_U_C_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Integer.class.getName(),
+				
+			Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_C_S =
+		new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
+			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByG_U_C_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			},
+			MBMessageModelImpl.GROUPID_COLUMN_BITMASK |
+			MBMessageModelImpl.USERID_COLUMN_BITMASK |
+			MBMessageModelImpl.CATEGORYID_COLUMN_BITMASK |
+			MBMessageModelImpl.STATUS_COLUMN_BITMASK |
+			MBMessageModelImpl.CREATEDATE_COLUMN_BITMASK);
+	public static final FinderPath FINDER_PATH_COUNT_BY_G_U_C_S = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
+			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_U_C_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_U_C_S = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
+			MBMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByG_U_C_S",
+			new String[] {
+				Long.class.getName(), Long.class.getName(), Long.class.getName(),
+				Integer.class.getName()
+			});
+
+	/**
+	 * Returns all the message-boards messages where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @return the matching message-boards messages
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> findByG_U_C_S(long groupId, long userId,
+		long categoryId, int status) throws SystemException {
+		return findByG_U_C_S(groupId, userId, categoryId, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the message-boards messages where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @return the range of matching message-boards messages
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> findByG_U_C_S(long groupId, long userId,
+		long categoryId, int status, int start, int end)
+		throws SystemException {
+		return findByG_U_C_S(groupId, userId, categoryId, status, start, end,
+			null);
+	}
+
+	/**
+	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching message-boards messages
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> findByG_U_C_S(long groupId, long userId,
+		long categoryId, int status, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		boolean pagination = true;
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			pagination = false;
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_C_S;
+			finderArgs = new Object[] { groupId, userId, categoryId, status };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_G_U_C_S;
+			finderArgs = new Object[] {
+					groupId, userId, categoryId, status,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<MBMessage> list = (List<MBMessage>)FinderCacheUtil.getResult(finderPath,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (MBMessage mbMessage : list) {
+				if ((groupId != mbMessage.getGroupId()) ||
+						(userId != mbMessage.getUserId()) ||
+						(categoryId != mbMessage.getCategoryId()) ||
+						(status != mbMessage.getStatus())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(6 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(6);
+			}
+
+			query.append(_SQL_SELECT_MBMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_U_C_S_USERID_2);
+
+			query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_2);
+
+			query.append(_FINDER_COLUMN_G_U_C_S_STATUS_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+			else
+			 if (pagination) {
+				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(userId);
+
+				qPos.add(categoryId);
+
+				qPos.add(status);
+
+				if (!pagination) {
+					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
+
+					Collections.sort(list);
+
+					list = new UnmodifiableList<MBMessage>(list);
+				}
+				else {
+					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
+							start, end);
+				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first message-boards message in the ordered set where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching message-boards message
+	 * @throws com.liferay.portlet.messageboards.NoSuchMessageException if a matching message-boards message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBMessage findByG_U_C_S_First(long groupId, long userId,
+		long categoryId, int status, OrderByComparator orderByComparator)
+		throws NoSuchMessageException, SystemException {
+		MBMessage mbMessage = fetchByG_U_C_S_First(groupId, userId, categoryId,
+				status, orderByComparator);
+
+		if (mbMessage != null) {
+			return mbMessage;
+		}
+
+		StringBundler msg = new StringBundler(10);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("groupId=");
+		msg.append(groupId);
+
+		msg.append(", userId=");
+		msg.append(userId);
+
+		msg.append(", categoryId=");
+		msg.append(categoryId);
+
+		msg.append(", status=");
+		msg.append(status);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchMessageException(msg.toString());
+	}
+
+	/**
+	 * Returns the first message-boards message in the ordered set where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBMessage fetchByG_U_C_S_First(long groupId, long userId,
+		long categoryId, int status, OrderByComparator orderByComparator)
+		throws SystemException {
+		List<MBMessage> list = findByG_U_C_S(groupId, userId, categoryId,
+				status, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last message-boards message in the ordered set where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching message-boards message
+	 * @throws com.liferay.portlet.messageboards.NoSuchMessageException if a matching message-boards message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBMessage findByG_U_C_S_Last(long groupId, long userId,
+		long categoryId, int status, OrderByComparator orderByComparator)
+		throws NoSuchMessageException, SystemException {
+		MBMessage mbMessage = fetchByG_U_C_S_Last(groupId, userId, categoryId,
+				status, orderByComparator);
+
+		if (mbMessage != null) {
+			return mbMessage;
+		}
+
+		StringBundler msg = new StringBundler(10);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("groupId=");
+		msg.append(groupId);
+
+		msg.append(", userId=");
+		msg.append(userId);
+
+		msg.append(", categoryId=");
+		msg.append(categoryId);
+
+		msg.append(", status=");
+		msg.append(status);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchMessageException(msg.toString());
+	}
+
+	/**
+	 * Returns the last message-boards message in the ordered set where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching message-boards message, or <code>null</code> if a matching message-boards message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBMessage fetchByG_U_C_S_Last(long groupId, long userId,
+		long categoryId, int status, OrderByComparator orderByComparator)
+		throws SystemException {
+		int count = countByG_U_C_S(groupId, userId, categoryId, status);
+
+		List<MBMessage> list = findByG_U_C_S(groupId, userId, categoryId,
+				status, count - 1, count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the message-boards messages before and after the current message-boards message in the ordered set where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param messageId the primary key of the current message-boards message
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next message-boards message
+	 * @throws com.liferay.portlet.messageboards.NoSuchMessageException if a message-boards message with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBMessage[] findByG_U_C_S_PrevAndNext(long messageId, long groupId,
+		long userId, long categoryId, int status,
+		OrderByComparator orderByComparator)
+		throws NoSuchMessageException, SystemException {
+		MBMessage mbMessage = findByPrimaryKey(messageId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			MBMessage[] array = new MBMessageImpl[3];
+
+			array[0] = getByG_U_C_S_PrevAndNext(session, mbMessage, groupId,
+					userId, categoryId, status, orderByComparator, true);
+
+			array[1] = mbMessage;
+
+			array[2] = getByG_U_C_S_PrevAndNext(session, mbMessage, groupId,
+					userId, categoryId, status, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected MBMessage getByG_U_C_S_PrevAndNext(Session session,
+		MBMessage mbMessage, long groupId, long userId, long categoryId,
+		int status, OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		query.append(_SQL_SELECT_MBMESSAGE_WHERE);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_USERID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_STATUS_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(MBMessageModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(groupId);
+
+		qPos.add(userId);
+
+		qPos.add(categoryId);
+
+		qPos.add(status);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(mbMessage);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<MBMessage> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns all the message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @return the matching message-boards messages that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> filterFindByG_U_C_S(long groupId, long userId,
+		long categoryId, int status) throws SystemException {
+		return filterFindByG_U_C_S(groupId, userId, categoryId, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @return the range of matching message-boards messages that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> filterFindByG_U_C_S(long groupId, long userId,
+		long categoryId, int status, int start, int end)
+		throws SystemException {
+		return filterFindByG_U_C_S(groupId, userId, categoryId, status, start,
+			end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the message-boards messages that the user has permissions to view where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching message-boards messages that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> filterFindByG_U_C_S(long groupId, long userId,
+		long categoryId, int status, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return findByG_U_C_S(groupId, userId, categoryId, status, start,
+				end, orderByComparator);
+		}
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(6);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_MBMESSAGE_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_MBMESSAGE_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_USERID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_STATUS_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_MBMESSAGE_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			if (getDB().isSupportsInlineDistinct()) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+			else {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator);
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(MBMessageModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				MBMessage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			if (getDB().isSupportsInlineDistinct()) {
+				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
+			}
+			else {
+				q.addEntity(_FILTER_ENTITY_TABLE, MBMessageImpl.class);
+			}
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+
+			qPos.add(userId);
+
+			qPos.add(categoryId);
+
+			qPos.add(status);
+
+			return (List<MBMessage>)QueryUtil.list(q, getDialect(), start, end);
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the message-boards messages before and after the current message-boards message in the ordered set of message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param messageId the primary key of the current message-boards message
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next message-boards message
+	 * @throws com.liferay.portlet.messageboards.NoSuchMessageException if a message-boards message with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBMessage[] filterFindByG_U_C_S_PrevAndNext(long messageId,
+		long groupId, long userId, long categoryId, int status,
+		OrderByComparator orderByComparator)
+		throws NoSuchMessageException, SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return findByG_U_C_S_PrevAndNext(messageId, groupId, userId,
+				categoryId, status, orderByComparator);
+		}
+
+		MBMessage mbMessage = findByPrimaryKey(messageId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			MBMessage[] array = new MBMessageImpl[3];
+
+			array[0] = filterGetByG_U_C_S_PrevAndNext(session, mbMessage,
+					groupId, userId, categoryId, status, orderByComparator, true);
+
+			array[1] = mbMessage;
+
+			array[2] = filterGetByG_U_C_S_PrevAndNext(session, mbMessage,
+					groupId, userId, categoryId, status, orderByComparator,
+					false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected MBMessage filterGetByG_U_C_S_PrevAndNext(Session session,
+		MBMessage mbMessage, long groupId, long userId, long categoryId,
+		int status, OrderByComparator orderByComparator, boolean previous) {
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(6 +
+					(orderByComparator.getOrderByFields().length * 6));
+		}
+		else {
+			query = new StringBundler(3);
+		}
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_MBMESSAGE_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_MBMESSAGE_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_USERID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_STATUS_2);
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_MBMESSAGE_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				if (getDB().isSupportsInlineDistinct()) {
+					query.append(_ORDER_BY_ENTITY_ALIAS);
+				}
+				else {
+					query.append(_ORDER_BY_ENTITY_TABLE);
+				}
+
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(MBMessageModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				MBMessage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+
+		SQLQuery q = session.createSQLQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		if (getDB().isSupportsInlineDistinct()) {
+			q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
+		}
+		else {
+			q.addEntity(_FILTER_ENTITY_TABLE, MBMessageImpl.class);
+		}
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(groupId);
+
+		qPos.add(userId);
+
+		qPos.add(categoryId);
+
+		qPos.add(status);
+
+		if (orderByComparator != null) {
+			Object[] values = orderByComparator.getOrderByConditionValues(mbMessage);
+
+			for (Object value : values) {
+				qPos.add(value);
+			}
+		}
+
+		List<MBMessage> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns all the message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63; and categoryId = any &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryIds the category IDs
+	 * @param status the status
+	 * @return the matching message-boards messages that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> filterFindByG_U_C_S(long groupId, long userId,
+		long[] categoryIds, int status) throws SystemException {
+		return filterFindByG_U_C_S(groupId, userId, categoryIds, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63; and categoryId = any &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryIds the category IDs
+	 * @param status the status
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @return the range of matching message-boards messages that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> filterFindByG_U_C_S(long groupId, long userId,
+		long[] categoryIds, int status, int start, int end)
+		throws SystemException {
+		return filterFindByG_U_C_S(groupId, userId, categoryIds, status, start,
+			end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63; and categoryId = any &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryIds the category IDs
+	 * @param status the status
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching message-boards messages that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> filterFindByG_U_C_S(long groupId, long userId,
+		long[] categoryIds, int status, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return findByG_U_C_S(groupId, userId, categoryIds, status, start,
+				end, orderByComparator);
+		}
+
+		StringBundler query = new StringBundler();
+
+		if (getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_MBMESSAGE_WHERE);
+		}
+		else {
+			query.append(_FILTER_SQL_SELECT_MBMESSAGE_NO_INLINE_DISTINCT_WHERE_1);
+		}
+
+		boolean conjunctionable = false;
+
+		if (conjunctionable) {
+			query.append(WHERE_AND);
+		}
+
+		query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_5);
+
+		conjunctionable = true;
+
+		if (conjunctionable) {
+			query.append(WHERE_AND);
+		}
+
+		query.append(_FINDER_COLUMN_G_U_C_S_USERID_5);
+
+		conjunctionable = true;
+
+		if ((categoryIds == null) || (categoryIds.length > 0)) {
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(StringPool.OPEN_PARENTHESIS);
+
+			for (int i = 0; i < categoryIds.length; i++) {
+				query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_5);
+
+				if ((i + 1) < categoryIds.length) {
+					query.append(WHERE_OR);
+				}
+			}
+
+			query.append(StringPool.CLOSE_PARENTHESIS);
+
+			conjunctionable = true;
+		}
+
+		if (conjunctionable) {
+			query.append(WHERE_AND);
+		}
+
+		query.append(_FINDER_COLUMN_G_U_C_S_STATUS_5);
+
+		conjunctionable = true;
+
+		if (!getDB().isSupportsInlineDistinct()) {
+			query.append(_FILTER_SQL_SELECT_MBMESSAGE_NO_INLINE_DISTINCT_WHERE_2);
+		}
+
+		if (orderByComparator != null) {
+			if (getDB().isSupportsInlineDistinct()) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+			else {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_TABLE,
+					orderByComparator);
+			}
+		}
+		else {
+			if (getDB().isSupportsInlineDistinct()) {
+				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
+			}
+			else {
+				query.append(MBMessageModelImpl.ORDER_BY_SQL);
+			}
+		}
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				MBMessage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			if (getDB().isSupportsInlineDistinct()) {
+				q.addEntity(_FILTER_ENTITY_ALIAS, MBMessageImpl.class);
+			}
+			else {
+				q.addEntity(_FILTER_ENTITY_TABLE, MBMessageImpl.class);
+			}
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+
+			qPos.add(userId);
+
+			if (categoryIds != null) {
+				qPos.add(categoryIds);
+			}
+
+			qPos.add(status);
+
+			return (List<MBMessage>)QueryUtil.list(q, getDialect(), start, end);
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns all the message-boards messages where groupId = &#63; and userId = &#63; and categoryId = any &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryIds the category IDs
+	 * @param status the status
+	 * @return the matching message-boards messages
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> findByG_U_C_S(long groupId, long userId,
+		long[] categoryIds, int status) throws SystemException {
+		return findByG_U_C_S(groupId, userId, categoryIds, status,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the message-boards messages where groupId = &#63; and userId = &#63; and categoryId = any &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryIds the category IDs
+	 * @param status the status
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @return the range of matching message-boards messages
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> findByG_U_C_S(long groupId, long userId,
+		long[] categoryIds, int status, int start, int end)
+		throws SystemException {
+		return findByG_U_C_S(groupId, userId, categoryIds, status, start, end,
+			null);
+	}
+
+	/**
+	 * Returns an ordered range of all the message-boards messages where groupId = &#63; and userId = &#63; and categoryId = any &#63; and status = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS}), then the query will include the default ORDER BY logic from {@link com.liferay.portlet.messageboards.model.impl.MBMessageModelImpl}. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryIds the category IDs
+	 * @param status the status
+	 * @param start the lower bound of the range of message-boards messages
+	 * @param end the upper bound of the range of message-boards messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching message-boards messages
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<MBMessage> findByG_U_C_S(long groupId, long userId,
+		long[] categoryIds, int status, int start, int end,
+		OrderByComparator orderByComparator) throws SystemException {
+		if ((categoryIds != null) && (categoryIds.length == 1)) {
+			return findByG_U_C_S(groupId, userId, categoryIds[0], status,
+				start, end, orderByComparator);
+		}
+
+		boolean pagination = true;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			pagination = false;
+			finderArgs = new Object[] {
+					groupId, userId, StringUtil.merge(categoryIds), status
+				};
+		}
+		else {
+			finderArgs = new Object[] {
+					groupId, userId, StringUtil.merge(categoryIds), status,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<MBMessage> list = (List<MBMessage>)FinderCacheUtil.getResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_G_U_C_S,
+				finderArgs, this);
+
+		if ((list != null) && !list.isEmpty()) {
+			for (MBMessage mbMessage : list) {
+				if ((groupId != mbMessage.getGroupId()) ||
+						(userId != mbMessage.getUserId()) ||
+						!ArrayUtil.contains(categoryIds,
+							mbMessage.getCategoryId()) ||
+						(status != mbMessage.getStatus())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = new StringBundler();
+
+			query.append(_SQL_SELECT_MBMESSAGE_WHERE);
+
+			boolean conjunctionable = false;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_5);
+
+			conjunctionable = true;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_G_U_C_S_USERID_5);
+
+			conjunctionable = true;
+
+			if ((categoryIds == null) || (categoryIds.length > 0)) {
+				if (conjunctionable) {
+					query.append(WHERE_AND);
+				}
+
+				query.append(StringPool.OPEN_PARENTHESIS);
+
+				for (int i = 0; i < categoryIds.length; i++) {
+					query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_5);
+
+					if ((i + 1) < categoryIds.length) {
+						query.append(WHERE_OR);
+					}
+				}
+
+				query.append(StringPool.CLOSE_PARENTHESIS);
+
+				conjunctionable = true;
+			}
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_G_U_C_S_STATUS_5);
+
+			conjunctionable = true;
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+			else
+			 if (pagination) {
+				query.append(MBMessageModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(userId);
+
+				if (categoryIds != null) {
+					qPos.add(categoryIds);
+				}
+
+				qPos.add(status);
+
+				if (!pagination) {
+					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
+							start, end, false);
+
+					Collections.sort(list);
+
+					list = new UnmodifiableList<MBMessage>(list);
+				}
+				else {
+					list = (List<MBMessage>)QueryUtil.list(q, getDialect(),
+							start, end);
+				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_G_U_C_S,
+					finderArgs, list);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(FINDER_PATH_WITH_PAGINATION_FIND_BY_G_U_C_S,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Removes all the message-boards messages where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void removeByG_U_C_S(long groupId, long userId, long categoryId,
+		int status) throws SystemException {
+		for (MBMessage mbMessage : findByG_U_C_S(groupId, userId, categoryId,
+				status, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+			remove(mbMessage);
+		}
+	}
+
+	/**
+	 * Returns the number of message-boards messages where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @return the number of matching message-boards messages
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByG_U_C_S(long groupId, long userId, long categoryId,
+		int status) throws SystemException {
+		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_U_C_S;
+
+		Object[] finderArgs = new Object[] { groupId, userId, categoryId, status };
+
+		Long count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs,
+				this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(5);
+
+			query.append(_SQL_COUNT_MBMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_U_C_S_USERID_2);
+
+			query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_2);
+
+			query.append(_FINDER_COLUMN_G_U_C_S_STATUS_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(userId);
+
+				qPos.add(categoryId);
+
+				qPos.add(status);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of message-boards messages where groupId = &#63; and userId = &#63; and categoryId = any &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryIds the category IDs
+	 * @param status the status
+	 * @return the number of matching message-boards messages
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int countByG_U_C_S(long groupId, long userId, long[] categoryIds,
+		int status) throws SystemException {
+		Object[] finderArgs = new Object[] {
+				groupId, userId, StringUtil.merge(categoryIds), status
+			};
+
+		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_U_C_S,
+				finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler();
+
+			query.append(_SQL_COUNT_MBMESSAGE_WHERE);
+
+			boolean conjunctionable = false;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_5);
+
+			conjunctionable = true;
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_G_U_C_S_USERID_5);
+
+			conjunctionable = true;
+
+			if ((categoryIds == null) || (categoryIds.length > 0)) {
+				if (conjunctionable) {
+					query.append(WHERE_AND);
+				}
+
+				query.append(StringPool.OPEN_PARENTHESIS);
+
+				for (int i = 0; i < categoryIds.length; i++) {
+					query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_5);
+
+					if ((i + 1) < categoryIds.length) {
+						query.append(WHERE_OR);
+					}
+				}
+
+				query.append(StringPool.CLOSE_PARENTHESIS);
+
+				conjunctionable = true;
+			}
+
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(_FINDER_COLUMN_G_U_C_S_STATUS_5);
+
+			conjunctionable = true;
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(userId);
+
+				if (categoryIds != null) {
+					qPos.add(categoryIds);
+				}
+
+				qPos.add(status);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_U_C_S,
+					finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_G_U_C_S,
+					finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	/**
+	 * Returns the number of message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63; and categoryId = &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryId the category ID
+	 * @param status the status
+	 * @return the number of matching message-boards messages that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int filterCountByG_U_C_S(long groupId, long userId, long categoryId,
+		int status) throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return countByG_U_C_S(groupId, userId, categoryId, status);
+		}
+
+		StringBundler query = new StringBundler(5);
+
+		query.append(_FILTER_SQL_COUNT_MBMESSAGE_WHERE);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_USERID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_2);
+
+		query.append(_FINDER_COLUMN_G_U_C_S_STATUS_2);
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				MBMessage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+
+			qPos.add(userId);
+
+			qPos.add(categoryId);
+
+			qPos.add(status);
+
+			Long count = (Long)q.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	/**
+	 * Returns the number of message-boards messages that the user has permission to view where groupId = &#63; and userId = &#63; and categoryId = any &#63; and status = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param userId the user ID
+	 * @param categoryIds the category IDs
+	 * @param status the status
+	 * @return the number of matching message-boards messages that the user has permission to view
+	 * @throws SystemException if a system exception occurred
+	 */
+	public int filterCountByG_U_C_S(long groupId, long userId,
+		long[] categoryIds, int status) throws SystemException {
+		if (!InlineSQLHelperUtil.isEnabled(groupId)) {
+			return countByG_U_C_S(groupId, userId, categoryIds, status);
+		}
+
+		StringBundler query = new StringBundler();
+
+		query.append(_FILTER_SQL_COUNT_MBMESSAGE_WHERE);
+
+		boolean conjunctionable = false;
+
+		if (conjunctionable) {
+			query.append(WHERE_AND);
+		}
+
+		query.append(_FINDER_COLUMN_G_U_C_S_GROUPID_5);
+
+		conjunctionable = true;
+
+		if (conjunctionable) {
+			query.append(WHERE_AND);
+		}
+
+		query.append(_FINDER_COLUMN_G_U_C_S_USERID_5);
+
+		conjunctionable = true;
+
+		if ((categoryIds == null) || (categoryIds.length > 0)) {
+			if (conjunctionable) {
+				query.append(WHERE_AND);
+			}
+
+			query.append(StringPool.OPEN_PARENTHESIS);
+
+			for (int i = 0; i < categoryIds.length; i++) {
+				query.append(_FINDER_COLUMN_G_U_C_S_CATEGORYID_5);
+
+				if ((i + 1) < categoryIds.length) {
+					query.append(WHERE_OR);
+				}
+			}
+
+			query.append(StringPool.CLOSE_PARENTHESIS);
+
+			conjunctionable = true;
+		}
+
+		if (conjunctionable) {
+			query.append(WHERE_AND);
+		}
+
+		query.append(_FINDER_COLUMN_G_U_C_S_STATUS_5);
+
+		conjunctionable = true;
+
+		String sql = InlineSQLHelperUtil.replacePermissionCheck(query.toString(),
+				MBMessage.class.getName(),
+				_FILTER_ENTITY_TABLE_FILTER_PK_COLUMN, groupId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addScalar(COUNT_COLUMN_NAME,
+				com.liferay.portal.kernel.dao.orm.Type.LONG);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(groupId);
+
+			qPos.add(userId);
+
+			if (categoryIds != null) {
+				qPos.add(categoryIds);
+			}
+
+			qPos.add(status);
+
+			Long count = (Long)q.uniqueResult();
+
+			return count.intValue();
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	private static final String _FINDER_COLUMN_G_U_C_S_GROUPID_2 = "mbMessage.groupId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_C_S_GROUPID_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_U_C_S_GROUPID_2) + ")";
+	private static final String _FINDER_COLUMN_G_U_C_S_USERID_2 = "mbMessage.userId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_C_S_USERID_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_U_C_S_USERID_2) + ")";
+	private static final String _FINDER_COLUMN_G_U_C_S_CATEGORYID_2 = "mbMessage.categoryId = ? AND ";
+	private static final String _FINDER_COLUMN_G_U_C_S_CATEGORYID_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_U_C_S_CATEGORYID_2) + ")";
+	private static final String _FINDER_COLUMN_G_U_C_S_STATUS_2 = "mbMessage.status = ?";
+	private static final String _FINDER_COLUMN_G_U_C_S_STATUS_5 = "(" +
+		removeConjunction(_FINDER_COLUMN_G_U_C_S_STATUS_2) + ")";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_C_T_A = new FinderPath(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
 			MBMessageModelImpl.FINDER_CACHE_ENABLED, MBMessageImpl.class,
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByG_C_T_A",
@@ -18125,9 +19773,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			MBMessageImpl.class, mbMessage.getPrimaryKey(), mbMessage);
 
 		FinderCacheUtil.putResult(FINDER_PATH_FETCH_BY_UUID_G,
-			new Object[] {
-				mbMessage.getUuid(), Long.valueOf(mbMessage.getGroupId())
-			}, mbMessage);
+			new Object[] { mbMessage.getUuid(), mbMessage.getGroupId() },
+			mbMessage);
 
 		mbMessage.resetOriginalValues();
 	}
@@ -18204,7 +19851,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	protected void cacheUniqueFindersCache(MBMessage mbMessage) {
 		if (mbMessage.isNew()) {
 			Object[] args = new Object[] {
-					mbMessage.getUuid(), Long.valueOf(mbMessage.getGroupId())
+					mbMessage.getUuid(), mbMessage.getGroupId()
 				};
 
 			FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
@@ -18218,8 +19865,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						mbMessage.getUuid(),
-						Long.valueOf(mbMessage.getGroupId())
+						mbMessage.getUuid(), mbMessage.getGroupId()
 					};
 
 				FinderCacheUtil.putResult(FINDER_PATH_COUNT_BY_UUID_G, args,
@@ -18233,9 +19879,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	protected void clearUniqueFindersCache(MBMessage mbMessage) {
 		MBMessageModelImpl mbMessageModelImpl = (MBMessageModelImpl)mbMessage;
 
-		Object[] args = new Object[] {
-				mbMessage.getUuid(), Long.valueOf(mbMessage.getGroupId())
-			};
+		Object[] args = new Object[] { mbMessage.getUuid(), mbMessage.getGroupId() };
 
 		FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
 		FinderCacheUtil.removeResult(FINDER_PATH_FETCH_BY_UUID_G, args);
@@ -18244,7 +19888,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				FINDER_PATH_FETCH_BY_UUID_G.getColumnBitmask()) != 0) {
 			args = new Object[] {
 					mbMessageModelImpl.getOriginalUuid(),
-					Long.valueOf(mbMessageModelImpl.getOriginalGroupId())
+					mbMessageModelImpl.getOriginalGroupId()
 				};
 
 			FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_G, args);
@@ -18281,7 +19925,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 */
 	public MBMessage remove(long messageId)
 		throws NoSuchMessageException, SystemException {
-		return remove(Long.valueOf(messageId));
+		return remove((Serializable)messageId);
 	}
 
 	/**
@@ -18448,7 +20092,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_UUID_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
 						mbMessageModelImpl.getOriginalUuid(),
-						Long.valueOf(mbMessageModelImpl.getOriginalCompanyId())
+						mbMessageModelImpl.getOriginalCompanyId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
@@ -18457,7 +20101,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				args = new Object[] {
 						mbMessageModelImpl.getUuid(),
-						Long.valueOf(mbMessageModelImpl.getCompanyId())
+						mbMessageModelImpl.getCompanyId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_UUID_C, args);
@@ -18468,16 +20112,14 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalGroupId())
+						mbMessageModelImpl.getOriginalGroupId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
 					args);
 
-				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getGroupId())
-					};
+				args = new Object[] { mbMessageModelImpl.getGroupId() };
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_GROUPID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_GROUPID,
@@ -18487,7 +20129,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalCompanyId())
+						mbMessageModelImpl.getOriginalCompanyId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
@@ -18495,9 +20137,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_COMPANYID,
 					args);
 
-				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getCompanyId())
-					};
+				args = new Object[] { mbMessageModelImpl.getCompanyId() };
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_COMPANYID,
 					args);
@@ -18508,16 +20148,14 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_THREADID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalThreadId())
+						mbMessageModelImpl.getOriginalThreadId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_THREADID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_THREADID,
 					args);
 
-				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getThreadId())
-					};
+				args = new Object[] { mbMessageModelImpl.getThreadId() };
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_THREADID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_THREADID,
@@ -18527,7 +20165,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_THREADREPLIES.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalThreadId())
+						mbMessageModelImpl.getOriginalThreadId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_THREADREPLIES,
@@ -18535,9 +20173,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_THREADREPLIES,
 					args);
 
-				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getThreadId())
-					};
+				args = new Object[] { mbMessageModelImpl.getThreadId() };
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_THREADREPLIES,
 					args);
@@ -18548,14 +20184,14 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalUserId())
+						mbMessageModelImpl.getOriginalUserId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
 					args);
 
-				args = new Object[] { Long.valueOf(mbMessageModelImpl.getUserId()) };
+				args = new Object[] { mbMessageModelImpl.getUserId() };
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_USERID, args);
 				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_USERID,
@@ -18565,8 +20201,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalUserId())
+						mbMessageModelImpl.getOriginalGroupId(),
+						mbMessageModelImpl.getOriginalUserId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
@@ -18574,8 +20210,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getGroupId()),
-						Long.valueOf(mbMessageModelImpl.getUserId())
+						mbMessageModelImpl.getGroupId(),
+						mbMessageModelImpl.getUserId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U, args);
@@ -18586,8 +20222,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalCategoryId())
+						mbMessageModelImpl.getOriginalGroupId(),
+						mbMessageModelImpl.getOriginalCategoryId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C, args);
@@ -18595,8 +20231,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getGroupId()),
-						Long.valueOf(mbMessageModelImpl.getCategoryId())
+						mbMessageModelImpl.getGroupId(),
+						mbMessageModelImpl.getCategoryId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C, args);
@@ -18607,8 +20243,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalGroupId()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalGroupId(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_S, args);
@@ -18616,8 +20252,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getGroupId()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getGroupId(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_S, args);
@@ -18628,8 +20264,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalCompanyId()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalCompanyId(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_S, args);
@@ -18637,8 +20273,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getCompanyId()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getCompanyId(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_S, args);
@@ -18649,8 +20285,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalUserId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalClassNameId())
+						mbMessageModelImpl.getOriginalUserId(),
+						mbMessageModelImpl.getOriginalClassNameId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C, args);
@@ -18658,8 +20294,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getUserId()),
-						Long.valueOf(mbMessageModelImpl.getClassNameId())
+						mbMessageModelImpl.getUserId(),
+						mbMessageModelImpl.getClassNameId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C, args);
@@ -18670,8 +20306,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalClassNameId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalClassPK())
+						mbMessageModelImpl.getOriginalClassNameId(),
+						mbMessageModelImpl.getOriginalClassPK()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
@@ -18679,8 +20315,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getClassNameId()),
-						Long.valueOf(mbMessageModelImpl.getClassPK())
+						mbMessageModelImpl.getClassNameId(),
+						mbMessageModelImpl.getClassPK()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C, args);
@@ -18691,8 +20327,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_T_P.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalThreadId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalParentMessageId())
+						mbMessageModelImpl.getOriginalThreadId(),
+						mbMessageModelImpl.getOriginalParentMessageId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_T_P, args);
@@ -18700,8 +20336,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getThreadId()),
-						Long.valueOf(mbMessageModelImpl.getParentMessageId())
+						mbMessageModelImpl.getThreadId(),
+						mbMessageModelImpl.getParentMessageId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_T_P, args);
@@ -18712,8 +20348,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_T_A.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalThreadId()),
-						Boolean.valueOf(mbMessageModelImpl.getOriginalAnswer())
+						mbMessageModelImpl.getOriginalThreadId(),
+						mbMessageModelImpl.getOriginalAnswer()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_T_A, args);
@@ -18721,8 +20357,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getThreadId()),
-						Boolean.valueOf(mbMessageModelImpl.getAnswer())
+						mbMessageModelImpl.getThreadId(),
+						mbMessageModelImpl.getAnswer()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_T_A, args);
@@ -18733,8 +20369,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_T_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalThreadId()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalThreadId(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_T_S, args);
@@ -18742,8 +20378,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getThreadId()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getThreadId(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_T_S, args);
@@ -18754,8 +20390,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_TR_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalThreadId()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalThreadId(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_TR_S, args);
@@ -18763,8 +20399,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getThreadId()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getThreadId(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_TR_S, args);
@@ -18775,9 +20411,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalUserId()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalGroupId(),
+						mbMessageModelImpl.getOriginalUserId(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U_S, args);
@@ -18785,9 +20421,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getGroupId()),
-						Long.valueOf(mbMessageModelImpl.getUserId()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getGroupId(),
+						mbMessageModelImpl.getUserId(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U_S, args);
@@ -18798,9 +20434,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_C_T.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalCategoryId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalThreadId())
+						mbMessageModelImpl.getOriginalGroupId(),
+						mbMessageModelImpl.getOriginalCategoryId(),
+						mbMessageModelImpl.getOriginalThreadId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_T, args);
@@ -18808,9 +20444,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getGroupId()),
-						Long.valueOf(mbMessageModelImpl.getCategoryId()),
-						Long.valueOf(mbMessageModelImpl.getThreadId())
+						mbMessageModelImpl.getGroupId(),
+						mbMessageModelImpl.getCategoryId(),
+						mbMessageModelImpl.getThreadId()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_T, args);
@@ -18821,9 +20457,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_C_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalCategoryId()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalGroupId(),
+						mbMessageModelImpl.getOriginalCategoryId(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_S, args);
@@ -18831,9 +20467,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getGroupId()),
-						Long.valueOf(mbMessageModelImpl.getCategoryId()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getGroupId(),
+						mbMessageModelImpl.getCategoryId(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_S, args);
@@ -18844,9 +20480,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_C_C.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalUserId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalClassNameId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalClassPK())
+						mbMessageModelImpl.getOriginalUserId(),
+						mbMessageModelImpl.getOriginalClassNameId(),
+						mbMessageModelImpl.getOriginalClassPK()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C_C, args);
@@ -18854,9 +20490,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getUserId()),
-						Long.valueOf(mbMessageModelImpl.getClassNameId()),
-						Long.valueOf(mbMessageModelImpl.getClassPK())
+						mbMessageModelImpl.getUserId(),
+						mbMessageModelImpl.getClassNameId(),
+						mbMessageModelImpl.getClassPK()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C_C, args);
@@ -18867,9 +20503,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_C_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalUserId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalClassNameId()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalUserId(),
+						mbMessageModelImpl.getOriginalClassNameId(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C_S, args);
@@ -18877,9 +20513,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getUserId()),
-						Long.valueOf(mbMessageModelImpl.getClassNameId()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getUserId(),
+						mbMessageModelImpl.getClassNameId(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C_S, args);
@@ -18890,9 +20526,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_C_C_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalClassNameId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalClassPK()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalClassNameId(),
+						mbMessageModelImpl.getOriginalClassPK(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_S, args);
@@ -18900,9 +20536,9 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getClassNameId()),
-						Long.valueOf(mbMessageModelImpl.getClassPK()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getClassNameId(),
+						mbMessageModelImpl.getClassPK(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_C_C_S, args);
@@ -18911,12 +20547,37 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			}
 
 			if ((mbMessageModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_C_S.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						mbMessageModelImpl.getOriginalGroupId(),
+						mbMessageModelImpl.getOriginalUserId(),
+						mbMessageModelImpl.getOriginalCategoryId(),
+						mbMessageModelImpl.getOriginalStatus()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U_C_S, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_C_S,
+					args);
+
+				args = new Object[] {
+						mbMessageModelImpl.getGroupId(),
+						mbMessageModelImpl.getUserId(),
+						mbMessageModelImpl.getCategoryId(),
+						mbMessageModelImpl.getStatus()
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_U_C_S, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_U_C_S,
+					args);
+			}
+
+			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_C_T_A.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalCategoryId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalThreadId()),
-						Boolean.valueOf(mbMessageModelImpl.getOriginalAnswer())
+						mbMessageModelImpl.getOriginalGroupId(),
+						mbMessageModelImpl.getOriginalCategoryId(),
+						mbMessageModelImpl.getOriginalThreadId(),
+						mbMessageModelImpl.getOriginalAnswer()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_T_A, args);
@@ -18924,10 +20585,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getGroupId()),
-						Long.valueOf(mbMessageModelImpl.getCategoryId()),
-						Long.valueOf(mbMessageModelImpl.getThreadId()),
-						Boolean.valueOf(mbMessageModelImpl.getAnswer())
+						mbMessageModelImpl.getGroupId(),
+						mbMessageModelImpl.getCategoryId(),
+						mbMessageModelImpl.getThreadId(),
+						mbMessageModelImpl.getAnswer()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_T_A, args);
@@ -18938,10 +20599,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_G_C_T_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalGroupId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalCategoryId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalThreadId()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalGroupId(),
+						mbMessageModelImpl.getOriginalCategoryId(),
+						mbMessageModelImpl.getOriginalThreadId(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_T_S, args);
@@ -18949,10 +20610,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getGroupId()),
-						Long.valueOf(mbMessageModelImpl.getCategoryId()),
-						Long.valueOf(mbMessageModelImpl.getThreadId()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getGroupId(),
+						mbMessageModelImpl.getCategoryId(),
+						mbMessageModelImpl.getThreadId(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_G_C_T_S, args);
@@ -18963,10 +20624,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 			if ((mbMessageModelImpl.getColumnBitmask() &
 					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_U_C_C_S.getColumnBitmask()) != 0) {
 				Object[] args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getOriginalUserId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalClassNameId()),
-						Long.valueOf(mbMessageModelImpl.getOriginalClassPK()),
-						Integer.valueOf(mbMessageModelImpl.getOriginalStatus())
+						mbMessageModelImpl.getOriginalUserId(),
+						mbMessageModelImpl.getOriginalClassNameId(),
+						mbMessageModelImpl.getOriginalClassPK(),
+						mbMessageModelImpl.getOriginalStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C_C_S, args);
@@ -18974,10 +20635,10 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 					args);
 
 				args = new Object[] {
-						Long.valueOf(mbMessageModelImpl.getUserId()),
-						Long.valueOf(mbMessageModelImpl.getClassNameId()),
-						Long.valueOf(mbMessageModelImpl.getClassPK()),
-						Integer.valueOf(mbMessageModelImpl.getStatus())
+						mbMessageModelImpl.getUserId(),
+						mbMessageModelImpl.getClassNameId(),
+						mbMessageModelImpl.getClassPK(),
+						mbMessageModelImpl.getStatus()
 					};
 
 				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_U_C_C_S, args);
@@ -19022,7 +20683,6 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		mbMessageImpl.setSubject(mbMessage.getSubject());
 		mbMessageImpl.setBody(mbMessage.getBody());
 		mbMessageImpl.setFormat(mbMessage.getFormat());
-		mbMessageImpl.setAttachments(mbMessage.isAttachments());
 		mbMessageImpl.setAnonymous(mbMessage.isAnonymous());
 		mbMessageImpl.setPriority(mbMessage.getPriority());
 		mbMessageImpl.setAllowPingbacks(mbMessage.isAllowPingbacks());
@@ -19040,13 +20700,24 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 *
 	 * @param primaryKey the primary key of the message-boards message
 	 * @return the message-boards message
-	 * @throws com.liferay.portal.NoSuchModelException if a message-boards message with the primary key could not be found
+	 * @throws com.liferay.portlet.messageboards.NoSuchMessageException if a message-boards message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Override
 	public MBMessage findByPrimaryKey(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return findByPrimaryKey(((Long)primaryKey).longValue());
+		throws NoSuchMessageException, SystemException {
+		MBMessage mbMessage = fetchByPrimaryKey(primaryKey);
+
+		if (mbMessage == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
+			}
+
+			throw new NoSuchMessageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
+				primaryKey);
+		}
+
+		return mbMessage;
 	}
 
 	/**
@@ -19059,18 +20730,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	 */
 	public MBMessage findByPrimaryKey(long messageId)
 		throws NoSuchMessageException, SystemException {
-		MBMessage mbMessage = fetchByPrimaryKey(messageId);
-
-		if (mbMessage == null) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + messageId);
-			}
-
-			throw new NoSuchMessageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-				messageId);
-		}
-
-		return mbMessage;
+		return findByPrimaryKey((Serializable)messageId);
 	}
 
 	/**
@@ -19083,20 +20743,8 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	@Override
 	public MBMessage fetchByPrimaryKey(Serializable primaryKey)
 		throws SystemException {
-		return fetchByPrimaryKey(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Returns the message-boards message with the primary key or returns <code>null</code> if it could not be found.
-	 *
-	 * @param messageId the primary key of the message-boards message
-	 * @return the message-boards message, or <code>null</code> if a message-boards message with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public MBMessage fetchByPrimaryKey(long messageId)
-		throws SystemException {
 		MBMessage mbMessage = (MBMessage)EntityCacheUtil.getResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-				MBMessageImpl.class, messageId);
+				MBMessageImpl.class, primaryKey);
 
 		if (mbMessage == _nullMBMessage) {
 			return null;
@@ -19109,19 +20757,19 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 				session = openSession();
 
 				mbMessage = (MBMessage)session.get(MBMessageImpl.class,
-						Long.valueOf(messageId));
+						primaryKey);
 
 				if (mbMessage != null) {
 					cacheResult(mbMessage);
 				}
 				else {
 					EntityCacheUtil.putResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-						MBMessageImpl.class, messageId, _nullMBMessage);
+						MBMessageImpl.class, primaryKey, _nullMBMessage);
 				}
 			}
 			catch (Exception e) {
 				EntityCacheUtil.removeResult(MBMessageModelImpl.ENTITY_CACHE_ENABLED,
-					MBMessageImpl.class, messageId);
+					MBMessageImpl.class, primaryKey);
 
 				throw processException(e);
 			}
@@ -19131,6 +20779,18 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 		}
 
 		return mbMessage;
+	}
+
+	/**
+	 * Returns the message-boards message with the primary key or returns <code>null</code> if it could not be found.
+	 *
+	 * @param messageId the primary key of the message-boards message
+	 * @return the message-boards message, or <code>null</code> if a message-boards message with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public MBMessage fetchByPrimaryKey(long messageId)
+		throws SystemException {
+		return fetchByPrimaryKey((Serializable)messageId);
 	}
 
 	/**
@@ -19315,7 +20975,7 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 
 				for (String listenerClassName : listenerClassNames) {
 					listenersList.add((ModelListener<MBMessage>)InstanceFactory.newInstance(
-							listenerClassName));
+							getClassLoader(), listenerClassName));
 				}
 
 				listeners = listenersList.toArray(new ModelListener[listenersList.size()]);
@@ -19337,17 +20997,6 @@ public class MBMessagePersistenceImpl extends BasePersistenceImpl<MBMessage>
 	private static final String _SQL_SELECT_MBMESSAGE_WHERE = "SELECT mbMessage FROM MBMessage mbMessage WHERE ";
 	private static final String _SQL_COUNT_MBMESSAGE = "SELECT COUNT(mbMessage) FROM MBMessage mbMessage";
 	private static final String _SQL_COUNT_MBMESSAGE_WHERE = "SELECT COUNT(mbMessage) FROM MBMessage mbMessage WHERE ";
-
-	private static String _removeConjunction(String sql) {
-		int pos = sql.indexOf(" AND ");
-
-		if (pos != -1) {
-			sql = sql.substring(0, pos);
-		}
-
-		return sql;
-	}
-
 	private static final String _FILTER_ENTITY_TABLE_FILTER_PK_COLUMN = "mbMessage.rootMessageId";
 	private static final String _FILTER_SQL_SELECT_MBMESSAGE_WHERE = "SELECT DISTINCT {mbMessage.*} FROM MBMessage mbMessage WHERE ";
 	private static final String _FILTER_SQL_SELECT_MBMESSAGE_NO_INLINE_DISTINCT_WHERE_1 =

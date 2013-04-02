@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -38,6 +38,9 @@ public interface JournalArticle extends JournalArticleModel, PersistedModel {
 			}
 		};
 
+	public java.lang.String getArticleImageURL(
+		com.liferay.portal.theme.ThemeDisplay themeDisplay);
+
 	public com.liferay.portlet.journal.model.JournalArticleResource getArticleResource()
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -60,8 +63,13 @@ public interface JournalArticle extends JournalArticleModel, PersistedModel {
 
 	public java.util.Map<java.util.Locale, java.lang.String> getTitleMap();
 
+	public com.liferay.portlet.journal.model.JournalFolder getTrashContainer();
+
+	public boolean isInTrashContainer();
+
 	public boolean isTemplateDriven();
 
+	@java.lang.SuppressWarnings(value = "unused")
 	public void prepareLocalizedFieldsForImport(
 		java.util.Locale defaultImportLocale)
 		throws com.liferay.portal.LocaleException;

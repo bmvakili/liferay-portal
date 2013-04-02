@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,6 +16,7 @@ package com.liferay.portal.service.persistence;
 
 import com.liferay.portal.NoSuchPasswordPolicyException;
 import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
+import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
+import com.liferay.portal.kernel.util.IntegerWrapper;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.PasswordPolicy;
@@ -147,6 +149,8 @@ public class PasswordPolicyPersistenceTest {
 
 		newPasswordPolicy.setMinUpperCase(ServiceTestUtil.nextInt());
 
+		newPasswordPolicy.setRegex(ServiceTestUtil.randomString());
+
 		newPasswordPolicy.setHistory(ServiceTestUtil.randomBoolean());
 
 		newPasswordPolicy.setHistoryCount(ServiceTestUtil.nextInt());
@@ -217,6 +221,8 @@ public class PasswordPolicyPersistenceTest {
 			newPasswordPolicy.getMinSymbols());
 		Assert.assertEquals(existingPasswordPolicy.getMinUpperCase(),
 			newPasswordPolicy.getMinUpperCase());
+		Assert.assertEquals(existingPasswordPolicy.getRegex(),
+			newPasswordPolicy.getRegex());
 		Assert.assertEquals(existingPasswordPolicy.getHistory(),
 			newPasswordPolicy.getHistory());
 		Assert.assertEquals(existingPasswordPolicy.getHistoryCount(),
@@ -282,6 +288,26 @@ public class PasswordPolicyPersistenceTest {
 		PasswordPolicy missingPasswordPolicy = _persistence.fetchByPrimaryKey(pk);
 
 		Assert.assertNull(missingPasswordPolicy);
+	}
+
+	@Test
+	public void testActionableDynamicQuery() throws Exception {
+		final IntegerWrapper count = new IntegerWrapper();
+
+		ActionableDynamicQuery actionableDynamicQuery = new PasswordPolicyActionableDynamicQuery() {
+				@Override
+				protected void performAction(Object object) {
+					PasswordPolicy passwordPolicy = (PasswordPolicy)object;
+
+					Assert.assertNotNull(passwordPolicy);
+
+					count.increment();
+				}
+			};
+
+		actionableDynamicQuery.performActions();
+
+		Assert.assertEquals(count.getValue(), _persistence.countAll());
 	}
 
 	@Test
@@ -424,6 +450,8 @@ public class PasswordPolicyPersistenceTest {
 		passwordPolicy.setMinSymbols(ServiceTestUtil.nextInt());
 
 		passwordPolicy.setMinUpperCase(ServiceTestUtil.nextInt());
+
+		passwordPolicy.setRegex(ServiceTestUtil.randomString());
 
 		passwordPolicy.setHistory(ServiceTestUtil.randomBoolean());
 

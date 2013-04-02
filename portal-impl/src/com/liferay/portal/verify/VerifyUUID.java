@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -77,6 +77,9 @@ public class VerifyUUID extends VerifyProcess {
 
 	private static final String[][] _MODELS = new String[][] {
 		new String[] {
+			"DLFileRank", "fileRankId"
+		},
+		new String[] {
 			"DLFileVersion", "fileVersionId"
 		},
 		new String[] {
@@ -86,12 +89,6 @@ public class VerifyUUID extends VerifyProcess {
 			"JournalFeed", "id_"
 		},
 		new String[] {
-			"JournalStructure", "id_"
-		},
-		new String[] {
-			"JournalTemplate", "id_"
-		},
-		new String[] {
 			"Layout", "plid"
 		},
 		new String[] {
@@ -99,6 +96,21 @@ public class VerifyUUID extends VerifyProcess {
 		},
 		new String[] {
 			"LayoutSetPrototype", "layoutSetPrototypeId"
+		},
+		new String[] {
+			"MBBan", "banId"
+		},
+		new String[] {
+			"MBDiscussion", "discussionId"
+		},
+		new String[] {
+			"MBThread", "threadId"
+		},
+		new String[] {
+			"MBThreadFlag", "threadFlagId"
+		},
+		new String[] {
+			"PollsVote", "voteId"
 		},
 		new String[] {
 			"WikiPageResource", "resourcePrimKey"

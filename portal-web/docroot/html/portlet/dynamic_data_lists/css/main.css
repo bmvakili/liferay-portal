@@ -12,9 +12,13 @@
 	}
 }
 
-.portlet-dynamic-data-lists, .dynamic_data_list_display {
+.portlet-dynamic-data-lists, .portlet-dynamic-data-list-display {
 	.add-record-button-row {
 		margin: 10px 0;
+	}
+
+	.record-toolbar {
+		margin-bottom: 5px;
 	}
 }
 

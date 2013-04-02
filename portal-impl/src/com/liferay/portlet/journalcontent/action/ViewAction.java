@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -63,13 +63,14 @@ public class ViewAction extends WebContentAction {
 		}
 
 		String articleId = ParamUtil.getString(renderRequest, "articleId");
-		String templateId = ParamUtil.getString(renderRequest, "templateId");
+		String ddmTemplateKey = ParamUtil.getString(
+			renderRequest, "ddmTemplateKey");
 
 		if (Validator.isNull(articleId)) {
 			articleId = GetterUtil.getString(
 				preferences.getValue("articleId", StringPool.BLANK));
-			templateId = GetterUtil.getString(
-				preferences.getValue("templateId", StringPool.BLANK));
+			ddmTemplateKey = GetterUtil.getString(
+				preferences.getValue("ddmTemplateKey", StringPool.BLANK));
 		}
 
 		String viewMode = ParamUtil.getString(renderRequest, "viewMode");
@@ -98,14 +99,14 @@ public class ViewAction extends WebContentAction {
 				double version = article.getVersion();
 
 				articleDisplay = JournalContentUtil.getDisplay(
-					groupId, articleId, version, templateId, viewMode,
+					groupId, articleId, version, ddmTemplateKey, viewMode,
 					languageId, themeDisplay, page, xmlRequest);
 			}
 			catch (Exception e) {
 				renderRequest.removeAttribute(WebKeys.JOURNAL_ARTICLE);
 
 				articleDisplay = JournalContentUtil.getDisplay(
-					groupId, articleId, templateId, viewMode, languageId,
+					groupId, articleId, ddmTemplateKey, viewMode, languageId,
 					themeDisplay, page, xmlRequest);
 			}
 		}

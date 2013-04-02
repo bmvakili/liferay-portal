@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -436,7 +436,7 @@ long orderId = BeanParamUtil.getLong(order, request, "orderId");
 			sb.append(HtmlUtil.escape(orderItem.getName()));
 			sb.append(" (");
 			sb.append(StringUtil.replace(StringUtil.merge(fieldsArray, ", "), "=", ": "));
-			sb.append(")");
+			sb.append(StringPool.CLOSE_PARENTHESIS);
 
 			row.addText(sb.toString(), rowURL);
 		}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -35,6 +35,8 @@ import com.liferay.portal.service.persistence.CompanyUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portal.test.MainServletExecutionTestListener;
 import com.liferay.portal.test.TransactionalCallbackAwareExecutionTestListener;
+import com.liferay.portal.util.GroupTestUtil;
+import com.liferay.portal.util.LayoutTestUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.TestPropsValues;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -56,13 +58,12 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 /**
  * @author Eduardo Garcia
  */
-@PrepareForTest({PortletLocalServiceUtil.class})
-
 @ExecutionTestListeners(
 	listeners = {
 		MainServletExecutionTestListener.class,
 		TransactionalCallbackAwareExecutionTestListener.class
 	})
+@PrepareForTest({PortletLocalServiceUtil.class})
 @RunWith(LiferayIntegrationJUnitTestRunner.class)
 @Transactional
 public class PortletExportImportTest extends BaseExportImportTestCase {
@@ -75,12 +76,12 @@ public class PortletExportImportTest extends BaseExportImportTestCase {
 		FinderCacheUtil.clearCache();
 
 		LayoutSetPrototype layoutSetPrototype =
-			ServiceTestUtil.addLayoutSetPrototype(
+			LayoutTestUtil.addLayoutSetPrototype(
 				ServiceTestUtil.randomString());
 
 		_layoutSetPrototypeGroup = layoutSetPrototype.getGroup();
 
-		_layoutSetPrototypeLayout = ServiceTestUtil.addLayout(
+		_layoutSetPrototypeLayout = LayoutTestUtil.addLayout(
 			_layoutSetPrototypeGroup.getGroupId(),
 			ServiceTestUtil.randomString(), true);
 
@@ -97,7 +98,7 @@ public class PortletExportImportTest extends BaseExportImportTestCase {
 
 		// Create site from site template
 
-		_group = ServiceTestUtil.addGroup();
+		_group = GroupTestUtil.addGroup();
 
 		SitesUtil.updateLayoutSetPrototypesLinks(
 			_group, layoutSetPrototype.getLayoutSetPrototypeId(), 0, true,
@@ -275,7 +276,7 @@ public class PortletExportImportTest extends BaseExportImportTestCase {
 		throws Exception {
 
 		LayoutTypePortlet layoutTypePortlet =
-			(LayoutTypePortlet) layout.getLayoutType();
+			(LayoutTypePortlet)layout.getLayoutType();
 
 		String journalPortletId = layoutTypePortlet.addPortletId(
 			userId, PortletKeys.JOURNAL_CONTENT, columnId, -1);
@@ -321,7 +322,8 @@ public class PortletExportImportTest extends BaseExportImportTestCase {
 	}
 
 	protected JournalArticle updateArticle(
-		JournalArticle journalArticle, String content) throws Exception {
+			JournalArticle journalArticle, String content)
+		throws Exception {
 
 		Locale locale = LocaleUtil.getDefault();
 

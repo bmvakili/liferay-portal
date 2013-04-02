@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -190,7 +190,7 @@ public class CalEventModelImpl extends BaseModelImpl<CalEvent>
 	}
 
 	public Serializable getPrimaryKeyObj() {
-		return new Long(_eventId);
+		return _eventId;
 	}
 
 	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
@@ -778,8 +778,7 @@ public class CalEventModelImpl extends BaseModelImpl<CalEvent>
 			return value;
 		}
 
-		value = getTitle().toLowerCase()
-					.compareTo(calEvent.getTitle().toLowerCase());
+		value = getTitle().compareToIgnoreCase(calEvent.getTitle());
 
 		if (value != 0) {
 			return value;

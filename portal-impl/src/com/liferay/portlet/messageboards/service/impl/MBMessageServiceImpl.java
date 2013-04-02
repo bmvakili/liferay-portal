@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -37,6 +37,7 @@ import com.liferay.portlet.messageboards.NoSuchCategoryException;
 import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBCategoryConstants;
 import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.messageboards.model.MBMessageConstants;
 import com.liferay.portlet.messageboards.model.MBMessageDisplay;
 import com.liferay.portlet.messageboards.model.MBThread;
 import com.liferay.portlet.messageboards.model.MBThreadConstants;
@@ -92,8 +93,8 @@ public class MBMessageServiceImpl extends MBMessageServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated {@link #addMessage(long, String, String, String,
-	 *             java.util.List, boolean, double, boolean,
+	 * @deprecated As of 6.2.0, replaced by {@link #addMessage(long, String,
+	 *             String, String, java.util.List, boolean, double, boolean,
 	 *             com.liferay.portal.service.ServiceContext)}
 	 */
 	public MBMessage addMessage(
@@ -139,6 +140,23 @@ public class MBMessageServiceImpl extends MBMessageServiceBaseImpl {
 			getGuestOrUserId(), null, groupId, categoryId, subject, body,
 			format, inputStreamOVPs, anonymous, priority, allowPingbacks,
 			serviceContext);
+	}
+
+	public MBMessage addMessage(
+			long categoryId, String subject, String body,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		MBCategory category = mbCategoryPersistence.findByPrimaryKey(
+			categoryId);
+
+		List<ObjectValuePair<String, InputStream>> inputStreamOVPs =
+			Collections.emptyList();
+
+		return addMessage(
+			category.getGroupId(), categoryId, subject, body,
+			MBMessageConstants.DEFAULT_FORMAT, inputStreamOVPs, false, 0.0,
+			false, serviceContext);
 	}
 
 	public MBMessage addMessage(
@@ -749,10 +767,13 @@ public class MBMessageServiceImpl extends MBMessageServiceBaseImpl {
 			else if (displayStyle.equals(RSSUtil.DISPLAY_STYLE_TITLE)) {
 				value = StringPool.BLANK;
 			}
-			else {
+			else if (message.isFormatBBCode()) {
 				value = BBCodeTranslatorUtil.getHTML(message.getBody());
 
 				value = MBUtil.replaceMessageBodyPaths(themeDisplay, value);
+			}
+			else {
+				value = message.getBody();
 			}
 
 			syndContent.setValue(value);
@@ -782,9 +803,6 @@ public class MBMessageServiceImpl extends MBMessageServiceBaseImpl {
 		selfSyndLink.setHref(feedURL);
 		selfSyndLink.setRel("self");
 
-		syndFeed.setPublishedDate(new Date());
-		syndFeed.setTitle(name);
-		syndFeed.setUri(feedURL);
 		syndFeed.setPublishedDate(new Date());
 		syndFeed.setTitle(name);
 		syndFeed.setUri(feedURL);

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,12 +18,14 @@
 
 <%@ page import="com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil" %><%@
 page import="com.liferay.portal.kernel.repository.model.FileEntry" %><%@
-page import="com.liferay.portal.kernel.search.Document" %><%@
 page import="com.liferay.portal.kernel.search.Hits" %><%@
 page import="com.liferay.portal.kernel.search.Indexer" %><%@
 page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %><%@
+page import="com.liferay.portal.kernel.search.QueryConfig" %><%@
 page import="com.liferay.portal.kernel.search.SearchContext" %><%@
 page import="com.liferay.portal.kernel.search.SearchContextFactory" %><%@
+page import="com.liferay.portal.kernel.search.SearchResultUtil" %><%@
+page import="com.liferay.portal.kernel.search.Summary" %><%@
 page import="com.liferay.portal.kernel.util.MimeTypesUtil" %><%@
 page import="com.liferay.portlet.asset.model.AssetEntry" %><%@
 page import="com.liferay.portlet.asset.model.AssetTag" %><%@
@@ -118,7 +120,7 @@ String recentPostsDateOffset = preferences.getValue("recentPostsDateOffset", "7"
 
 boolean enableRSS = !PortalUtil.isRSSFeedsEnabled() ? false : GetterUtil.getBoolean(preferences.getValue("enableRss", null), true);
 int rssDelta = GetterUtil.getInteger(preferences.getValue("rssDelta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
-String rssDisplayStyle = preferences.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_FULL_CONTENT);
+String rssDisplayStyle = preferences.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_DEFAULT);
 String rssFeedType = preferences.getValue("rssFeedType", RSSUtil.FEED_TYPE_DEFAULT);
 
 ResourceURL rssURL = liferayPortletResponse.createResourceURL();

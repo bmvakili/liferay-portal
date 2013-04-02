@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,6 +17,7 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.LayoutSetBranchNameException;
 import com.liferay.portal.NoSuchLayoutSetBranchException;
 import com.liferay.portal.RequiredLayoutSetBranchException;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -40,6 +41,7 @@ import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.LayoutSetBranchLocalServiceBaseImpl;
+import com.liferay.portal.util.comparator.LayoutSetBranchCreateDateComparator;
 
 import java.text.Format;
 
@@ -328,7 +330,9 @@ public class LayoutSetBranchLocalServiceImpl
 			long groupId, boolean privateLayout)
 		throws SystemException {
 
-		return layoutSetBranchPersistence.findByG_P(groupId, privateLayout);
+		return layoutSetBranchPersistence.findByG_P(
+			groupId, privateLayout, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			new LayoutSetBranchCreateDateComparator(true));
 	}
 
 	public LayoutSetBranch getMasterLayoutSetBranch(
@@ -339,8 +343,8 @@ public class LayoutSetBranchLocalServiceImpl
 	}
 
 	/**
-	 * @deprecated {@link #getUserLayoutSetBranch(long, long, boolean, long,
-	 *             long)}
+	 * @deprecated As of 6.2.0, replaced by {@link #getUserLayoutSetBranch(long,
+	 *             long, boolean, long, long)}
 	 */
 	public LayoutSetBranch getUserLayoutSetBranch(
 			long userId, long groupId, boolean privateLayout,

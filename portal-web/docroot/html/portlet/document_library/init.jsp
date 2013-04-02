@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -28,8 +28,12 @@ page import="com.liferay.portal.kernel.search.Document" %><%@
 page import="com.liferay.portal.kernel.search.Hits" %><%@
 page import="com.liferay.portal.kernel.search.Indexer" %><%@
 page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %><%@
+page import="com.liferay.portal.kernel.search.QueryConfig" %><%@
 page import="com.liferay.portal.kernel.search.SearchContext" %><%@
 page import="com.liferay.portal.kernel.search.SearchContextFactory" %><%@
+page import="com.liferay.portal.kernel.search.SearchResult" %><%@
+page import="com.liferay.portal.kernel.search.SearchResultUtil" %><%@
+page import="com.liferay.portal.kernel.search.Summary" %><%@
 page import="com.liferay.portal.kernel.util.MimeTypesUtil" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowDefinition" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowDefinitionManagerUtil" %><%@
@@ -85,6 +89,7 @@ page import="com.liferay.portlet.documentlibrary.util.DLUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DocumentConversionUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.ImageProcessorUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.PDFProcessorUtil" %><%@
+page import="com.liferay.portlet.documentlibrary.util.RawMetadataProcessor" %><%@
 page import="com.liferay.portlet.documentlibrary.util.VideoProcessorUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.NoSuchStructureException" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.RequiredStructureException" %><%@
@@ -147,8 +152,8 @@ boolean showAssetMetadata = ParamUtil.getBoolean(request, "showAssetMetadata");
 boolean showAddFolderButton = false;
 boolean showFolderMenu = PrefsParamUtil.getBoolean(preferences, request, "showFolderMenu");
 boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
+boolean showMinimalActionButtons = ParamUtil.getBoolean(request, "showMinimalActionButtons");
 boolean showTabs = PrefsParamUtil.getBoolean(preferences, request, "showTabs");
-boolean showMinimalActionButtons = false;
 
 if (portletName.equals(PortletKeys.DOCUMENT_LIBRARY)) {
 	showActions = true;
@@ -166,7 +171,7 @@ boolean enableRelatedAssets = GetterUtil.getBoolean(preferences.getValue("enable
 
 String defaultEntryColumns = "name,size";
 
-if (PropsValues.DL_FILE_ENTRY_READ_COUNT_ENABLED) {
+if (PropsValues.DL_FILE_ENTRY_BUFFERED_INCREMENT_ENABLED) {
 	defaultEntryColumns += ",downloads";
 }
 

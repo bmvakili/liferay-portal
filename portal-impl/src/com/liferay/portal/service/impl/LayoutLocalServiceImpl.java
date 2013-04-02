@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.lar.PortletDataException;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -63,16 +64,18 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.model.impl.LayoutImpl;
 import com.liferay.portal.model.impl.PortletPreferencesImpl;
-import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.LayoutLocalServiceBaseImpl;
+import com.liferay.portal.util.ClassLoaderUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.comparator.LayoutComparator;
 import com.liferay.portal.util.comparator.LayoutPriorityComparator;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portlet.expando.model.ExpandoBridge;
+import com.liferay.portlet.dynamicdatalists.RecordSetDuplicateRecordSetKeyException;
+import com.liferay.portlet.dynamicdatamapping.StructureDuplicateStructureKeyException;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
+import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
 
 import java.io.File;
@@ -102,6 +105,7 @@ import javax.portlet.PortletException;
  * @author Jorge Ferrer
  * @author Bruno Farache
  * @author Vilmos Papp
+ * @author James Lefeu
  */
 public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
@@ -161,12 +165,12 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 *         normalized when accessed see {@link
 	 *         com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
 	 *         String)}.
-	 * @param  serviceContext the service context. Must set the universally
-	 *         unique identifier (UUID) for the layout. Can set the creation
-	 *         date, modification date and the expando bridge attributes for the
-	 *         layout. For layouts that belong to a layout set prototype, an
-	 *         attribute named 'layoutUpdateable' can be set to specify whether
-	 *         site administrators can modify this page within their site. For
+	 * @param  serviceContext the service context to be applied. Must set the
+	 *         UUID for the layout. Can set the creation date, modification date
+	 *         and the expando bridge attributes for the layout. For layouts
+	 *         that belong to a layout set prototype, an attribute named
+	 *         'layoutUpdateable' can be set to specify whether site
+	 *         administrators can modify this page within their site. For
 	 *         layouts that are created from a layout prototype, attributes
 	 *         named 'layoutPrototypeUuid' and 'layoutPrototypeLinkedEnabled'
 	 *         can be specified to provide the unique identifier of the source
@@ -228,14 +232,14 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layout.setPriority(priority);
 
 		boolean layoutUpdateable = ParamUtil.getBoolean(
-			serviceContext, "layoutUpdateable", true);
+			serviceContext, Sites.LAYOUT_UPDATEABLE, true);
 
 		if (!layoutUpdateable) {
 			UnicodeProperties typeSettingsProperties =
 				layout.getTypeSettingsProperties();
 
 			typeSettingsProperties.put(
-				"layoutUpdateable", String.valueOf(layoutUpdateable));
+				Sites.LAYOUT_UPDATEABLE, String.valueOf(layoutUpdateable));
 
 			layout.setTypeSettingsProperties(typeSettingsProperties);
 		}
@@ -258,6 +262,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layoutTypePortlet.setLayoutTemplateId(
 				0, PropsValues.LAYOUT_DEFAULT_TEMPLATE_ID, false);
 		}
+
+		layout.setExpandoBridgeAttributes(serviceContext);
 
 		layoutPersistence.update(layout);
 
@@ -321,12 +327,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		layout.setLayoutSet(layoutSet);
 
-		// Expando
-
-		ExpandoBridge expandoBridge = layout.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
-
 		// Message boards
 
 		if (PropsValues.LAYOUT_COMMENTS_ENABLED) {
@@ -339,7 +339,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Adds a layout.
+	 * Adds a layout with single entry maps for name, title, and description to
+	 * the default locale.
 	 *
 	 * <p>
 	 * This method handles the creation of the layout including its resources,
@@ -382,12 +383,12 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 *         normalized when accessed see {@link
 	 *         com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
 	 *         String)}.
-	 * @param  serviceContext the service context. Must set the universally
-	 *         unique identifier (UUID) for the layout. Can set the creation
-	 *         date and modification date for the layout. For layouts that
-	 *         belong to a layout set prototype, an attribute named
-	 *         'layoutUpdateable' can be set to specify whether site
-	 *         administrators can modify this page within their site.
+	 * @param  serviceContext the service context to be applied. Must set the
+	 *         UUID for the layout. Can set the creation date and modification
+	 *         date for the layout. For layouts that belong to a layout set
+	 *         prototype, an attribute named 'layoutUpdateable' can be set to
+	 *         specify whether site administrators can modify this page within
+	 *         their site.
 	 * @return the layout
 	 * @throws PortalException if a group or user with the primary key could not
 	 *         be found
@@ -400,17 +401,25 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		Map<Locale, String> localeNamesMap = new HashMap<Locale, String>();
+		Locale locale = LocaleUtil.getDefault();
 
-		Locale defaultLocale = LocaleUtil.getDefault();
+		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
 
-		localeNamesMap.put(defaultLocale, name);
+		descriptionMap.put(locale, description);
+
+		Map<Locale, String> nameMap = new HashMap<Locale, String>();
+
+		nameMap.put(locale, name);
+
+		Map<Locale, String> titleMap = new HashMap<Locale, String>();
+
+		titleMap.put(locale, title);
 
 		return addLayout(
-			userId, groupId, privateLayout, parentLayoutId, localeNamesMap,
-			new HashMap<Locale, String>(), new HashMap<Locale, String>(),
-			new HashMap<Locale, String>(), new HashMap<Locale, String>(), type,
-			hidden, friendlyURL, serviceContext);
+			userId, groupId, privateLayout, parentLayoutId, nameMap, titleMap,
+			descriptionMap, new HashMap<Locale, String>(),
+			new HashMap<Locale, String>(), type, hidden, friendlyURL,
+			serviceContext);
 	}
 
 	/**
@@ -419,7 +428,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 * @param  layout the layout
 	 * @param  updateLayoutSet whether the layout set's page counter needs to be
 	 *         updated
-	 * @param  serviceContext the service context
+	 * @param  serviceContext the service context to be applied
 	 * @throws PortalException if a portal exception occurred
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -529,7 +538,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layout.getPlid() + PortletConstants.LAYOUT_SEPARATOR + "%";
 
 		List<ResourcePermission> resourcePermissions =
-			resourcePermissionPersistence.findByC_P(
+			resourcePermissionPersistence.findByC_LikeP(
 				layout.getCompanyId(), primKey);
 
 		for (ResourcePermission resourcePermission : resourcePermissions) {
@@ -560,7 +569,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 * @param  groupId the primary key of the group
 	 * @param  privateLayout whether the layout is private to the group
 	 * @param  layoutId the primary key of the layout
-	 * @param  serviceContext the service context
+	 * @param  serviceContext the service context to be applied
 	 * @throws PortalException if a matching layout could not be found , or if
 	 *         some other portal exception occurred
 	 * @throws SystemException if a system exception occurred
@@ -581,7 +590,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 * layouts, and associated resources.
 	 *
 	 * @param  plid the primary key of the layout
-	 * @param  serviceContext the service context
+	 * @param  serviceContext the service context to be applied
 	 * @throws PortalException if a layout with the primary key could not be
 	 *         found , or if some other portal exception occurred
 	 * @throws SystemException if a system exception occurred
@@ -600,7 +609,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 *
 	 * @param  groupId the primary key of the group
 	 * @param  privateLayout whether the layout is private to the group
-	 * @param  serviceContext the service context
+	 * @param  serviceContext the service context to be applied
 	 * @throws PortalException if a group with the primary key could not be
 	 *         found or if a layout set for the group and privacy could not be
 	 *         found
@@ -829,19 +838,20 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns the layout matching the universally unique identifier and group
-	 * ID
+	 * Returns the layout matching the UUID, group, and privacy.
 	 *
-	 * @param  uuid the universally unique identifier of the scope layout
+	 * @param  uuid the layout's UUID
 	 * @param  groupId the primary key of the group
+	 * @param  privateLayout whether the layout is private to the group
 	 * @return the layout, or <code>null</code> if a matching layout could not
 	 *         be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public Layout fetchLayoutByUuidAndGroupId(String uuid, long groupId)
+	public Layout fetchLayoutByUuidAndGroupId(
+			String uuid, long groupId, boolean privateLayout)
 		throws SystemException {
 
-		return layoutPersistence.fetchByUUID_G(uuid, groupId);
+		return layoutPersistence.fetchByUUID_G_P(uuid, groupId, privateLayout);
 	}
 
 	/**
@@ -1077,8 +1087,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 * @param  groupId the primary key of the group
 	 * @param  privateLayout whether the layout is private to the group
 	 * @param  layoutIds the primary keys of the layouts
-	 * @return the matching layouts, or <code>null</code> if no matches were
-	 *         found
+	 * @return the matching layouts, or an empty list if no matches were found
 	 * @throws PortalException if a group or layout with the primary key could
 	 *         not be found
 	 * @throws SystemException if a system exception occurred
@@ -1237,6 +1246,19 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Returns all the layouts without resource permissions
+	 *
+	 * @param  roleId the primary key of the role
+	 * @return all the layouts without resource permissions
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<Layout> getNoPermissionLayouts(long roleId)
+		throws SystemException {
+
+		return layoutFinder.findByNoPermissions(roleId);
+	}
+
+	/**
 	 * Returns all the layouts whose friendly URLs are <code>null</code>
 	 *
 	 * @return all the layouts whose friendly URLs are <code>null</code>
@@ -1344,7 +1366,19 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	public boolean hasLayoutSetPrototypeLayout(
-			String layoutSetPrototypeUuid, String layoutUuid, long companyId)
+			long layoutSetPrototypeId, String layoutUuid)
+		throws PortalException, SystemException {
+
+		LayoutSetPrototype layoutSetPrototype =
+			layoutSetPrototypeLocalService.getLayoutSetPrototype(
+				layoutSetPrototypeId);
+
+		return layoutLocalServiceHelper.hasLayoutSetPrototypeLayout(
+			layoutSetPrototype, layoutUuid);
+	}
+
+	public boolean hasLayoutSetPrototypeLayout(
+			String layoutSetPrototypeUuid, long companyId, String layoutUuid)
 		throws PortalException, SystemException {
 
 		LayoutSetPrototype layoutSetPrototype =
@@ -1495,8 +1529,26 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		catch (PortalException pe) {
 			Throwable cause = pe.getCause();
 
-			if (cause instanceof LocaleException) {
-				throw (PortalException)cause;
+			while (true) {
+				if (cause == null) {
+					break;
+				}
+
+				if ((cause instanceof LocaleException) ||
+					(cause instanceof
+						RecordSetDuplicateRecordSetKeyException) ||
+					(cause instanceof
+						StructureDuplicateStructureKeyException)) {
+
+					throw (PortalException)cause;
+				}
+
+				if (cause instanceof PortletDataException) {
+					cause = cause.getCause();
+				}
+				else {
+					break;
+				}
 			}
 
 			throw pe;
@@ -1557,7 +1609,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 * @param  privateLayout whether the layout is private to the group
 	 * @param  parentLayoutId the primary key of the parent layout
 	 * @param  layoutIds the primary keys of the layouts
-	 * @param  serviceContext the service context
+	 * @param  serviceContext the service context to be applied
 	 * @throws PortalException if a group or layout with the primary key could
 	 *         not be found, if no layouts were specified, if the first layout
 	 *         was not page-able, if the first layout was hidden, or if some
@@ -1585,11 +1637,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			if (!PortalUtil.isLayoutFirstPageable(layout.getType())) {
 				throw new RequiredLayoutException(
 					RequiredLayoutException.FIRST_LAYOUT_TYPE);
-			}
-
-			if (layout.isHidden()) {
-				throw new RequiredLayoutException(
-					RequiredLayoutException.FIRST_LAYOUT_HIDDEN);
 			}
 		}
 
@@ -1693,11 +1740,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 *         String)}.
 	 * @param  iconImage whether the icon image will be updated
 	 * @param  iconBytes the byte array of the layout's new icon image
-	 * @param  serviceContext the service context. Can set the modification date
-	 *         and expando bridge attributes for the layout. For layouts that
-	 *         are linked to a layout prototype, attributes named
-	 *         'layoutPrototypeUuid' and 'layoutPrototypeLinkedEnabled' can be
-	 *         specified to provide the unique identifier of the source
+	 * @param  serviceContext the service context to be applied. Can set the
+	 *         modification date and expando bridge attributes for the layout.
+	 *         For layouts that are linked to a layout prototype, attributes
+	 *         named 'layoutPrototypeUuid' and 'layoutPrototypeLinkedEnabled'
+	 *         can be specified to provide the unique identifier of the source
 	 *         prototype and a boolean to determined whether a link to it should
 	 *         be enabled to activate propagation of changes made to the linked
 	 *         page in the prototype.
@@ -1774,13 +1821,13 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 
 		boolean layoutUpdateable = ParamUtil.getBoolean(
-			serviceContext, "layoutUpdateable", true);
+			serviceContext, Sites.LAYOUT_UPDATEABLE, true);
 
 		UnicodeProperties typeSettingsProperties =
 			layout.getTypeSettingsProperties();
 
 		typeSettingsProperties.put(
-			"layoutUpdateable", String.valueOf(layoutUpdateable));
+			Sites.LAYOUT_UPDATEABLE, String.valueOf(layoutUpdateable));
 
 		layout.setTypeSettingsProperties(typeSettingsProperties);
 
@@ -1793,6 +1840,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layout.setLayoutPrototypeUuid(layoutPrototypeUuid);
 			layout.setLayoutPrototypeLinkEnabled(layoutPrototypeLinkEnabled);
 		}
+
+		layout.setExpandoBridgeAttributes(serviceContext);
 
 		layoutPersistence.update(layout);
 
@@ -1814,12 +1863,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			updateScopedPortletNames(
 				groupId, privateLayout, layoutId, nameMap, modifiedLocales);
 		}
-
-		// Expando
-
-		ExpandoBridge expandoBridge = layout.getExpandoBridge();
-
-		expandoBridge.setAttributes(serviceContext);
 
 		return layout;
 	}
@@ -2114,10 +2157,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			return layout;
 		}
 
-		Date now = new Date();
-
-		layout.setModifiedDate(now);
-
 		int oldPriority = layout.getPriority();
 
 		int nextPriority = layoutLocalServiceHelper.getNextPriority(
@@ -2125,6 +2164,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layout.getParentLayoutId(), layout.getSourcePrototypeLayoutUuid(),
 			priority);
 
+		if (oldPriority == nextPriority) {
+			return layout;
+		}
+
+		layout.setModifiedDate(new Date());
 		layout.setPriority(nextPriority);
 
 		layoutPersistence.update(layout);
@@ -2145,13 +2189,16 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		priority = 0;
 
 		for (Layout curLayout : layouts) {
-			curLayout.setModifiedDate(now);
-
 			int curNextPriority = layoutLocalServiceHelper.getNextPriority(
 				layout.getGroupId(), layout.isPrivateLayout(),
 				layout.getParentLayoutId(),
 				curLayout.getSourcePrototypeLayoutUuid(), priority++);
 
+			if (curLayout.getPriority() == curNextPriority) {
+				continue;
+			}
+
+			curLayout.setModifiedDate(layout.getModifiedDate());
 			curLayout.setPriority(curNextPriority);
 
 			layoutPersistence.update(curLayout);
@@ -2215,13 +2262,13 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		DynamicQuery portletPreferencesDynamicQuery =
 			DynamicQueryFactoryUtil.forClass(
 				PortletPreferences.class, PortletPreferencesImpl.TABLE_NAME,
-				PACLClassLoaderUtil.getPortalClassLoader());
+				ClassLoaderUtil.getPortalClassLoader());
 
 		Property plidProperty = PropertyFactoryUtil.forName("plid");
 
 		DynamicQuery layoutDynamicQuery = DynamicQueryFactoryUtil.forClass(
 			Layout.class, LayoutImpl.TABLE_NAME,
-			PACLClassLoaderUtil.getPortalClassLoader());
+			ClassLoaderUtil.getPortalClassLoader());
 
 		Projection plidProjection = ProjectionFactoryUtil.property("plid");
 
@@ -2321,12 +2368,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 	/**
 	 * Updates the names of the portlets within scope of the group, the scope of
-	 * the layout's universally unique identifier, and the privacy.
+	 * the layout's UUID, and the privacy.
 	 *
 	 * @param  groupId the primary key of the group
 	 * @param  privateLayout whether the layout is private to the group
-	 * @param  layoutId the primary key of the layout whose universally unique
-	 *         identifier to match
+	 * @param  layoutId the primary key of the layout whose UUID to match
 	 * @param  name the new name for the portlets
 	 * @param  languageId the primary key of the language
 	 * @throws PortalException if a matching layout could not be found

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -16,14 +16,16 @@
 
 <%@ include file="/html/portlet/init.jsp" %>
 
-<%@ page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandler" %><%@
-page import="com.liferay.portal.kernel.portletdisplaytemplate.PortletDisplayTemplateHandlerRegistryUtil" %><%@
-page import="com.liferay.portal.kernel.search.Document" %><%@
-page import="com.liferay.portal.kernel.search.Hits" %><%@
+<%@ page import="com.liferay.portal.kernel.search.Hits" %><%@
 page import="com.liferay.portal.kernel.search.Indexer" %><%@
 page import="com.liferay.portal.kernel.search.IndexerRegistryUtil" %><%@
+page import="com.liferay.portal.kernel.search.QueryConfig" %><%@
 page import="com.liferay.portal.kernel.search.SearchContext" %><%@
 page import="com.liferay.portal.kernel.search.SearchContextFactory" %><%@
+page import="com.liferay.portal.kernel.search.SearchResultUtil" %><%@
+page import="com.liferay.portal.kernel.search.Summary" %><%@
+page import="com.liferay.portal.kernel.template.TemplateHandler" %><%@
+page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><%@
 page import="com.liferay.portal.service.SubscriptionLocalServiceUtil" %><%@
 page import="com.liferay.portlet.asset.model.AssetEntry" %><%@
 page import="com.liferay.portlet.asset.model.AssetTag" %><%@
@@ -59,7 +61,7 @@ if (Validator.isNotNull(portletResource)) {
 }
 
 int pageDelta = GetterUtil.getInteger(preferences.getValue("pageDelta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
-String pageDisplayStyle = preferences.getValue("pageDisplayStyle", RSSUtil.DISPLAY_STYLE_FULL_CONTENT);
+String pageDisplayStyle = preferences.getValue("pageDisplayStyle", BlogsUtil.DISPLAY_STYLE_FULL_CONTENT);
 int pageAbstractLength = PropsValues.BLOGS_PAGE_ABSTRACT_LENGTH;
 boolean enableFlags = GetterUtil.getBoolean(preferences.getValue("enableFlags", null), true);
 boolean enableRelatedAssets = GetterUtil.getBoolean(preferences.getValue("enableRelatedAssets", null), true);
@@ -73,7 +75,7 @@ String socialBookmarksTypes = preferences.getValue("socialBookmarksTypes", Props
 
 boolean enableRSS = !PortalUtil.isRSSFeedsEnabled() ? false : GetterUtil.getBoolean(preferences.getValue("enableRss", null), true);
 int rssDelta = GetterUtil.getInteger(preferences.getValue("rssDelta", StringPool.BLANK), SearchContainer.DEFAULT_DELTA);
-String rssDisplayStyle = preferences.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_FULL_CONTENT);
+String rssDisplayStyle = preferences.getValue("rssDisplayStyle", RSSUtil.DISPLAY_STYLE_DEFAULT);
 String rssFeedType = preferences.getValue("rssFeedType", RSSUtil.FEED_TYPE_DEFAULT);
 
 boolean showSearch = true;

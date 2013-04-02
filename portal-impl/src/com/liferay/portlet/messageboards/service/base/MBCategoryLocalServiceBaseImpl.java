@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -42,8 +42,12 @@ import com.liferay.portal.service.persistence.SubscriptionPersistence;
 import com.liferay.portal.service.persistence.UserFinder;
 import com.liferay.portal.service.persistence.UserPersistence;
 
+import com.liferay.portlet.asset.service.AssetEntryLocalService;
+import com.liferay.portlet.asset.service.AssetEntryService;
 import com.liferay.portlet.asset.service.AssetTagLocalService;
 import com.liferay.portlet.asset.service.AssetTagService;
+import com.liferay.portlet.asset.service.persistence.AssetEntryFinder;
+import com.liferay.portlet.asset.service.persistence.AssetEntryPersistence;
 import com.liferay.portlet.asset.service.persistence.AssetTagFinder;
 import com.liferay.portlet.asset.service.persistence.AssetTagPersistence;
 import com.liferay.portlet.expando.service.ExpandoValueLocalService;
@@ -73,6 +77,9 @@ import com.liferay.portlet.messageboards.service.persistence.MBStatsUserPersiste
 import com.liferay.portlet.messageboards.service.persistence.MBThreadFinder;
 import com.liferay.portlet.messageboards.service.persistence.MBThreadFlagPersistence;
 import com.liferay.portlet.messageboards.service.persistence.MBThreadPersistence;
+import com.liferay.portlet.trash.service.TrashEntryLocalService;
+import com.liferay.portlet.trash.service.TrashEntryService;
+import com.liferay.portlet.trash.service.persistence.TrashEntryPersistence;
 
 import java.io.Serializable;
 
@@ -250,12 +257,12 @@ public abstract class MBCategoryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the message boards category with the UUID in the group.
+	 * Returns the message boards category matching the UUID and group.
 	 *
-	 * @param uuid the UUID of message boards category
-	 * @param groupId the group id of the message boards category
-	 * @return the message boards category
-	 * @throws PortalException if a message boards category with the UUID in the group could not be found
+	 * @param uuid the message boards category's UUID
+	 * @param groupId the primary key of the group
+	 * @return the matching message boards category
+	 * @throws PortalException if a matching message boards category could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public MBCategory getMBCategoryByUuidAndGroupId(String uuid, long groupId)
@@ -950,6 +957,80 @@ public abstract class MBCategoryLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the asset entry local service.
+	 *
+	 * @return the asset entry local service
+	 */
+	public AssetEntryLocalService getAssetEntryLocalService() {
+		return assetEntryLocalService;
+	}
+
+	/**
+	 * Sets the asset entry local service.
+	 *
+	 * @param assetEntryLocalService the asset entry local service
+	 */
+	public void setAssetEntryLocalService(
+		AssetEntryLocalService assetEntryLocalService) {
+		this.assetEntryLocalService = assetEntryLocalService;
+	}
+
+	/**
+	 * Returns the asset entry remote service.
+	 *
+	 * @return the asset entry remote service
+	 */
+	public AssetEntryService getAssetEntryService() {
+		return assetEntryService;
+	}
+
+	/**
+	 * Sets the asset entry remote service.
+	 *
+	 * @param assetEntryService the asset entry remote service
+	 */
+	public void setAssetEntryService(AssetEntryService assetEntryService) {
+		this.assetEntryService = assetEntryService;
+	}
+
+	/**
+	 * Returns the asset entry persistence.
+	 *
+	 * @return the asset entry persistence
+	 */
+	public AssetEntryPersistence getAssetEntryPersistence() {
+		return assetEntryPersistence;
+	}
+
+	/**
+	 * Sets the asset entry persistence.
+	 *
+	 * @param assetEntryPersistence the asset entry persistence
+	 */
+	public void setAssetEntryPersistence(
+		AssetEntryPersistence assetEntryPersistence) {
+		this.assetEntryPersistence = assetEntryPersistence;
+	}
+
+	/**
+	 * Returns the asset entry finder.
+	 *
+	 * @return the asset entry finder
+	 */
+	public AssetEntryFinder getAssetEntryFinder() {
+		return assetEntryFinder;
+	}
+
+	/**
+	 * Sets the asset entry finder.
+	 *
+	 * @param assetEntryFinder the asset entry finder
+	 */
+	public void setAssetEntryFinder(AssetEntryFinder assetEntryFinder) {
+		this.assetEntryFinder = assetEntryFinder;
+	}
+
+	/**
 	 * Returns the asset tag local service.
 	 *
 	 * @return the asset tag local service
@@ -1078,6 +1159,62 @@ public abstract class MBCategoryLocalServiceBaseImpl
 		this.expandoValuePersistence = expandoValuePersistence;
 	}
 
+	/**
+	 * Returns the trash entry local service.
+	 *
+	 * @return the trash entry local service
+	 */
+	public TrashEntryLocalService getTrashEntryLocalService() {
+		return trashEntryLocalService;
+	}
+
+	/**
+	 * Sets the trash entry local service.
+	 *
+	 * @param trashEntryLocalService the trash entry local service
+	 */
+	public void setTrashEntryLocalService(
+		TrashEntryLocalService trashEntryLocalService) {
+		this.trashEntryLocalService = trashEntryLocalService;
+	}
+
+	/**
+	 * Returns the trash entry remote service.
+	 *
+	 * @return the trash entry remote service
+	 */
+	public TrashEntryService getTrashEntryService() {
+		return trashEntryService;
+	}
+
+	/**
+	 * Sets the trash entry remote service.
+	 *
+	 * @param trashEntryService the trash entry remote service
+	 */
+	public void setTrashEntryService(TrashEntryService trashEntryService) {
+		this.trashEntryService = trashEntryService;
+	}
+
+	/**
+	 * Returns the trash entry persistence.
+	 *
+	 * @return the trash entry persistence
+	 */
+	public TrashEntryPersistence getTrashEntryPersistence() {
+		return trashEntryPersistence;
+	}
+
+	/**
+	 * Sets the trash entry persistence.
+	 *
+	 * @param trashEntryPersistence the trash entry persistence
+	 */
+	public void setTrashEntryPersistence(
+		TrashEntryPersistence trashEntryPersistence) {
+		this.trashEntryPersistence = trashEntryPersistence;
+	}
+
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register("com.liferay.portlet.messageboards.model.MBCategory",
 			mbCategoryLocalService);
@@ -1203,6 +1340,14 @@ public abstract class MBCategoryLocalServiceBaseImpl
 	protected UserPersistence userPersistence;
 	@BeanReference(type = UserFinder.class)
 	protected UserFinder userFinder;
+	@BeanReference(type = AssetEntryLocalService.class)
+	protected AssetEntryLocalService assetEntryLocalService;
+	@BeanReference(type = AssetEntryService.class)
+	protected AssetEntryService assetEntryService;
+	@BeanReference(type = AssetEntryPersistence.class)
+	protected AssetEntryPersistence assetEntryPersistence;
+	@BeanReference(type = AssetEntryFinder.class)
+	protected AssetEntryFinder assetEntryFinder;
 	@BeanReference(type = AssetTagLocalService.class)
 	protected AssetTagLocalService assetTagLocalService;
 	@BeanReference(type = AssetTagService.class)
@@ -1217,6 +1362,12 @@ public abstract class MBCategoryLocalServiceBaseImpl
 	protected ExpandoValueService expandoValueService;
 	@BeanReference(type = ExpandoValuePersistence.class)
 	protected ExpandoValuePersistence expandoValuePersistence;
+	@BeanReference(type = TrashEntryLocalService.class)
+	protected TrashEntryLocalService trashEntryLocalService;
+	@BeanReference(type = TrashEntryService.class)
+	protected TrashEntryService trashEntryService;
+	@BeanReference(type = TrashEntryPersistence.class)
+	protected TrashEntryPersistence trashEntryPersistence;
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry persistedModelLocalServiceRegistry;
 	private String _beanIdentifier;

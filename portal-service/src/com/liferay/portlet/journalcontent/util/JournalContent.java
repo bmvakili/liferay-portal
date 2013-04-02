@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -40,22 +40,23 @@ public interface JournalContent {
 
 	public void clearCache();
 
-	public void clearCache(long groupId, String articleId, String templateId);
+	public void clearCache(
+		long groupId, String articleId, String ddmTemplateKey);
 
 	public String getContent(
 		long groupId, String articleId, String viewMode, String languageId,
 		String xmlRequest);
 
 	public String getContent(
-		long groupId, String articleId, String templateId, String viewMode,
+		long groupId, String articleId, String ddmTemplateKey, String viewMode,
 		String languageId, String xmlRequest);
 
 	public String getContent(
-		long groupId, String articleId, String templateId, String viewMode,
+		long groupId, String articleId, String ddmTemplateKey, String viewMode,
 		String languageId, ThemeDisplay themeDisplay);
 
 	public String getContent(
-		long groupId, String articleId, String templateId, String viewMode,
+		long groupId, String articleId, String ddmTemplateKey, String viewMode,
 		String languageId, ThemeDisplay themeDisplay, String xmlRequest);
 
 	public String getContent(
@@ -63,7 +64,7 @@ public interface JournalContent {
 		ThemeDisplay themeDisplay);
 
 	public JournalArticleDisplay getDisplay(
-		long groupId, String articleId, double version, String templateId,
+		long groupId, String articleId, double version, String ddmTemplateKey,
 		String viewMode, String languageId, ThemeDisplay themeDisplay, int page,
 		String xmlRequest);
 
@@ -72,15 +73,15 @@ public interface JournalContent {
 		String xmlRequest);
 
 	public JournalArticleDisplay getDisplay(
-		long groupId, String articleId, String templateId, String viewMode,
+		long groupId, String articleId, String ddmTemplateKey, String viewMode,
 		String languageId, String xmlRequest);
 
 	public JournalArticleDisplay getDisplay(
-		long groupId, String articleId, String templateId, String viewMode,
+		long groupId, String articleId, String ddmTemplateKey, String viewMode,
 		String languageId, ThemeDisplay themeDisplay);
 
 	public JournalArticleDisplay getDisplay(
-		long groupId, String articleId, String templateId, String viewMode,
+		long groupId, String articleId, String ddmTemplateKey, String viewMode,
 		String languageId, ThemeDisplay themeDisplay, int page,
 		String xmlRequest);
 

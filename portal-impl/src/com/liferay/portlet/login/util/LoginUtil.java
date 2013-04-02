@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -221,11 +221,10 @@ public class LoginUtil {
 		PortletURL portletURL = PortletURLFactoryUtil.create(
 			request, PortletKeys.LOGIN, plid, PortletRequest.RENDER_PHASE);
 
-		portletURL.setWindowState(WindowState.MAXIMIZED);
-		portletURL.setPortletMode(PortletMode.VIEW);
-
-		portletURL.setParameter("saveLastPath", "0");
+		portletURL.setParameter("saveLastPath", Boolean.FALSE.toString());
 		portletURL.setParameter("struts_action", "/login/login");
+		portletURL.setPortletMode(PortletMode.VIEW);
+		portletURL.setWindowState(WindowState.MAXIMIZED);
 
 		return portletURL;
 	}

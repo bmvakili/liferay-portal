@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -65,7 +65,7 @@ import java.rmi.RemoteException;
  */
 public class DLSyncServiceSoap {
 	public static com.liferay.portlet.documentlibrary.model.DLSyncUpdate getDLSyncUpdate(
-		long companyId, long repositoryId, java.util.Date lastAccessDate)
+		long companyId, long repositoryId, long lastAccessDate)
 		throws RemoteException {
 		try {
 			com.liferay.portlet.documentlibrary.model.DLSyncUpdate returnValue = DLSyncServiceUtil.getDLSyncUpdate(companyId,

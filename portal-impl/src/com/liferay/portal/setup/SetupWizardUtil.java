@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -132,8 +132,9 @@ public class SetupWizardUtil {
 			request, PropsKeys.JDBC_DEFAULT_USERNAME, null);
 		String password = _getParameter(
 			request, PropsKeys.JDBC_DEFAULT_PASSWORD, null);
+		String jndiName = StringPool.BLANK;
 
-		_testConnection(driverClassName, url, userName, password);
+		_testConnection(driverClassName, url, userName, password, jndiName);
 	}
 
 	public static void updateLanguage(
@@ -327,7 +328,7 @@ public class SetupWizardUtil {
 
 	private static void _testConnection(
 			String driverClassName, String url, String userName,
-			String password)
+			String password, String jndiName)
 		throws Exception {
 
 		Class.forName(driverClassName);
@@ -336,7 +337,7 @@ public class SetupWizardUtil {
 
 		try {
 			DataSource dataSource = DataSourceFactoryUtil.initDataSource(
-				driverClassName, url, userName, password);
+				driverClassName, url, userName, password, jndiName);
 
 			connection = dataSource.getConnection();
 		}

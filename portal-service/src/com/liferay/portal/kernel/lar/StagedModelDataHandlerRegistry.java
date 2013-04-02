@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,7 +17,11 @@ package com.liferay.portal.kernel.lar;
 import java.util.List;
 
 /**
+ * The interface for the staged model data handler registry framework.
+ *
  * @author Mate Thurzo
+ * @see    com.liferay.portal.kernel.lar.StagedModelDataHandlerRegistryUtil
+ * @since  6.2
  */
 public interface StagedModelDataHandlerRegistry {
 

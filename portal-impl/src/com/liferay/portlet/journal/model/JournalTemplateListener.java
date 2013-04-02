@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,7 +15,7 @@
 package com.liferay.portlet.journal.model;
 
 import com.liferay.portal.ModelListenerException;
-import com.liferay.portal.kernel.template.TemplateManager;
+import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.model.BaseModelListener;
 import com.liferay.portal.servlet.filters.cache.CacheUtil;
@@ -63,7 +63,7 @@ public class JournalTemplateListener
 				template.getTemplateId();
 
 		TemplateResourceLoaderUtil.clearCache(
-			TemplateManager.FREEMARKER, freeMarkerTemplateId);
+			TemplateConstants.LANG_TYPE_FTL, freeMarkerTemplateId);
 
 		// Journal content
 
@@ -76,7 +76,7 @@ public class JournalTemplateListener
 		// Velocity cache
 
 		TemplateResourceLoaderUtil.clearCache(
-			TemplateManager.VELOCITY, freeMarkerTemplateId);
+			TemplateConstants.LANG_TYPE_VM, freeMarkerTemplateId);
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -52,6 +52,8 @@ public class I18nFilter extends BasePortalFilter {
 	}
 
 	public static void setLanguageIds(Set<String> languageIds) {
+		_languageIds = new HashSet<String>();
+
 		for (String languageId : languageIds) {
 			languageId = languageId.substring(1);
 
@@ -145,9 +147,7 @@ public class I18nFilter extends BasePortalFilter {
 			}
 		}
 
-		Locale i18nPathLocale = LocaleUtil.fromLanguageId(i18nPathLanguageId);
-
-		if (!LanguageUtil.isAvailableLocale(i18nPathLocale)) {
+		if (!LanguageUtil.isAvailableLanguageCode(i18nPathLanguageId)) {
 			return null;
 		}
 
@@ -261,6 +261,6 @@ public class I18nFilter extends BasePortalFilter {
 
 	private static Log _log = LogFactoryUtil.getLog(I18nFilter.class);
 
-	private static Set<String> _languageIds = new HashSet<String>();
+	private static Set<String> _languageIds;
 
 }

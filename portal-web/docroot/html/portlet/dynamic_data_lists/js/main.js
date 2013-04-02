@@ -3,6 +3,8 @@ AUI.add(
 	function(A) {
 		var AArray = A.Array;
 
+		var DateMath = A.DataType.DateMath;
+
 		var Lang = A.Lang;
 
 		var JSON = A.JSON;
@@ -23,7 +25,7 @@ AUI.add(
 					initializer: function() {
 						var instance = this;
 
-						window[Liferay.Util.getPortletNamespace('15') + 'selectDocumentLibrary'] = A.bind(instance._selectFileEntry, instance);
+						window[Liferay.Util.getPortletNamespace('15') + 'selectDocumentLibrary'] = A.bind('_selectFileEntry', instance);
 					},
 
 					getElementsValue: function() {
@@ -39,7 +41,7 @@ AUI.add(
 
 						instance.toolbar.add(
 							{
-								handler: A.bind(instance._handleChooseEvent, instance),
+								handler: A.bind('_handleChooseEvent', instance),
 								label: Liferay.Language.get('choose')
 							},
 							1
@@ -52,9 +54,9 @@ AUI.add(
 						var uri = Liferay.Util.addParams(
 							{
 								groupId: themeDisplay.getScopeGroupId(),
-								p_p_id: '15',
+								p_p_id: '166',
 								p_p_state: 'pop_up',
-								struts_action: '/journal/select_document_library'
+								struts_action: '/dynamic_data_mapping/select_document_library'
 							},
 							themeDisplay.getURLControlPanel()
 						);
@@ -464,9 +466,11 @@ AUI.add(
 									var value = data[name];
 
 									if (value !== STR_EMPTY) {
-										value = parseInt(value, 10);
+										var date = new Date(Lang.toInt(value));
 
-										value = A.DataType.Date.format(new Date(value));
+										date = DateMath.add(value, DateMath.MINUTES, value.getTimezoneOffset());
+
+										value = A.DataType.Date.format(date);
 									}
 
 									return value;

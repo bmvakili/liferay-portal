@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,32 +23,21 @@ import com.liferay.portal.kernel.io.OutputStreamWriter;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedWriter;
 import com.liferay.portal.kernel.io.unsync.UnsyncTeeWriter;
-import com.liferay.portal.kernel.util.DateUtil_IW;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil_IW;
-import com.liferay.portal.model.Company;
-import com.liferay.portal.model.Contact;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.tools.ArgumentsUtil;
 import com.liferay.portal.util.InitUtil;
-import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
-import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.dynamicdatalists.model.DDLRecord;
-import com.liferay.portlet.dynamicdatalists.model.DDLRecordSet;
-import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
-import com.liferay.portlet.messageboards.model.MBCategory;
 import com.liferay.portlet.messageboards.model.MBMessage;
-import com.liferay.portlet.wiki.model.WikiNode;
-import com.liferay.portlet.wiki.model.WikiPage;
-import com.liferay.util.SimpleCounter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,290 +66,205 @@ public class SampleSQLBuilder {
 	public static void main(String[] args) {
 		Map<String, String> arguments = ArgumentsUtil.parseArguments(args);
 
-		InitUtil.initWithSpring();
+		List<String> extraConfigLocations = new ArrayList<String>();
 
-		String baseDir = arguments.get("sample.sql.base.dir");
-		String dbType = arguments.get("sample.sql.db.type");
-		int maxBlogsEntryCommentCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.blogs.entry.comment.count"));
-		int maxBlogsEntryCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.blogs.entry.count"));
-		int maxDDLRecordCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.ddl.record.count"));
-		int maxDDLRecordSetCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.ddl.record.set.count"));
-		int maxDLFileEntryCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.dl.file.entry.count"));
-		int maxDLFileEntrySize = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.dl.file.entry.size"));
-		int maxDLFolderCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.dl.folder.count"));
-		int maxDLFolderDepth = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.dl.folder.depth"));
-		int maxGroupCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.group.count"));
-		int maxJournalArticleCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.journal.article.count"));
-		int maxJournalArticleSize = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.journal.article.size"));
-		int maxMBCategoryCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.mb.category.count"));
-		int maxMBMessageCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.mb.message.count"));
-		int maxMBThreadCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.mb.thread.count"));
-		int maxUserCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.user.count"));
-		int maxUserToGroupCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.user.to.group.count"));
-		int maxWikiNodeCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.wiki.node.count"));
-		int maxWikiPageCommentCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.wiki.page.comment.count"));
-		int maxWikiPageCount = GetterUtil.getInteger(
-			arguments.get("sample.sql.max.wiki.page.count"));
-		int optimizeBufferSize = GetterUtil.getInteger(
-			arguments.get("sample.sql.optimize.buffer.size"));
-		String outputDir = arguments.get("sample.sql.output.dir");
-		boolean outputMerge = GetterUtil.getBoolean(
-			arguments.get("sample.sql.output.merge"));
+		extraConfigLocations.add("META-INF/portlet-container-spring.xml");
 
-		new SampleSQLBuilder(
-			arguments, baseDir, dbType, maxBlogsEntryCommentCount,
-			maxBlogsEntryCount, maxDDLRecordCount, maxDDLRecordSetCount,
-			maxDLFileEntryCount, maxDLFileEntrySize, maxDLFolderCount,
-			maxDLFolderDepth, maxGroupCount, maxJournalArticleCount,
-			maxJournalArticleSize, maxMBCategoryCount, maxMBMessageCount,
-			maxMBThreadCount, maxUserCount, maxUserToGroupCount,
-			maxWikiNodeCount, maxWikiPageCommentCount, maxWikiPageCount,
-			optimizeBufferSize, outputDir, outputMerge);
-	}
-
-	public SampleSQLBuilder(
-		Map<String, String> arguments, String baseDir, String dbType,
-		int maxBlogsEntryCommentCount, int maxBlogsEntryCount,
-		int maxDDLRecordCount, int maxDDLRecordSetCount,
-		int maxDLFileEntryCount, int maxDLFileEntrySize, int maxDLFolderCount,
-		int maxDLFolderDepth, int maxGroupCount, int maxJournalArticleCount,
-		int maxJournalArticleSize, int maxMBCategoryCount,
-		int maxMBMessageCount, int maxMBThreadCount, int maxUserCount,
-		int maxUserToGroupCount, int maxWikiNodeCount,
-		int maxWikiPageCommentCount, int maxWikiPageCount,
-		int optimizeBufferSize, String outputDir, boolean outputMerge) {
+		InitUtil.initWithSpring(false, extraConfigLocations);
 
 		try {
-			_dbType = dbType;
-			_maxBlogsEntryCommentCount = maxBlogsEntryCommentCount;
-			_maxBlogsEntryCount = maxBlogsEntryCount;
-			_maxDDLRecordCount = maxDDLRecordCount;
-			_maxDDLRecordSetCount = maxDDLRecordSetCount;
-			_maxDLFileEntryCount = maxDLFileEntryCount;
-			_maxDLFileEntrySize = maxDLFileEntrySize;
-			_maxDLFolderCount = maxDLFolderCount;
-			_maxDLFolderDepth = maxDLFolderDepth;
-			_maxGroupCount = maxGroupCount;
-			_maxJournalArticleCount = maxJournalArticleCount;
-			_maxMBCategoryCount = maxMBCategoryCount;
-			_maxMBMessageCount = maxMBMessageCount;
-			_maxMBThreadCount = maxMBThreadCount;
-			_maxUserCount = maxUserCount;
-			_maxUserToGroupCount = maxUserToGroupCount;
-			_maxWikiNodeCount = maxWikiNodeCount;
-			_maxWikiPageCommentCount = maxWikiPageCommentCount;
-			_maxWikiPageCount = maxWikiPageCount;
-			_optimizeBufferSize = optimizeBufferSize;
-			_outputDir = outputDir;
-			_outputMerge = outputMerge;
-
-			int totalMThreadCount = maxMBCategoryCount * maxMBThreadCount;
-			int totalMBMessageCount = totalMThreadCount * maxMBMessageCount;
-
-			int counterOffset =
-				_maxGroupCount +
-				(_maxGroupCount *
-					(maxMBCategoryCount + totalMThreadCount +
-						totalMBMessageCount)
-				) + 1;
-
-			_counter = new SimpleCounter(counterOffset);
-			_dlDateCounter = new SimpleCounter();
-			_permissionCounter = new SimpleCounter();
-			_resourceCounter = new SimpleCounter();
-			_resourcePermissionCounter = new SimpleCounter();
-			_socialActivityCounter = new SimpleCounter();
-
-			_userScreenNameIncrementer = new SimpleCounter();
-
-			_dataFactory = new DataFactory(
-				baseDir, _maxGroupCount, maxJournalArticleSize,
-				_maxUserToGroupCount, _counter, _dlDateCounter,
-				_permissionCounter, _resourceCounter,
-				_resourcePermissionCounter, _socialActivityCounter);
-
-			_db = DBFactoryUtil.getDB(_dbType);
-
-			if (_db instanceof MySQLDB) {
-				_db = new SampleMySQLDB();
-			}
-
-			// Clean up previous output
-
-			FileUtil.delete(_outputDir + "/sample-" + _dbType + ".sql");
-			FileUtil.deltree(_outputDir + "/output");
-
-			// Generic
-
-			_tempDir = new File(_outputDir, "temp");
-
-			_tempDir.mkdirs();
-
-			final CharPipe charPipe = new CharPipe(_PIPE_BUFFER_SIZE);
-
-			generateSQL(charPipe);
-
-			try {
-
-				// Specific
-
-				compressSQL(charPipe.getReader());
-
-				// Merge
-
-				mergeSQL();
-			}
-			finally {
-				FileUtil.deltree(_tempDir);
-			}
-
-			StringBundler sb = new StringBundler();
-
-			List<String> keys = ListUtil.fromMapKeys(arguments);
-
-			Collections.sort(keys);
-
-			for (String key : keys) {
-				if (!key.startsWith("sample.sql")) {
-					continue;
-				}
-
-				String value = arguments.get(key);
-
-				sb.append(key);
-				sb.append(StringPool.EQUAL);
-				sb.append(value);
-				sb.append(StringPool.NEW_LINE);
-			}
-
-			FileUtil.write(
-				new File(_outputDir, "benchmarks-actual.properties"),
-				sb.toString());
+			new SampleSQLBuilder(arguments);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void insertBlogsEntry(BlogsEntry blogsEntry) throws Exception {
-		Map<String, Object> context = getContext();
+	public SampleSQLBuilder(Map<String, String> arguments) throws Exception {
+		String baseDir = arguments.get("sample.sql.base.dir");
 
-		put(context, "blogsEntry", blogsEntry);
+		_dbType = arguments.get("sample.sql.db.type");
+		_maxBlogsEntryCommentCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.blogs.entry.comment.count"));
+		_maxBlogsEntryCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.blogs.entry.count"));
+		_maxDDLRecordCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.ddl.record.count"));
+		_maxDDLRecordSetCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.ddl.record.set.count"));
+		_maxDLFileEntryCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.dl.file.entry.count"));
+		_maxDLFileEntrySize = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.dl.file.entry.size"));
+		_maxDLFolderCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.dl.folder.count"));
+		_maxDLFolderDepth = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.dl.folder.depth"));
+		_maxGroupCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.group.count"));
+		_maxJournalArticleCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.journal.article.count"));
+		_maxJournalArticleSize = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.journal.article.size"));
+		_maxJournalArticleVersionCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.journal.article.version.count"));
+		_maxMBCategoryCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.mb.category.count"));
+		_maxMBMessageCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.mb.message.count"));
+		_maxMBThreadCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.mb.thread.count"));
+		_maxUserCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.user.count"));
+		_maxUserToGroupCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.user.to.group.count"));
+		_maxWikiNodeCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.wiki.node.count"));
+		_maxWikiPageCommentCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.wiki.page.comment.count"));
+		_maxWikiPageCount = GetterUtil.getInteger(
+			arguments.get("sample.sql.max.wiki.page.count"));
+		_optimizeBufferSize = GetterUtil.getInteger(
+			arguments.get("sample.sql.optimize.buffer.size"));
+		_outputDir = arguments.get("sample.sql.output.dir");
+		_outputMerge = GetterUtil.getBoolean(
+			arguments.get("sample.sql.output.merge"));
 
-		processTemplate(_tplBlogsEntry, context);
+		_dataFactory = new DataFactory(
+			baseDir, _maxBlogsEntryCount, _maxGroupCount,
+			_maxJournalArticleSize, _maxMBCategoryCount, _maxMBThreadCount,
+			_maxMBMessageCount, _maxUserToGroupCount);
+
+		_db = DBFactoryUtil.getDB(_dbType);
+
+		if (_db instanceof MySQLDB) {
+			_db = new SampleMySQLDB();
+		}
+
+		// Clean up previous output
+
+		FileUtil.delete(_outputDir + "/sample-" + _dbType + ".sql");
+		FileUtil.deltree(_outputDir + "/output");
+
+		// Generic
+
+		_tempDir = new File(_outputDir, "temp");
+
+		_tempDir.mkdirs();
+
+		final CharPipe charPipe = new CharPipe(_PIPE_BUFFER_SIZE);
+
+		generateSQL(charPipe);
+
+		try {
+
+			// Specific
+
+			compressSQL(charPipe.getReader());
+
+			// Merge
+
+			mergeSQL();
+		}
+		finally {
+			FileUtil.deltree(_tempDir);
+		}
+
+		StringBundler sb = new StringBundler();
+
+		List<String> keys = ListUtil.fromMapKeys(arguments);
+
+		Collections.sort(keys);
+
+		for (String key : keys) {
+			if (!key.startsWith("sample.sql")) {
+				continue;
+			}
+
+			String value = arguments.get(key);
+
+			sb.append(key);
+			sb.append(StringPool.EQUAL);
+			sb.append(value);
+			sb.append(StringPool.NEW_LINE);
+		}
+
+		FileUtil.write(
+			new File(_outputDir, "benchmarks-actual.properties"),
+			sb.toString());
 	}
 
-	public void insertDDLRecord(DDLRecord ddlRecord, DDLRecordSet ddlRecordSet)
+	public void insertDDLRecord(
+			DDLRecord ddlRecord, int ddlRecordCount, long ddmStructureId)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
 		put(context, "ddlRecord", ddlRecord);
-		put(context, "ddlRecordSet", ddlRecordSet);
+		put(context, "ddlRecordCount", ddlRecordCount);
+		put(context, "ddmStructureId", ddmStructureId);
 
 		processTemplate(_tplDDLRecord, context);
 	}
 
-	public void insertDDLRecordSet(DDMStructure ddmStructure) throws Exception {
-		Map<String, Object> context = getContext();
-
-		put(context, "ddmStructure", ddmStructure);
-
-		processTemplate(_tplDLFolders, context);
-	}
-
-	public void insertDLFileEntry(
-			DLFileEntry dlFileEntry, DDMStructure ddmStructure)
+	public void insertDLFileEntry(DLFileEntry dlFileEntry, long ddmStructureId)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
-		put(context, "ddmStructure", ddmStructure);
+		put(context, "ddmStructureId", ddmStructureId);
 		put(context, "dlFileEntry", dlFileEntry);
 
 		processTemplate(_tplDLFileEntry, context);
 	}
 
-	public void insertDLFolder(DLFolder dlFolder, DDMStructure ddmStructure)
-		throws Exception {
-
-		Map<String, Object> context = getContext();
-
-		put(context, "ddmStructure", ddmStructure);
-		put(context, "dlFolder", dlFolder);
-
-		processTemplate(_tplDLFolder, context);
-	}
-
 	public void insertDLFolders(
-			long parentDLFolderId, int dlFolderDepth, DDMStructure ddmStructure)
+			long groupId, long parentDLFolderId, int dlFolderDepth,
+			long ddmStructureId)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
-		put(context, "ddmStructure", ddmStructure);
+		put(context, "ddmStructureId", ddmStructureId);
 		put(context, "dlFolderDepth", dlFolderDepth);
+		put(context, "groupId", groupId);
 		put(context, "parentDLFolderId", parentDLFolderId);
 
 		processTemplate(_tplDLFolders, context);
 	}
 
-	public void insertGroup(
-			Group group, List<Layout> privateLayouts,
-			List<Layout> publicLayouts)
-		throws Exception {
-
+	public void insertGroup(Group group, int publicPageCount) throws Exception {
 		Map<String, Object> context = getContext();
 
 		put(context, "group", group);
-		put(context, "privateLayouts", privateLayouts);
-		put(context, "publicLayouts", publicLayouts);
+		put(context, "publicPageCount", publicPageCount);
 
 		processTemplate(_tplGroup, context);
 	}
 
-	public void insertJournalArticle(
-			long groupId, List<Layout> journalArticleLayouts)
+	public void insertLayout(Layout layout) throws Exception {
+		Map<String, Object> context = getContext();
+
+		put(context, "layout", layout);
+
+		processTemplate(_tplLayout, context);
+	}
+
+	public void insertMBDiscussion(
+			long groupId, long classNameId, long classPK, long mbThreadId,
+			long mbRootMessageId, int maxCommentCount)
 		throws Exception {
-
-		if ((journalArticleLayouts == null) ||
-			journalArticleLayouts.isEmpty()) {
-
-			return;
-		}
 
 		Map<String, Object> context = getContext();
 
 		put(context, "groupId", groupId);
-		put(context, "journalArticleLayouts", journalArticleLayouts);
+		put(context, "classNameId", classNameId);
+		put(context, "classPK", classPK);
+		put(context, "mbThreadId", mbThreadId);
+		put(context, "mbRootMessageId", mbRootMessageId);
+		put(context, "maxCommentCount", maxCommentCount);
 
-		processTemplate(_tplJournalArticle, context);
-	}
-
-	public void insertMBCategory(MBCategory mbCategory) throws Exception {
-		Map<String, Object> context = getContext();
-
-		put(context, "mbCategory", mbCategory);
-
-		processTemplate(_tplMBCategory, context);
+		processTemplate(_tplMBDiscussion, context);
 	}
 
 	public void insertMBMessage(MBMessage mbMessage) throws Exception {
@@ -382,35 +286,16 @@ public class SampleSQLBuilder {
 		processTemplate(_tplResourcePermission, context);
 	}
 
-	public void insertUser(
-			Contact contact, Group group, List<Long> groupIds,
-			List<Long> organizationIds, List<Layout> privateLayouts,
-			List<Layout> publicLayouts, List<Role> roleIds, User user)
+	public void insertUser(List<Long> groupIds, List<Role> roleIds, User user)
 		throws Exception {
 
 		Map<String, Object> context = getContext();
 
-		put(context, "contact", contact);
-		put(context, "group", group);
 		put(context, "groupIds", groupIds);
-		put(context, "organizationIds", organizationIds);
-		put(context, "privateLayouts", privateLayouts);
-		put(context, "publicLayouts", publicLayouts);
 		put(context, "roleIds", roleIds);
 		put(context, "user", user);
 
 		processTemplate(_tplUser, context);
-	}
-
-	public void insertWikiPage(WikiNode wikiNode, WikiPage wikiPage)
-		throws Exception {
-
-		Map<String, Object> context = getContext();
-
-		put(context, "wikiNode", wikiNode);
-		put(context, "wikiPage", wikiPage);
-
-		processTemplate(_tplWikiPage, context);
 	}
 
 	protected void compressInsertSQL(String insertSQL) throws IOException {
@@ -528,7 +413,6 @@ public class SampleSQLBuilder {
 				_writerLayoutCSV = getWriter("layout.csv");
 				_writerMessageBoardsCSV = getWriter("message_boards.csv");
 				_writerRepositoryCSV = getWriter("repository.csv");
-				_writerUserCSV = getWriter("user.csv");
 				_writerWikiCSV = getWriter("wiki.csv");
 
 				Map<String, Object> context = getContext();
@@ -542,7 +426,6 @@ public class SampleSQLBuilder {
 				_writerLayoutCSV.close();
 				_writerMessageBoardsCSV.close();
 				_writerRepositoryCSV.close();
-				_writerUserCSV.close();
 				_writerWikiCSV.close();
 			}
 
@@ -558,14 +441,8 @@ public class SampleSQLBuilder {
 	protected Map<String, Object> getContext() {
 		Map<String, Object> context = new HashMap<String, Object>();
 
-		Company company = _dataFactory.getCompany();
-		User defaultUser = _dataFactory.getDefaultUser();
-
-		put(context, "companyId", company.getCompanyId());
-		put(context, "counter", _counter);
+		put(context, "counter", _dataFactory.getCounter());
 		put(context, "dataFactory", _dataFactory);
-		put(context, "dateUtil", DateUtil_IW.getInstance());
-		put(context, "defaultUserId", defaultUser.getCompanyId());
 		put(context, "maxDLFileEntrySize", _maxDLFileEntrySize);
 		put(context, "maxBlogsEntryCommentCount", _maxBlogsEntryCommentCount);
 		put(context, "maxBlogsEntryCount", _maxBlogsEntryCount);
@@ -576,6 +453,9 @@ public class SampleSQLBuilder {
 		put(context, "maxDLFolderDepth", _maxDLFolderDepth);
 		put(context, "maxGroupCount", _maxGroupCount);
 		put(context, "maxJournalArticleCount", _maxJournalArticleCount);
+		put(
+			context, "maxJournalArticleVersionCount",
+			_maxJournalArticleVersionCount);
 		put(context, "maxMBCategoryCount", _maxMBCategoryCount);
 		put(context, "maxMBMessageCount", _maxMBMessageCount);
 		put(context, "maxMBThreadCount", _maxMBThreadCount);
@@ -584,10 +464,8 @@ public class SampleSQLBuilder {
 		put(context, "maxWikiNodeCount", _maxWikiNodeCount);
 		put(context, "maxWikiPageCommentCount", _maxWikiPageCommentCount);
 		put(context, "maxWikiPageCount", _maxWikiPageCount);
-		put(context, "portalUUIDUtil", SequentialUUID.getSequentialUUID());
 		put(context, "sampleSQLBuilder", this);
 		put(context, "stringUtil", StringUtil_IW.getInstance());
-		put(context, "userScreenNameIncrementer", _userScreenNameIncrementer);
 		put(context, "writerBlogsCSV", _writerBlogsCSV);
 		put(context, "writerCompanyCSV", _writerCompanyCSV);
 		put(context, "writerDocumentLibraryCSV", _writerDocumentLibraryCSV);
@@ -595,7 +473,6 @@ public class SampleSQLBuilder {
 		put(context, "writerLayoutCSV", _writerLayoutCSV);
 		put(context, "writerMessageBoardsCSV", _writerMessageBoardsCSV);
 		put(context, "writerRepositoryCSV", _writerRepositoryCSV);
-		put(context, "writerUserCSV", _writerUserCSV);
 		put(context, "writerWikiCSV", _writerWikiCSV);
 
 		return context;
@@ -712,11 +589,9 @@ public class SampleSQLBuilder {
 
 	private static final int _WRITER_BUFFER_SIZE = 16 * 1024;
 
-	private SimpleCounter _counter;
 	private DataFactory _dataFactory;
 	private DB _db;
 	private String _dbType;
-	private SimpleCounter _dlDateCounter;
 	private Map<String, StringBundler> _insertSQLs =
 		new ConcurrentHashMap<String, StringBundler>();
 	private Map<String, Writer> _insertSQLWriters =
@@ -731,6 +606,8 @@ public class SampleSQLBuilder {
 	private int _maxDLFolderDepth;
 	private int _maxGroupCount;
 	private int _maxJournalArticleCount;
+	private int _maxJournalArticleSize;
+	private int _maxJournalArticleVersionCount;
 	private int _maxMBCategoryCount;
 	private int _maxMBMessageCount;
 	private int _maxMBThreadCount;
@@ -743,26 +620,18 @@ public class SampleSQLBuilder {
 	private List<String> _otherSQLs = new ArrayList<String>();
 	private String _outputDir;
 	private boolean _outputMerge;
-	private SimpleCounter _permissionCounter;
-	private SimpleCounter _resourceCounter;
-	private SimpleCounter _resourcePermissionCounter;
-	private SimpleCounter _socialActivityCounter;
 	private File _tempDir;
-	private String _tplBlogsEntry = _TPL_ROOT + "blogs_entry.ftl";
 	private String _tplDDLRecord = _TPL_ROOT + "ddl_record.ftl";
 	private String _tplDLFileEntry = _TPL_ROOT + "dl_file_entry.ftl";
-	private String _tplDLFolder = _TPL_ROOT + "dl_folder.ftl";
 	private String _tplDLFolders = _TPL_ROOT + "dl_folders.ftl";
 	private String _tplGroup = _TPL_ROOT + "group.ftl";
-	private String _tplJournalArticle = _TPL_ROOT + "journal_article.ftl";
-	private String _tplMBCategory = _TPL_ROOT + "mb_category.ftl";
+	private String _tplLayout = _TPL_ROOT + "layout.ftl";
+	private String _tplMBDiscussion = _TPL_ROOT + "mb_discussion.ftl";
 	private String _tplMBMessage = _TPL_ROOT + "mb_message.ftl";;
 	private String _tplResourcePermission =
 		_TPL_ROOT + "resource_permission.ftl";
 	private String _tplSample = _TPL_ROOT + "sample.ftl";
 	private String _tplUser = _TPL_ROOT + "user.ftl";
-	private String _tplWikiPage = _TPL_ROOT + "wiki_page.ftl";
-	private SimpleCounter _userScreenNameIncrementer;
 	private Writer _writerBlogsCSV;
 	private Writer _writerCompanyCSV;
 	private Writer _writerDocumentLibraryCSV;
@@ -771,7 +640,6 @@ public class SampleSQLBuilder {
 	private Writer _writerMessageBoardsCSV;
 	private Writer _writerRepositoryCSV;
 	private Writer _writerSampleSQL;
-	private Writer _writerUserCSV;
 	private Writer _writerWikiCSV;
 
 }

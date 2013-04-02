@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -90,7 +90,14 @@ boolean showAddArticleButton = JournalPermission.contains(permissionChecker, sco
 			if (!displayTerms.getStructureId().equals("0")) {
 				structureId = displayTerms.getStructureId();
 
-				DDMStructure ddmStructure = DDMStructureLocalServiceUtil.getStructure(scopeGroupId, displayTerms.getStructureId());
+				DDMStructure ddmStructure = null;
+
+				try {
+					ddmStructure = DDMStructureLocalServiceUtil.getStructure(scopeGroupId, PortalUtil.getClassNameId(JournalArticle.class), displayTerms.getStructureId());
+				}
+				catch (NoSuchStructureException nsse) {
+					ddmStructure = DDMStructureLocalServiceUtil.getStructure(themeDisplay.getCompanyGroupId(), PortalUtil.getClassNameId(JournalArticle.class), displayTerms.getStructureId());
+				}
 
 				ddmStructureName = ddmStructure.getName(locale);
 			}
@@ -117,7 +124,7 @@ boolean showAddArticleButton = JournalPermission.contains(permissionChecker, sco
 		<div class="portlet-msg-info">
 
 			<%
-			DDMTemplate ddmTemplate = DDMTemplateLocalServiceUtil.getTemplate(scopeGroupId, displayTerms.getTemplateId());
+			DDMTemplate ddmTemplate = DDMTemplateLocalServiceUtil.getTemplate(scopeGroupId, PortalUtil.getClassNameId(DDMStructure.class), displayTerms.getTemplateId());
 
 			DDMStructure ddmStructure = DDMStructureLocalServiceUtil.getStructure(ddmTemplate.getClassPK());
 			%>
@@ -161,7 +168,7 @@ if (Validator.isNotNull(displayTerms.getStructureId())) {
 
 searchTerms.setVersion(-1);
 
-if (displayTerms.getNavigation().equals("recent")) {
+if (displayTerms.isNavigationRecent()) {
 	searchContainer.setOrderByCol("create-date");
 	searchContainer.setOrderByType(orderByType);
 }
@@ -178,28 +185,35 @@ int total = 0;
 %>
 
 <c:choose>
-	<c:when test="<%= (Validator.isNotNull(keywords) || advancedSearch) %>">
-		<c:choose>
-			<c:when test="<%= PropsValues.JOURNAL_ARTICLES_SEARCH_WITH_INDEX %>">
-				<%@ include file="/html/portlet/journal/article_search_results_index.jspf" %>
-			</c:when>
-			<c:otherwise>
-				<%@ include file="/html/portlet/journal/article_search_results_database.jspf" %>
-			</c:otherwise>
-		</c:choose>
-	</c:when>
-	<c:when test='<%= displayTerms.getNavigation().equals("mine") %>'>
+	<c:when test='<%= displayTerms.getNavigation().equals("mine") || displayTerms.isNavigationRecent() %>'>
 
 		<%
-		results = JournalArticleServiceUtil.getArticlesByUserId(scopeGroupId, themeDisplay.getUserId(), JournalArticleConstants.CLASSNAME_ID_DEFAULT, entryStart, entryEnd, searchContainer.getOrderByComparator());
-		total = JournalArticleServiceUtil.getArticlesCountByUserId(scopeGroupId, themeDisplay.getUserId(), JournalArticleConstants.CLASSNAME_ID_DEFAULT);
+		long userId = 0;
+
+		if (displayTerms.getNavigation().equals("mine")) {
+			userId = themeDisplay.getUserId();
+		}
+
+		results = JournalArticleServiceUtil.getGroupArticles(scopeGroupId, userId, folderId, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
+		total = JournalArticleServiceUtil.getGroupArticlesCount(scopeGroupId, userId, folderId);
 
 		searchContainer.setResults(results);
 		searchContainer.setTotal(total);
 		%>
 
 	</c:when>
-	<c:when test='<%= Validator.isNotNull(displayTerms.getStructureId()) || Validator.isNotNull(displayTerms.getTemplateId()) || displayTerms.getNavigation().equals("recent") %>'>
+	<c:when test="<%= Validator.isNotNull(displayTerms.getStructureId()) %>">
+
+		<%
+		results = JournalArticleServiceUtil.getArticlesByStructureId(scopeGroupId, displayTerms.getStructureId(), entryStart, entryEnd, searchContainer.getOrderByComparator());
+		total = JournalArticleServiceUtil.getArticlesCountByStructureId(scopeGroupId, searchTerms.getStructureId());
+
+		searchContainer.setResults(results);
+		searchContainer.setTotal(total);
+		%>
+
+	</c:when>
+	<c:when test="<%= Validator.isNotNull(displayTerms.getTemplateId()) %>">
 
 		<%
 		results = JournalArticleServiceUtil.search(company.getCompanyId(), searchTerms.getGroupId(), searchTerms.getFolderIds(), JournalArticleConstants.CLASSNAME_ID_DEFAULT, searchTerms.getKeywords(), searchTerms.getVersionObj(), null, searchTerms.getStructureId(), searchTerms.getTemplateId(), searchTerms.getDisplayDateGT(), searchTerms.getDisplayDateLT(), searchTerms.getStatusCode(), searchTerms.getReviewDate(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
@@ -353,12 +367,9 @@ for (int i = 0; i < results.size(); i++) {
 		<c:when test="<%= curFolder != null %>">
 
 			<%
-			int foldersCount = JournalFolderServiceUtil.getFoldersCount(scopeGroupId, curFolder.getFolderId());
-			int articlesCount = JournalArticleServiceUtil.getArticlesCount(scopeGroupId, curFolder.getFolderId());
-
 			String folderImage = "folder_empty";
 
-			if ((foldersCount + articlesCount) > 0) {
+			if (JournalFolderServiceUtil.getFoldersAndArticlesCount(scopeGroupId, curFolder.getFolderId()) > 0) {
 				folderImage = "folder_full_document";
 			}
 			%>

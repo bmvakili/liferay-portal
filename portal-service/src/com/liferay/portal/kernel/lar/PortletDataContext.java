@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.lar;
 
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.KeyValuePair;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.model.ClassedModel;
 import com.liferay.portal.model.Lock;
+import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.expando.model.ExpandoColumn;
 import com.liferay.portlet.messageboards.model.MBMessage;
@@ -75,6 +77,9 @@ public interface PortletDataContext extends Serializable {
 	public void addComments(
 		String className, long classPK, List<MBMessage> messages);
 
+	public void addDateRangeCriteria(
+		DynamicQuery dynamicQuery, String modifiedDatePropertyName);
+
 	public void addExpando(
 			Element element, String path, ClassedModel classedModel)
 		throws PortalException, SystemException;
@@ -116,6 +121,9 @@ public interface PortletDataContext extends Serializable {
 		Element element, ClassedModel classedModel, String namespace);
 
 	public ServiceContext createServiceContext(
+		StagedModel stagedModel, String namespace);
+
+	public ServiceContext createServiceContext(
 		String path, ClassedModel classedModel, String namespace);
 
 	public Object fromXML(byte[] bytes);
@@ -150,7 +158,24 @@ public interface PortletDataContext extends Serializable {
 
 	public Map<String, List<ExpandoColumn>> getExpandoColumns();
 
+	public Element getExportDataGroupElement(
+		Class<? extends StagedModel> clazz);
+
+	public Element getExportDataRootElement();
+
+	public Element getExportDataStagedModelElement(StagedModel stagedModel);
+
 	public long getGroupId();
+
+	public Element getImportDataGroupElement(
+		Class<? extends StagedModel> clazz);
+
+	public Element getImportDataRootElement();
+
+	public Element getImportDataStagedModelElement(StagedModel stagedModel);
+
+	public Element getImportDataStagedModelElement(
+		StagedModel stagedModel, String attribute, String value);
 
 	public String getLayoutPath(long layoutId);
 
@@ -251,6 +276,8 @@ public interface PortletDataContext extends Serializable {
 
 	public boolean isPathNotProcessed(String path);
 
+	public boolean isPathProcessed(String path);
+
 	public boolean isPerformDirectBinaryImport();
 
 	public boolean isPrivateLayout();
@@ -261,7 +288,11 @@ public interface PortletDataContext extends Serializable {
 
 	public void setClassLoader(ClassLoader classLoader);
 
+	public void setExportDataRootElement(Element exportDataRootElement);
+
 	public void setGroupId(long groupId);
+
+	public void setImportDataRootElement(Element importDataRootElement);
 
 	public void setOldPlid(long oldPlid);
 

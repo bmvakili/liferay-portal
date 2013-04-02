@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -407,7 +407,8 @@ public class SocialActivityLocalServiceWrapper
 	* @throws SystemException if a system exception occurred
 	*/
 	public void deleteActivities(java.lang.String className, long classPK)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		_socialActivityLocalService.deleteActivities(className, classPK);
 	}
 
@@ -432,7 +433,8 @@ public class SocialActivityLocalServiceWrapper
 	*/
 	public void deleteActivity(
 		com.liferay.portlet.social.model.SocialActivity activity)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		_socialActivityLocalService.deleteActivity(activity);
 	}
 
@@ -453,6 +455,13 @@ public class SocialActivityLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_socialActivityLocalService.deleteUserActivities(userId);
+	}
+
+	public com.liferay.portlet.social.model.SocialActivity fetchFirstActivity(
+		java.lang.String className, long classPK, int type)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _socialActivityLocalService.fetchFirstActivity(className,
+			classPK, type);
 	}
 
 	/**
@@ -642,6 +651,13 @@ public class SocialActivityLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _socialActivityLocalService.getActivity(activityId);
+	}
+
+	public java.util.List<com.liferay.portlet.social.model.SocialActivity> getActivitySetActivities(
+		long activitySetId, int start, int end)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _socialActivityLocalService.getActivitySetActivities(activitySetId,
+			start, end);
 	}
 
 	/**
@@ -1076,14 +1092,14 @@ public class SocialActivityLocalServiceWrapper
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #getWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public SocialActivityLocalService getWrappedSocialActivityLocalService() {
 		return _socialActivityLocalService;
 	}
 
 	/**
-	 * @deprecated Renamed to {@link #setWrappedService}
+	 * @deprecated As of 6.1.0, replaced by {@link #setWrappedService}
 	 */
 	public void setWrappedSocialActivityLocalService(
 		SocialActivityLocalService socialActivityLocalService) {

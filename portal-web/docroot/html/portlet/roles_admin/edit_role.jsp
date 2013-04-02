@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -128,6 +128,15 @@ String subtype = BeanParamUtil.getString(role, request, "subtype");
 				</aui:select>
 			</c:if>
 		</c:if>
+
+		<aui:fieldset>
+			<liferay-ui:custom-attribute-list
+				className="<%= Role.class.getName() %>"
+				classPK="<%= (role != null) ? role.getRoleId() : 0 %>"
+				editable="<%= true %>"
+				label="<%= true %>"
+			/>
+		</aui:fieldset>
 
 		<aui:button-row>
 			<aui:button type="submit" />

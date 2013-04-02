@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -400,17 +400,18 @@ public abstract class LayoutLocalServiceBaseImpl extends BaseLocalServiceImpl
 	}
 
 	/**
-	 * Returns the layout with the UUID in the group.
+	 * Returns the layout matching the UUID, group, and privacy.
 	 *
-	 * @param uuid the UUID of layout
-	 * @param groupId the group id of the layout
-	 * @return the layout
-	 * @throws PortalException if a layout with the UUID in the group could not be found
+	 * @param uuid the layout's UUID
+	 * @param groupId the primary key of the group
+	 * @param privateLayout whether the layout is private to the group
+	 * @return the matching layout
+	 * @throws PortalException if a matching layout could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
-	public Layout getLayoutByUuidAndGroupId(String uuid, long groupId)
-		throws PortalException, SystemException {
-		return layoutPersistence.findByUUID_G(uuid, groupId);
+	public Layout getLayoutByUuidAndGroupId(String uuid, long groupId,
+		boolean privateLayout) throws PortalException, SystemException {
+		return layoutPersistence.findByUUID_G_P(uuid, groupId, privateLayout);
 	}
 
 	/**

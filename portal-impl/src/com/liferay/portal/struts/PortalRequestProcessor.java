@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -648,8 +648,8 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 			if (saveLastPath) {
 
-				// Was a last path set by another servlet that dispatched to
-				// the MainServlet? If so, use that last path instead.
+				// Was a last path set by another servlet that dispatched to the
+				// MainServlet? If so, use that last path instead.
 
 				LastPath lastPath = (LastPath)request.getAttribute(
 					WebKeys.LAST_PATH);
@@ -782,7 +782,7 @@ public class PortalRequestProcessor extends TilesRequestProcessor {
 
 			// Authenticated users should have a reminder query
 
-			if ((user != null) &&
+			if ((user != null) && !user.isDefaultUser() &&
 				(Validator.isNull(user.getReminderQueryQuestion()) ||
 				 Validator.isNull(user.getReminderQueryAnswer()))) {
 

@@ -1,6 +1,6 @@
 <%--
 /**
- * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -39,6 +39,7 @@ java.lang.String fieldsNamespace = GetterUtil.getString((java.lang.String)reques
 java.lang.String mode = GetterUtil.getString((java.lang.String)request.getAttribute("ddm:html:mode"));
 boolean readOnly = GetterUtil.getBoolean(String.valueOf(request.getAttribute("ddm:html:readOnly")));
 boolean repeatable = GetterUtil.getBoolean(String.valueOf(request.getAttribute("ddm:html:repeatable")), true);
+java.util.Locale requestedLocale = (java.util.Locale)request.getAttribute("ddm:html:requestedLocale");
 
 _updateOptions(_options, "classNameId", classNameId);
 _updateOptions(_options, "classPK", classPK);
@@ -47,6 +48,7 @@ _updateOptions(_options, "fieldsNamespace", fieldsNamespace);
 _updateOptions(_options, "mode", mode);
 _updateOptions(_options, "readOnly", readOnly);
 _updateOptions(_options, "repeatable", repeatable);
+_updateOptions(_options, "requestedLocale", requestedLocale);
 %>
 
 <%@ include file="/html/taglib/ddm/html/init-ext.jspf" %>
