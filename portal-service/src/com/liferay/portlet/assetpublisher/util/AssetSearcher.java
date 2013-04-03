@@ -24,8 +24,10 @@ import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.persistence.AssetEntryQuery;
 
@@ -99,7 +101,7 @@ public class AssetSearcher extends BaseIndexer {
 		for (long allCategoryId : allCategoryIds) {
 			List<Long> categoryIds = new ArrayList<Long>();
 
-			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
+			if (GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_CATEGORIES_SEARCH_HIERARCHICAL))) {
 				categoryIds = AssetCategoryLocalServiceUtil.getSubcategoryIds(
 					allCategoryId);
 			}
@@ -157,7 +159,7 @@ public class AssetSearcher extends BaseIndexer {
 		for (long anyCategoryId : anyCategoryIds) {
 			List<Long> categoryIds = new ArrayList<Long>();
 
-			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
+			if (GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_CATEGORIES_SEARCH_HIERARCHICAL))) {
 				categoryIds = AssetCategoryLocalServiceUtil.getSubcategoryIds(
 					anyCategoryId);
 			}
@@ -232,7 +234,7 @@ public class AssetSearcher extends BaseIndexer {
 		for (long notAllCategoryId : notAllCategoryIds) {
 			List<Long> categoryIds = new ArrayList<Long>();
 
-			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
+			if (GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_CATEGORIES_SEARCH_HIERARCHICAL))) {
 				categoryIds = AssetCategoryLocalServiceUtil.getSubcategoryIds(
 					notAllCategoryId);
 			}
@@ -290,7 +292,7 @@ public class AssetSearcher extends BaseIndexer {
 		for (long notAnyCategoryId : notAnyCategoryIds) {
 			List<Long> categoryIds = new ArrayList<Long>();
 
-			if (PropsValues.ASSET_CATEGORIES_SEARCH_HIERARCHICAL) {
+			if (GetterUtil.getBoolean(PropsUtil.get(PropsKeys.ASSET_CATEGORIES_SEARCH_HIERARCHICAL))) {
 				categoryIds = AssetCategoryLocalServiceUtil.getSubcategoryIds(
 					notAnyCategoryId);
 			}
